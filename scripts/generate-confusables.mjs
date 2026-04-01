@@ -7,6 +7,7 @@ import { writeFileSync, readFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { createRequire } from 'module'
+import { buildCharGradeMap } from './grade-chars.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
@@ -125,19 +126,29 @@ async function main() {
   } catch (e) { console.warn('形近字加载失败:', e.message) }
 
   // 5. 构建结果
+  const charGradeMap = buildCharGradeMap()
   const results = []
   let id = 1
 
+  function getGroupGrade(group) {
+    // 年级 = 组内所有字中年级最高的（学完最后一个字才能做比较）
+    const grades = group.map(c => charGradeMap[c]).filter(Boolean)
+    if (grades.length < group.length) return null // 有字不在人教版字表，跳过
+    return Math.max(...grades)
+  }
+
   function buildEntry(group, type) {
+    const grade = getGroupGrade(group)
+    if (!grade) return null
+
     const pinyins = group.map(c => wordDict[c]?.pinyin || '')
     const meanings = group.map(c => wordDict[c]?.meaning || '')
-    // 至少一半字有含义才保留
     if (meanings.filter(Boolean).length < Math.ceil(group.length / 2)) return null
     const words = group.map(c => getWords(c))
     return {
       id: `${type === 'homophone' ? 'h' : 's'}-${id++}`,
       type,
-      grade: 3,
+      grade,
       chars: group,
       pinyin: pinyins,
       meaning: meanings,
