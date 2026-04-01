@@ -1,5 +1,13 @@
 .subject-page { padding: 8px 0; }
 
+.subject-back {
+  font-size: 14px;
+  color: #4f46e5;
+  padding: 6px 0;
+  margin-bottom: 16px;
+  display: block;
+}
+
 .subject-title {
   font-size: 22px;
   font-weight: 700;
