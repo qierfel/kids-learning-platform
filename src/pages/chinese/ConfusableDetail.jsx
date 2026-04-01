@@ -8,6 +8,7 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
   const [currentQuestions, setCurrentQuestions] = useState(null)
+  const [nextReady, setNextReady] = useState(false)
 
   // 生成练习题：每个字的所有词都出题，随机打乱
   function buildQuestions() {
@@ -37,6 +38,8 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
     if (quizAnswer !== null) return
     setQuizAnswer(char)
     if (char === questions[quizIndex].answer) setScore(s => s + 1)
+    setNextReady(false)
+    setTimeout(() => setNextReady(true), 400)
   }
 
   function nextQuestion() {
@@ -49,11 +52,12 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   }
 
   function restart() {
-    setCurrentQuestions(buildQuestions()) // 重新随机
+    setCurrentQuestions(buildQuestions())
     setQuizIndex(0)
     setQuizAnswer(null)
     setScore(0)
     setDone(false)
+    setNextReady(false)
   }
 
   return (
@@ -116,7 +120,7 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
                 ? <p className="feedback-correct">正确！完整词语：{questions[quizIndex].word}</p>
                 : <p className="feedback-wrong">应该是"{questions[quizIndex].answer}"，完整词语：{questions[quizIndex].word}</p>
               }
-              <button className="next-btn" onClick={nextQuestion}>
+              <button className="next-btn" onClick={nextQuestion} disabled={!nextReady}>
                 {quizIndex + 1 >= questions.length ? '查看结果' : '下一题'}
               </button>
             </div>
