@@ -21,8 +21,8 @@ export default function Layout({ user }) {
           <NavLink to="/english" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>英语</NavLink>
         </div>
         <div className="nav-user">
-          <span className="user-email">{user.email}</span>
-          <button onClick={handleLogout} className="logout-btn">退出</button>
+          <span className="user-email">{user?.email}</span>
+          {user && <button onClick={handleLogout} className="logout-btn">退出</button>}
         </div>
       </nav>
       <main className="main-content">
