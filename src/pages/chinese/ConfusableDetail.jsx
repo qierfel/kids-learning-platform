@@ -7,13 +7,31 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
+  const [currentQuestions, setCurrentQuestions] = useState(null)
 
-  // 生成练习题：从 words 里随机取一个词，挖掉目标字
-  const questions = item.chars.map((char, i) => {
-    const word = item.words[i][0]
-    const blank = word.replace(char, '＿')
-    return { blank, answer: char, word }
-  })
+  // 生成练习题：每个字的所有词都出题，随机打乱
+  function buildQuestions() {
+    const all = []
+    item.chars.forEach((char, i) => {
+      item.words[i].forEach(word => {
+        if (word.length >= 2 && word.includes(char)) {
+          all.push({ blank: word.replace(char, '＿'), answer: char, word })
+        }
+      })
+    })
+    // Fisher-Yates 洗牌
+    for (let i = all.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [all[i], all[j]] = [all[j], all[i]]
+    }
+    return all.length > 0 ? all : item.chars.map((char, i) => ({
+      blank: `＿（${item.meaning[i] || char}）`,
+      answer: char,
+      word: char,
+    }))
+  }
+
+  const questions = currentQuestions ?? buildQuestions()
 
   function handleAnswer(char) {
     if (quizAnswer !== null) return
@@ -31,6 +49,7 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   }
 
   function restart() {
+    setCurrentQuestions(buildQuestions()) // 重新随机
     setQuizIndex(0)
     setQuizAnswer(null)
     setScore(0)
