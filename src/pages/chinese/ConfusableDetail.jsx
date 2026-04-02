@@ -107,7 +107,11 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
                 else if (char === quizAnswer) cls += ' wrong'
               }
               return (
-                <button key={i} className={cls} onClick={() => handleAnswer(char)}>
+                <button
+                  key={i}
+                  className={cls}
+                  onPointerDown={(e) => { e.preventDefault(); handleAnswer(char) }}
+                >
                   {char}
                 </button>
               )
