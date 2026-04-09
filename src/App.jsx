@@ -25,7 +25,7 @@ export default function App() {
   if (user === undefined) return <div className="page-loading">加载中...</div>
 
   return (
-    <BrowserRouter basename="/kids-learning-platform">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route element={<Layout user={user} />}>
