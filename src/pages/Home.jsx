@@ -58,6 +58,22 @@ const SUBJECTS = [
     color: '#0ea5e9',
     bg: '#f0f9ff',
   },
+  {
+    path: '/mistakes',
+    label: '错题本',
+    icon: '📝',
+    desc: '错题归纳 · AI解析 · 同类练习',
+    color: '#e53e3e',
+    bg: '#fff5f5',
+  },
+  {
+    path: '/notebook',
+    label: '问题讨论',
+    icon: '💬',
+    desc: '提问 · AI引导 · 线上讨论',
+    color: '#6366f1',
+    bg: '#eef2ff',
+  },
 ]
 
 export default function Home({ user }) {
