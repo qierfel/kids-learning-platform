@@ -28,7 +28,7 @@ export default function App() {
           <Route path="/" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
           <Route path="/chinese" element={user ? <Chinese /> : <Navigate to="/login" />} />
           <Route path="/math" element={user ? <MathPage user={user} /> : <Navigate to="/login" />} />
-          <Route path="/english" element={user ? <English /> : <Navigate to="/login" />} />
+          <Route path="/english" element={user ? <English user={user} /> : <Navigate to="/login" />} />
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
         </Route>
