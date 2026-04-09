@@ -6,12 +6,16 @@ import {
 import { db } from '../firebase/config'
 import './Mistakes.css'
 
-const SUBJECTS = ['全部', '语文', '数学', '英语']
+const SUBJECTS = ['全部', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
 
 const TOPICS = {
   语文: ['同音字/形近字', '古诗词', '词语填空', '阅读理解', '拼音', '组词造句', '作文', '其他'],
   数学: ['加减法', '乘除法', '分数', '小数', '图形面积/周长', '应用题', '方程', '其他'],
-  英语: ['单词拼写', '语法', '阅读理解', '完形填空', '其他'],
+  英语: ['单词拼写', '语法', '阅读理解', '完形填空', '时态', '从句', '其他'],
+  物理: ['声学', '光学', '热学', '力学', '电路', '欧姆定律', '电功电热', '磁学', '其他'],
+  化学: ['物质构成', '化学方程式', '酸碱盐', '金属', '碳及氧化物', '溶液', '其他'],
+  历史: ['中国古代史', '中国近代史', '中国现代史', '世界史', '其他'],
+  地理: ['地球与地图', '世界地理', '中国地理', '山西地理', '气候', '人口与资源', '其他'],
 }
 
 const STATUS_LABELS = { new: '待复习', reviewing: '复习中', mastered: '已掌握' }
@@ -138,7 +142,7 @@ function AddMistake({ user, onClose, onAdded }) {
       <div className="form-row">
         <label>科目</label>
         <div className="btn-group">
-          {['语文', '数学', '英语'].map(s => (
+          {['语文', '数学', '英语', '物理', '化学', '历史', '地理'].map(s => (
             <button key={s} className={subject === s ? 'btn-opt active' : 'btn-opt'} onClick={() => handleSubjectChange(s)}>{s}</button>
           ))}
         </div>
@@ -147,7 +151,7 @@ function AddMistake({ user, onClose, onAdded }) {
       <div className="form-row">
         <label>年级</label>
         <div className="btn-group">
-          {[1,2,3,4,5,6].map(g => (
+          {[1,2,3,4,5,6,7,8,9].map(g => (
             <button key={g} className={grade === g ? 'btn-opt active' : 'btn-opt'} onClick={() => setGrade(g)}>{g}年级</button>
           ))}
         </div>

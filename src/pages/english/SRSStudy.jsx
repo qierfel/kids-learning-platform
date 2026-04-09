@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
-import { GRADE_WORDS, EXAM_WORDS } from '../../data/englishWords'
+import { GRADE_WORDS, EXAM_WORDS, IELTS_WORDS } from '../../data/englishWords'
 import { sm2Update, newCard, getTodayPlan, estimatePlan, getStats } from '../../utils/srs'
 import './SRSStudy.css'
 
 const LEVEL_LABELS = {
   grade3: '三年级', grade4: '四年级', grade5: '五年级', grade6: '六年级',
   KET: 'KET (A2)', PET: 'PET (B1)', FCE: 'FCE (B2)',
+  IELTS: 'IELTS 学术词汇',
 }
 
 function getWordPool(level) {
@@ -15,6 +16,7 @@ function getWordPool(level) {
     const g = parseInt(level.replace('grade', ''))
     return GRADE_WORDS[g] || []
   }
+  if (level === 'IELTS') return IELTS_WORDS
   return EXAM_WORDS[level] || []
 }
 
@@ -172,6 +174,17 @@ function LevelSelect({ onSelect, onBack }) {
               <div className="level-count">{getWordPool(l).length} 个单词</div>
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="level-section">
+        <div className="level-section-title">雅思备考</div>
+        <div className="level-grid">
+          <button className="level-card level-card-exam" onClick={() => onSelect('IELTS')}>
+            <div className="level-icon">🌏</div>
+            <div className="level-name">{LEVEL_LABELS['IELTS']}</div>
+            <div className="level-count">{getWordPool('IELTS').length} 个单词</div>
+          </button>
         </div>
       </div>
     </div>

@@ -1,0 +1,120 @@
+.junior-subject {
+  padding: 0;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Chapter tabs */
+.chapter-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+}
+.chapter-tabs::-webkit-scrollbar { display: none; }
+
+.chapter-tab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  background: #f3f4f6;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.chapter-tab:hover { background: #ede9fe; color: #7c3aed; }
+.chapter-tab.active {
+  background: #7c3aed;
+  color: #fff;
+  border-color: #7c3aed;
+}
+
+/* Knowledge cards */
+.knowledge-list { display: flex; flex-direction: column; gap: 10px; }
+
+.knowledge-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid #e8edf2;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.knowledge-card:hover { border-color: #c4b5fd; }
+
+.knowledge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.knowledge-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.expand-icon {
+  font-size: 11px;
+  color: #aaa;
+  transition: transform 0.15s;
+}
+
+.knowledge-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.knowledge-content {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.75;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+.knowledge-content strong { color: #7c3aed; }
+
+.formula-box {
+  margin-top: 10px;
+  background: #f0f0ff;
+  border-left: 3px solid #7c3aed;
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: #3730a3;
+  font-family: 'Courier New', monospace;
+}
+.formula-label {
+  font-weight: 600;
+  font-family: inherit;
+  color: #7c3aed;
+}
+
+.exam-tip {
+  margin-top: 10px;
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #92400e;
+  line-height: 1.6;
+}
+.exam-label {
+  display: inline-block;
+  background: #f97316;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-right: 8px;
+  vertical-align: middle;
+}

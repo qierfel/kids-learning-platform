@@ -7,6 +7,10 @@ import Login from './pages/Login'
 import Chinese from './pages/Chinese'
 import MathPage from './pages/Math'
 import English from './pages/English'
+import Physics from './pages/Physics'
+import Chemistry from './pages/Chemistry'
+import History from './pages/History'
+import Geography from './pages/Geography'
 import Notebook from './pages/Notebook'
 import Mistakes from './pages/Mistakes'
 import Layout from './components/Layout'
@@ -29,6 +33,10 @@ export default function App() {
           <Route path="/chinese" element={user ? <Chinese /> : <Navigate to="/login" />} />
           <Route path="/math" element={user ? <MathPage user={user} /> : <Navigate to="/login" />} />
           <Route path="/english" element={user ? <English user={user} /> : <Navigate to="/login" />} />
+          <Route path="/physics" element={user ? <Physics user={user} /> : <Navigate to="/login" />} />
+          <Route path="/chemistry" element={user ? <Chemistry user={user} /> : <Navigate to="/login" />} />
+          <Route path="/history" element={user ? <History user={user} /> : <Navigate to="/login" />} />
+          <Route path="/geography" element={user ? <Geography user={user} /> : <Navigate to="/login" />} />
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
         </Route>
