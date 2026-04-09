@@ -1,0 +1,63 @@
+.formulas { padding: 8px 0; }
+
+.back-btn { font-size: 14px; color: #2563eb; background: none; border: none; cursor: pointer; padding: 0 0 16px; }
+.formulas-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
+
+.grade-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+.grade-tab {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #555;
+  border: 1.5px solid #e8edf2;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.grade-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+.formula-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.formula-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid #e8edf2;
+  overflow: hidden;
+}
+
+.formula-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: var(--card-bg);
+}
+
+.formula-icon { font-size: 22px; }
+.formula-category { font-size: 16px; font-weight: 700; color: #1a1a2e; flex: 1; }
+.formula-grade { font-size: 12px; color: #888; background: #f3f4f6; padding: 2px 8px; border-radius: 20px; }
+.formula-expand { font-size: 12px; color: #aaa; }
+
+.formula-items { padding: 0 16px 16px; }
+
+.formula-item {
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.formula-item:first-child { border-top: none; padding-top: 16px; }
+
+.formula-name { font-size: 13px; color: #888; margin-bottom: 6px; }
+
+.formula-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--card-color);
+  font-family: 'Georgia', serif;
+  margin-bottom: 6px;
+}
+
+.formula-example { font-size: 13px; color: #666; background: #f9fafb; padding: 8px 12px; border-radius: 8px; line-height: 1.5; }

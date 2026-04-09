@@ -1,0 +1,155 @@
+.drill { padding: 8px 0; max-width: 480px; margin: 0 auto; }
+
+.back-btn { font-size: 14px; color: #2563eb; background: none; border: none; cursor: pointer; padding: 0 0 16px; }
+
+.drill-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 24px; }
+
+/* Setup */
+.setup-section { margin-bottom: 24px; }
+.setup-label { font-size: 14px; color: #888; margin-bottom: 10px; }
+
+.grade-btns, .type-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.grade-btn, .type-btn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #555;
+  border: 1.5px solid #e8edf2;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.grade-btn.active, .type-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+.start-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  margin-top: 32px;
+}
+
+.start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Drill */
+.drill-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.drill-counter { font-size: 14px; color: #888; }
+.drill-timer { font-size: 14px; color: #2563eb; font-weight: 600; }
+
+.drill-progress { height: 6px; background: #e8edf2; border-radius: 3px; margin-bottom: 40px; overflow: hidden; }
+.drill-progress-bar { height: 100%; background: #2563eb; border-radius: 3px; transition: width 0.3s; }
+
+.question-display {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-align: center;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+  min-height: 64px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+.question-display.shake { animation: shake 0.4s ease; color: #e53e3e; }
+
+.drill-input {
+  display: block;
+  width: 100%;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #e8edf2;
+  border-radius: 14px;
+  padding: 14px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+.drill-input:focus { outline: none; border-color: #2563eb; }
+
+.confirm-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+/* Result */
+.result-header { text-align: center; padding: 24px 0; }
+
+.result-score { font-size: 72px; font-weight: 900; color: #2563eb; line-height: 1; }
+.result-total { font-size: 32px; color: #888; font-weight: 400; }
+.result-time { font-size: 15px; color: #888; margin: 8px 0; }
+.result-stars { font-size: 24px; margin: 8px 0; }
+.result-hint { font-size: 13px; color: #16a34a; background: #dcfce7; padding: 6px 14px; border-radius: 20px; display: inline-block; margin-top: 8px; }
+
+.result-wrongs {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1.5px solid #e8edf2;
+  margin: 20px 0;
+}
+
+.wrongs-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
+
+.wrong-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.wrong-item:first-of-type { border-top: none; }
+.wrong-q { font-weight: 600; color: #1a1a2e; min-width: 100px; }
+.wrong-user em { color: #e53e3e; font-style: normal; }
+.wrong-ans strong { color: #16a34a; }
+
+.result-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+
+.again-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.change-btn, .back-btn-flat {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #555;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+}

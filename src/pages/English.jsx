@@ -1,19 +1,28 @@
+import { useState } from 'react'
+import WordQuiz from './english/WordQuiz'
 import './Subject.css'
 
 const TOOLS = [
-  { icon: 'K', label: 'KET 词库', desc: 'A2 级别 · 约1500词', ready: false },
-  { icon: 'P', label: 'PET 词库', desc: 'B1 级别 · 约3500词', ready: false },
-  { icon: 'F', label: 'FCE 词库', desc: 'B2 级别 · 约5000词', ready: false },
-  { icon: '年', label: '按年级学单词', desc: '三年级起 · 跟教材走', ready: false },
+  { id: 'words', icon: 'W', label: '单词练习', desc: '年级词汇 · KET · PET · FCE · 闪卡', ready: true },
+  { id: 'grammar', icon: 'G', label: '语法练习', desc: '时态 · 句型 · 填空', ready: false },
+  { id: 'reading', icon: 'R', label: '阅读理解', desc: '短文 · 选择题 · AI讲解', ready: false },
 ]
 
 export default function English() {
+  const [activeTool, setActiveTool] = useState(null)
+
+  if (activeTool === 'words') return <WordQuiz onBack={() => setActiveTool(null)} />
+
   return (
     <div className="subject-page">
-      <h2 className="subject-title">英语</h2>
+      <h2 className="subject-title">英语 <span className="edition">KET · PET · FCE</span></h2>
       <div className="tool-grid">
         {TOOLS.map(t => (
-          <div key={t.label} className={`tool-card ${t.ready ? '' : 'coming-soon'}`}>
+          <div
+            key={t.id}
+            className={`tool-card ${t.ready ? '' : 'coming-soon'}`}
+            onClick={() => t.ready && setActiveTool(t.id)}
+          >
             <div className="tool-icon">{t.icon}</div>
             <div className="tool-label">{t.label}</div>
             <div className="tool-desc">{t.desc}</div>
