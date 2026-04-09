@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import Confusables from './chinese/Confusables'
+import Poems from './chinese/Poems'
 import './Subject.css'
 
 const TOOLS = [
   { id: 'confusables', icon: '字', label: '同音/形近字', desc: '对比 · 组词 · 练习', ready: true },
-  { id: 'poems', icon: '诗', label: '古诗词', desc: '朗读 · 注释 · 背诵打卡', ready: false },
+  { id: 'poems', icon: '诗', label: '古诗词', desc: '朗读 · 背诵打卡', ready: true },
   { id: 'idioms', icon: '成', label: '成语故事', desc: '图文解释 · 例句 · 小测验', ready: false },
 ]
 
@@ -16,6 +17,15 @@ export default function Chinese() {
       <div className="subject-page">
         <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
         <Confusables />
+      </div>
+    )
+  }
+
+  if (activeTool === 'poems') {
+    return (
+      <div className="subject-page">
+        <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
+        <Poems />
       </div>
     )
   }

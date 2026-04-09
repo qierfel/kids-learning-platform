@@ -7,6 +7,8 @@ import Login from './pages/Login'
 import Chinese from './pages/Chinese'
 import MathPage from './pages/Math'
 import English from './pages/English'
+import Notebook from './pages/Notebook'
+import Mistakes from './pages/Mistakes'
 import Layout from './components/Layout'
 
 export default function App() {
@@ -27,6 +29,8 @@ export default function App() {
           <Route path="/chinese" element={user ? <Chinese /> : <Navigate to="/login" />} />
           <Route path="/math" element={user ? <MathPage /> : <Navigate to="/login" />} />
           <Route path="/english" element={user ? <English /> : <Navigate to="/login" />} />
+          <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
+          <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
         </Route>
       </Routes>
     </BrowserRouter>

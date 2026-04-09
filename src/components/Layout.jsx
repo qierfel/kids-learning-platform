@@ -19,6 +19,8 @@ export default function Layout({ user }) {
           <NavLink to="/chinese" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>语文</NavLink>
           <NavLink to="/math" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>数学</NavLink>
           <NavLink to="/english" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>英语</NavLink>
+          <NavLink to="/mistakes" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>错题本</NavLink>
+          <NavLink to="/notebook" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>问题讨论</NavLink>
         </div>
         <div className="nav-user">
           <span className="user-email">{user?.email}</span>
