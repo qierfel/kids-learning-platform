@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   collection, addDoc, onSnapshot, doc, updateDoc,
   serverTimestamp, query, where, orderBy
@@ -20,6 +20,16 @@ const TOPICS = {
 
 const STATUS_LABELS = { new: '待复习', reviewing: '复习中', mastered: '已掌握' }
 const STATUS_NEXT = { new: 'reviewing', reviewing: 'mastered', mastered: 'new' }
+
+// Image to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function Mistakes({ user }) {
   const [mistakes, setMistakes] = useState([])
@@ -103,6 +113,14 @@ export default function Mistakes({ user }) {
 }
 
 function AddMistake({ user, onClose, onAdded }) {
+  const [mode, setMode] = useState('photo') // 'photo' | 'manual'
+  const [photoFile, setPhotoFile] = useState(null)
+  const [photoPreview, setPhotoPreview] = useState('')
+  const [ocrLoading, setOcrLoading] = useState(false)
+  const [ocrDone, setOcrDone] = useState(false)
+  const [ocrResult, setOcrResult] = useState(null)
+  const fileInputRef = useRef(null)
+
   const [subject, setSubject] = useState('语文')
   const [topic, setTopic] = useState(TOPICS['语文'][0])
   const [grade, setGrade] = useState(3)
@@ -114,6 +132,42 @@ function AddMistake({ user, onClose, onAdded }) {
   function handleSubjectChange(s) {
     setSubject(s)
     setTopic(TOPICS[s][0])
+  }
+
+  async function handlePhoto(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+    setOcrDone(false)
+    setOcrResult(null)
+  }
+
+  async function recognizePhoto() {
+    if (!photoFile) return
+    setOcrLoading(true)
+    try {
+      const imageBase64 = await fileToBase64(photoFile)
+      const mediaType = photoFile.type || 'image/jpeg'
+      const res = await fetch('/api/claude', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ type: 'photo_ocr', payload: { imageBase64, mediaType } }),
+      })
+      const json = await res.json()
+      if (json.parsed) {
+        const p = json.parsed
+        if (p.subject && TOPICS[p.subject]) { setSubject(p.subject); setTopic(TOPICS[p.subject][0]) }
+        if (p.topic) setTopic(p.topic)
+        if (p.question) setQuestion(p.question)
+        if (p.myAnswer) setMyAnswer(p.myAnswer)
+        if (p.correctAnswer) setCorrectAnswer(p.correctAnswer)
+        setOcrResult(p)
+        setOcrDone(true)
+        setMode('manual') // switch to manual mode to let user review/edit
+      }
+    } catch { /* silent */ }
+    setOcrLoading(false)
   }
 
   async function submit() {
@@ -139,53 +193,140 @@ function AddMistake({ user, onClose, onAdded }) {
     <div className="add-panel">
       <div className="add-panel-title">添加错题</div>
 
-      <div className="form-row">
-        <label>科目</label>
-        <div className="btn-group">
-          {['语文', '数学', '英语', '物理', '化学', '历史', '地理'].map(s => (
-            <button key={s} className={subject === s ? 'btn-opt active' : 'btn-opt'} onClick={() => handleSubjectChange(s)}>{s}</button>
-          ))}
-        </div>
-      </div>
-
-      <div className="form-row">
-        <label>年级</label>
-        <div className="btn-group">
-          {[1,2,3,4,5,6,7,8,9].map(g => (
-            <button key={g} className={grade === g ? 'btn-opt active' : 'btn-opt'} onClick={() => setGrade(g)}>{g}年级</button>
-          ))}
-        </div>
-      </div>
-
-      <div className="form-row">
-        <label>知识点</label>
-        <select className="form-select" value={topic} onChange={e => setTopic(e.target.value)}>
-          {TOPICS[subject].map(t => <option key={t}>{t}</option>)}
-        </select>
-      </div>
-
-      <div className="form-row">
-        <label>题目</label>
-        <textarea className="form-textarea" rows={2} placeholder="把题目内容写在这里" value={question} onChange={e => setQuestion(e.target.value)} />
-      </div>
-
-      <div className="form-row two-col">
-        <div>
-          <label>我的答案</label>
-          <input className="form-input" placeholder="你当时写的" value={myAnswer} onChange={e => setMyAnswer(e.target.value)} />
-        </div>
-        <div>
-          <label>正确答案</label>
-          <input className="form-input" placeholder="正确的是" value={correctAnswer} onChange={e => setCorrectAnswer(e.target.value)} />
-        </div>
-      </div>
-
-      <div className="add-panel-actions">
-        <button className="cancel-btn" onClick={onClose}>取消</button>
-        <button className="submit-btn" onClick={submit} disabled={loading || !question.trim() || !myAnswer.trim() || !correctAnswer.trim()}>
-          {loading ? '保存中...' : '保存'}
+      {/* Mode toggle */}
+      <div className="photo-mode-toggle">
+        <button
+          className={mode === 'photo' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('photo')}
+        >
+          📷 拍照识别
+        </button>
+        <button
+          className={mode === 'manual' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('manual')}
+        >
+          ✏️ 手动输入
         </button>
       </div>
+
+      {/* Photo mode */}
+      {mode === 'photo' && (
+        <div className="photo-section">
+          {!photoPreview ? (
+            <div className="photo-upload-area" onClick={() => fileInputRef.current?.click()}>
+              <div className="photo-upload-icon">📸</div>
+              <div className="photo-upload-text">点击选择试卷照片</div>
+              <div className="photo-upload-hint">支持拍照或从相册选取</div>
+              <div className="photo-buttons">
+                <button className="photo-btn camera-btn" onClick={e => { e.stopPropagation(); fileInputRef.current?.click() }}>
+                  📷 拍照
+                </button>
+                <button className="photo-btn gallery-btn" onClick={e => { e.stopPropagation(); fileInputRef.current?.click() }}>
+                  🖼️ 相册
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="photo-preview-container">
+              <img src={photoPreview} alt="试卷照片" className="photo-preview" />
+              <div className="photo-actions">
+                <button className="photo-btn gallery-btn" onClick={() => fileInputRef.current?.click()}>
+                  重新选择
+                </button>
+                {!ocrLoading && (
+                  <button className="photo-btn recognize-btn" onClick={recognizePhoto}>
+                    🔍 识别题目
+                  </button>
+                )}
+                {ocrLoading && (
+                  <div className="ocr-loading">
+                    <span className="ocr-spinner">⏳</span>
+                    <span>AI识别中...</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={handlePhoto}
+          />
+        </div>
+      )}
+
+      {/* OCR success banner */}
+      {ocrDone && ocrResult && (
+        <div className="ocr-success">
+          <span className="ocr-success-icon">✅</span>
+          <div className="ocr-success-text">
+            <strong>识别成功！</strong>
+            <span>科目：{ocrResult.subject} · 知识点：{ocrResult.topic || '未识别'}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Manual / review form - always shown in manual mode, hidden in photo mode unless OCR done */}
+      {(mode === 'manual') && (
+        <>
+          <div className="form-row">
+            <label>科目</label>
+            <div className="btn-group">
+              {['语文', '数学', '英语', '物理', '化学', '历史', '地理'].map(s => (
+                <button key={s} className={subject === s ? 'btn-opt active' : 'btn-opt'} onClick={() => handleSubjectChange(s)}>{s}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label>年级</label>
+            <div className="btn-group">
+              {[1,2,3,4,5,6,7,8,9].map(g => (
+                <button key={g} className={grade === g ? 'btn-opt active' : 'btn-opt'} onClick={() => setGrade(g)}>{g}年级</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label>知识点</label>
+            <select className="form-select" value={topic} onChange={e => setTopic(e.target.value)}>
+              {TOPICS[subject].map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <div className="form-row">
+            <label>题目</label>
+            <textarea className="form-textarea" rows={2} placeholder="把题目内容写在这里" value={question} onChange={e => setQuestion(e.target.value)} />
+          </div>
+
+          <div className="form-row two-col">
+            <div>
+              <label>我的答案</label>
+              <input className="form-input" placeholder="你当时写的" value={myAnswer} onChange={e => setMyAnswer(e.target.value)} />
+            </div>
+            <div>
+              <label>正确答案</label>
+              <input className="form-input" placeholder="正确的是" value={correctAnswer} onChange={e => setCorrectAnswer(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="add-panel-actions">
+            <button className="cancel-btn" onClick={onClose}>取消</button>
+            <button className="submit-btn" onClick={submit} disabled={loading || !question.trim() || !myAnswer.trim() || !correctAnswer.trim()}>
+              {loading ? '保存中...' : '保存'}
+            </button>
+          </div>
+        </>
+      )}
+
+      {mode === 'photo' && (
+        <div className="add-panel-actions">
+          <button className="cancel-btn" onClick={onClose}>取消</button>
+        </div>
+      )}
     </div>
   )
 }

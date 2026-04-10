@@ -1,268 +1,365 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   collection, addDoc, onSnapshot, doc, updateDoc,
-  serverTimestamp, orderBy, query
+  serverTimestamp, orderBy, query, where, getDocs
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import './Notebook.css'
 
-const SUBJECTS = ['全部', '语文', '数学', '英语', '其他']
+const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
 
 export default function Notebook({ user }) {
-  const [questions, setQuestions] = useState([])
-  const [subject, setSubject] = useState('全部')
-  const [selected, setSelected] = useState(null)
-  const [showNew, setShowNew] = useState(false)
+  const [messages, setMessages] = useState([])
+  const [subject, setSubject] = useState('不限科目')
+  const [inputText, setInputText] = useState('')
+  const [streamingText, setStreamingText] = useState('')
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [ttsEnabled, setTtsEnabled] = useState(false)
+  const [threadId, setThreadId] = useState(null)
+  const [showHistory, setShowHistory] = useState(false)
+  const [historyList, setHistoryList] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
 
+  const bottomRef = useRef(null)
+  const isStreamingRef = useRef(false)
+  const recognitionRef = useRef(null)
+  const textareaRef = useRef(null)
+
+  // Auto-scroll to bottom
   useEffect(() => {
-    const q = query(collection(db, 'questions'), orderBy('createdAt', 'desc'))
-    return onSnapshot(q, snap => {
-      setQuestions(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, streamingText])
+
+  // Real-time sync from Firestore (skip during streaming)
+  useEffect(() => {
+    if (!threadId) return
+    return onSnapshot(doc(db, 'questions', threadId), snap => {
+      if (isStreamingRef.current) return // don't overwrite during streaming
+      const data = snap.data()
+      if (data?.messages) setMessages(data.messages)
     })
-  }, [])
+  }, [threadId])
 
-  const filtered = subject === '全部'
-    ? questions
-    : questions.filter(q => q.subject === subject)
+  // Send message
+  async function sendMessage() {
+    const text = inputText.trim()
+    if (!text || isStreaming) return
+    setInputText('')
 
-  if (selected) {
+    const userName = user.email.split('@')[0]
+    const userMsg = { role: 'user', content: text, userName, time: Date.now() }
+    const newMessages = [...messages, userMsg]
+    setMessages(newMessages)
+
+    // Save/create thread
+    let tid = threadId
+    if (!tid) {
+      const docRef = await addDoc(collection(db, 'questions'), {
+        userId: user.uid,
+        userName,
+        subject,
+        content: text,
+        status: 'open',
+        messages: newMessages,
+        createdAt: serverTimestamp(),
+      })
+      tid = docRef.id
+      setThreadId(tid)
+    } else {
+      await updateDoc(doc(db, 'questions', tid), { messages: newMessages })
+    }
+
+    // Stream AI response
+    setIsStreaming(true)
+    isStreamingRef.current = true
+    setStreamingText('')
+
+    try {
+      const res = await fetch('/api/claude-stream', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages, subject }),
+      })
+
+      if (!res.ok) throw new Error('Stream request failed')
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buf = ''
+      let fullText = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buf += decoder.decode(value, { stream: true })
+        const lines = buf.split('\n')
+        buf = lines.pop() || ''
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          const data = line.slice(6).trim()
+          if (data === '[DONE]') break
+          try {
+            const ev = JSON.parse(data)
+            if (ev.text) {
+              fullText += ev.text
+              setStreamingText(fullText)
+            }
+          } catch { /* ignore */ }
+        }
+      }
+
+      // Finalize AI message
+      const aiMsg = { role: 'ai', content: fullText, time: Date.now() }
+      const finalMessages = [...newMessages, aiMsg]
+      setMessages(finalMessages)
+      setStreamingText('')
+
+      await updateDoc(doc(db, 'questions', tid), { messages: finalMessages })
+
+      // TTS
+      if (ttsEnabled && fullText && window.speechSynthesis) {
+        const utter = new window.SpeechSynthesisUtterance(fullText)
+        utter.lang = 'zh-CN'
+        utter.rate = 0.9
+        window.speechSynthesis.speak(utter)
+      }
+    } catch (e) {
+      const errMsg = { role: 'ai', content: '抱歉，网络出现了问题，请重试。', time: Date.now() }
+      const finalMessages = [...newMessages, errMsg]
+      setMessages(finalMessages)
+      setStreamingText('')
+    }
+
+    isStreamingRef.current = false
+    setIsStreaming(false)
+  }
+
+  // Voice input
+  function toggleVoice() {
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+      return
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('您的浏览器不支持语音输入，请手动输入')
+      return
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.lang = subject === '英语' ? 'en-US' : 'zh-CN'
+    recognition.continuous = false
+    recognition.interimResults = true
+
+    recognition.onresult = e => {
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('')
+      setInputText(transcript)
+    }
+
+    recognition.onend = () => setIsListening(false)
+    recognition.onerror = () => setIsListening(false)
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setIsListening(true)
+  }
+
+  // New conversation
+  function newChat() {
+    setMessages([])
+    setStreamingText('')
+    setThreadId(null)
+    setInputText('')
+    setIsStreaming(false)
+    isStreamingRef.current = false
+  }
+
+  // Load history
+  async function loadHistory() {
+    setShowHistory(true)
+    setHistoryLoading(true)
+    try {
+      const q = query(
+        collection(db, 'questions'),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      )
+      const snap = await getDocs(q)
+      setHistoryList(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+    } catch { /* silent */ }
+    setHistoryLoading(false)
+  }
+
+  function loadThread(thread) {
+    setMessages(thread.messages || [])
+    setThreadId(thread.id)
+    setSubject(thread.subject || '不限科目')
+    setShowHistory(false)
+    setStreamingText('')
+  }
+
+  // Handle textarea auto-grow
+  function handleInputChange(e) {
+    setInputText(e.target.value)
+    const ta = textareaRef.current
+    if (ta) {
+      ta.style.height = 'auto'
+      ta.style.height = Math.min(ta.scrollHeight, 100) + 'px'
+    }
+  }
+
+  // Handle Enter key
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
+  // History view
+  if (showHistory) {
     return (
-      <Thread
-        question={selected}
-        user={user}
-        onBack={() => setSelected(null)}
-      />
+      <div className="chat-view">
+        <div className="chat-topbar">
+          <button className="topbar-icon-btn" onClick={() => setShowHistory(false)}>← 返回</button>
+          <div className="topbar-title">历史对话</div>
+          <div style={{ width: 60 }} />
+        </div>
+        <div className="history-view">
+          {historyLoading && <div className="history-loading">加载中...</div>}
+          {!historyLoading && historyList.length === 0 && (
+            <div className="history-empty">还没有历史对话</div>
+          )}
+          {historyList.map(thread => (
+            <div key={thread.id} className="history-card" onClick={() => loadThread(thread)}>
+              <div className="history-card-top">
+                <span className={`subject-pill subject-pill-${thread.subject}`}>{thread.subject || '不限科目'}</span>
+                <span className="history-time">
+                  {thread.createdAt?.toDate?.()?.toLocaleDateString?.('zh-CN') || ''}
+                </span>
+              </div>
+              <div className="history-preview">{thread.content}</div>
+              <div className="history-count">💬 {thread.messages?.length || 0} 条消息</div>
+            </div>
+          ))}
+        </div>
+      </div>
     )
   }
 
+  const hasMessages = messages.length > 0
+
   return (
-    <div className="notebook">
-      <div className="notebook-header">
-        <h2 className="page-title">问题讨论</h2>
-        <button className="new-btn" onClick={() => setShowNew(true)}>+ 提问</button>
+    <div className="chat-view">
+      {/* Top bar */}
+      <div className="chat-topbar">
+        <div className="topbar-teacher">
+          <div className="teacher-avatar">👩‍🏫</div>
+          <div className="teacher-info">
+            <div className="teacher-name">晓敏老师</div>
+            <div className="teacher-status">资深教师 · 随时在线</div>
+          </div>
+        </div>
+        <div className="topbar-actions">
+          <button
+            className={`topbar-icon-btn tts-btn ${ttsEnabled ? 'active' : ''}`}
+            onClick={() => setTtsEnabled(v => !v)}
+            title={ttsEnabled ? '关闭朗读' : '开启朗读'}
+          >
+            {ttsEnabled ? '🔊' : '🔇'}
+          </button>
+          <button className="topbar-icon-btn" onClick={loadHistory} title="历史记录">
+            📋
+          </button>
+          <button className="topbar-icon-btn" onClick={newChat} title="新对话">
+            ✏️
+          </button>
+        </div>
       </div>
 
-      <div className="subject-tabs">
+      {/* Subject selector */}
+      <div className="subject-selector">
         {SUBJECTS.map(s => (
           <button
             key={s}
-            className={subject === s ? 'subject-tab active' : 'subject-tab'}
+            className={`subject-pill ${subject === s ? 'active' : ''}`}
             onClick={() => setSubject(s)}
-          >{s}</button>
+          >
+            {s}
+          </button>
         ))}
       </div>
 
-      {showNew && (
-        <NewQuestion
-          user={user}
-          onClose={() => setShowNew(false)}
-          onCreated={q => { setShowNew(false); setSelected(q) }}
-        />
-      )}
-
-      <div className="question-list">
-        {filtered.length === 0 && (
-          <p className="empty">还没有问题，点击"提问"开始吧！</p>
-        )}
-        {filtered.map(q => (
-          <div key={q.id} className="question-card" onClick={() => setSelected(q)}>
-            <div className="question-card-top">
-              <span className={`subject-badge subject-${q.subject}`}>{q.subject}</span>
-              <span className={`status-badge ${q.status}`}>{q.status === 'resolved' ? '已解决' : '讨论中'}</span>
+      {/* Messages area */}
+      <div className="chat-messages">
+        {!hasMessages && !isStreaming && (
+          <div className="chat-welcome">
+            <div className="welcome-avatar">👩‍🏫</div>
+            <div className="welcome-bubble">
+              你好！我是晓敏老师 🌟<br />
+              有什么不懂的题目，或者想复习的知识点，都可以问我！<br />
+              <small>我会引导你自己找到答案～</small>
             </div>
-            <div className="question-content">{q.content}</div>
-            <div className="question-meta">
-              <span className="question-author">{q.userName}</span>
-              <span className="question-count">💬 {q.messages?.length || 0} 条回复</span>
+          </div>
+        )}
+
+        {messages.map((m, i) => (
+          <div key={i} className={`message message-${m.role === 'ai' ? 'ai' : 'user'}`}>
+            <div className="msg-avatar">
+              {m.role === 'ai' ? '👩‍🏫' : '👤'}
+            </div>
+            <div className={`msg-bubble ${m.role === 'ai' ? 'bubble-ai' : 'bubble-user'}`}>
+              {m.content}
             </div>
           </div>
         ))}
+
+        {/* Streaming message */}
+        {isStreaming && (
+          <div className="message message-ai">
+            <div className="msg-avatar">👩‍🏫</div>
+            <div className="msg-bubble bubble-ai streaming">
+              {streamingText
+                ? <>{streamingText}<span className="cursor">▋</span></>
+                : <div className="thinking"><span /><span /><span /></div>
+              }
+            </div>
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
-    </div>
-  )
-}
 
-function NewQuestion({ user, onClose, onCreated }) {
-  const [content, setContent] = useState('')
-  const [subject, setSubject] = useState('语文')
-  const [loading, setLoading] = useState(false)
-
-  async function submit() {
-    if (!content.trim()) return
-    setLoading(true)
-    const userName = user.email.split('@')[0]
-    const docRef = await addDoc(collection(db, 'questions'), {
-      userId: user.uid,
-      userName,
-      subject,
-      content: content.trim(),
-      status: 'open',
-      messages: [{ role: 'user', content: content.trim(), userName, time: Date.now() }],
-      createdAt: serverTimestamp(),
-    })
-    // 马上拿到 AI 第一条引导
-    const aiText = await askAI(content.trim(), [], subject)
-    if (aiText) {
-      await updateDoc(doc(db, 'questions', docRef.id), {
-        messages: [
-          { role: 'user', content: content.trim(), userName, time: Date.now() },
-          { role: 'ai', content: aiText, time: Date.now() + 1 },
-        ]
-      })
-    }
-    setLoading(false)
-    onCreated({ id: docRef.id, userId: user.uid, userName, subject, content: content.trim(), status: 'open', messages: [] })
-  }
-
-  return (
-    <div className="new-question-panel">
-      <div className="new-question-title">提一个问题</div>
-      <div className="new-question-subjects">
-        {['语文', '数学', '英语', '其他'].map(s => (
-          <button
-            key={s}
-            className={subject === s ? 'subject-tab active' : 'subject-tab'}
-            onClick={() => setSubject(s)}
-          >{s}</button>
-        ))}
-      </div>
-      <textarea
-        className="new-question-input"
-        placeholder="把你的问题写在这里，比如：'己'和'已'怎么区分？"
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        rows={3}
-      />
-      <div className="new-question-actions">
-        <button className="cancel-btn" onClick={onClose}>取消</button>
-        <button className="submit-btn" onClick={submit} disabled={loading || !content.trim()}>
-          {loading ? '提交中...' : '提交'}
+      {/* Input bar */}
+      <div className="chat-input-bar">
+        <button
+          className={`mic-btn ${isListening ? 'listening' : ''}`}
+          onClick={toggleVoice}
+          title={isListening ? '停止录音' : '语音输入'}
+        >
+          🎤
+        </button>
+        <textarea
+          ref={textareaRef}
+          className="chat-input"
+          placeholder="问晓敏老师..."
+          value={inputText}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          disabled={isStreaming}
+        />
+        <button
+          className="send-btn"
+          onClick={sendMessage}
+          disabled={isStreaming || !inputText.trim()}
+        >
+          发送
         </button>
       </div>
     </div>
   )
-}
-
-function Thread({ question, user, onBack }) {
-  const [messages, setMessages] = useState(question.messages || [])
-  const [reply, setReply] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [resolved, setResolved] = useState(question.status === 'resolved')
-  const bottomRef = useRef(null)
-
-  // 实时同步消息
-  useEffect(() => {
-    return onSnapshot(doc(db, 'questions', question.id), snap => {
-      const data = snap.data()
-      if (data) {
-        setMessages(data.messages || [])
-        setResolved(data.status === 'resolved')
-      }
-    })
-  }, [question.id])
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  async function sendReply() {
-    if (!reply.trim() || loading) return
-    const userName = user.email.split('@')[0]
-    const userMsg = { role: 'user', content: reply.trim(), userName, time: Date.now() }
-    const newMessages = [...messages, userMsg]
-    setReply('')
-    setLoading(true)
-
-    await updateDoc(doc(db, 'questions', question.id), { messages: newMessages })
-
-    // AI 回复（带上下文历史）
-    const aiText = await askAI(question.content, newMessages, question.subject)
-    if (aiText) {
-      const aiMsg = { role: 'ai', content: aiText, time: Date.now() }
-      await updateDoc(doc(db, 'questions', question.id), { messages: [...newMessages, aiMsg] })
-    }
-    setLoading(false)
-  }
-
-  async function toggleResolved() {
-    const newStatus = resolved ? 'open' : 'resolved'
-    await updateDoc(doc(db, 'questions', question.id), { status: newStatus })
-  }
-
-  return (
-    <div className="thread">
-      <div className="thread-topbar">
-        <button className="back-btn" onClick={onBack}>← 返回</button>
-        {user.uid === question.userId && (
-          <button
-            className={resolved ? 'resolve-btn resolved' : 'resolve-btn'}
-            onClick={toggleResolved}
-          >
-            {resolved ? '✓ 已解决' : '标记解决'}
-          </button>
-        )}
-      </div>
-
-      <div className="thread-question">
-        <span className={`subject-badge subject-${question.subject}`}>{question.subject}</span>
-        <p className="thread-question-content">{question.content}</p>
-        <span className="thread-author">— {question.userName}</span>
-      </div>
-
-      <div className="thread-messages">
-        {messages.map((m, i) => (
-          <div key={i} className={`message message-${m.role}`}>
-            <div className="message-header">
-              {m.role === 'ai' ? '🤖 AI老师' : `👤 ${m.userName}`}
-            </div>
-            <div className="message-bubble">{m.content}</div>
-          </div>
-        ))}
-        {loading && (
-          <div className="message message-ai">
-            <div className="message-header">🤖 AI老师</div>
-            <div className="message-bubble thinking">思考中...</div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      {!resolved && (
-        <div className="thread-input-area">
-          <textarea
-            className="thread-input"
-            placeholder="说说你的想法..."
-            value={reply}
-            onChange={e => setReply(e.target.value)}
-            rows={2}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply() }
-            }}
-          />
-          <button className="send-btn" onClick={sendReply} disabled={loading || !reply.trim()}>
-            发送
-          </button>
-        </div>
-      )}
-      {resolved && <p className="resolved-tip">✓ 这个问题已解决</p>}
-    </div>
-  )
-}
-
-async function askAI(question, history, subject) {
-  try {
-    const res = await fetch('/api/claude', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        type: 'question_guide',
-        payload: { question, history, subject },
-      }),
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.text || null
-  } catch {
-    return null
-  }
 }
