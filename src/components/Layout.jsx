@@ -21,7 +21,7 @@ const TOOL_NAV = [
   { to: '/notebook', label: '问题讨论' },
 ]
 
-export default function Layout({ user }) {
+export default function Layout({ user, profile }) {
   const navigate = useNavigate()
 
   async function handleLogout() {
@@ -55,7 +55,10 @@ export default function Layout({ user }) {
           </div>
         </div>
         <div className="nav-user">
-          <span className="user-email">{user?.email}</span>
+          <span className="user-email">{profile?.nickname || user?.email}</span>
+          {profile?.role === 'admin' && (
+            <NavLink to="/admin" className="admin-nav-btn">管理</NavLink>
+          )}
           {user && <button onClick={handleLogout} className="logout-btn">退出</button>}
         </div>
       </nav>

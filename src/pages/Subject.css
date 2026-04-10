@@ -93,3 +93,27 @@
   border-radius: 20px;
   font-weight: 500;
 }
+
+/* 年级段切换（语文小学/初中） */
+.stage-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.stage-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.stage-tab.active {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}

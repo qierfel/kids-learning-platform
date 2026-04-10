@@ -1,0 +1,60 @@
+.junior-back {
+  font-size: 14px;
+  color: #4f46e5;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 16px 0;
+  display: block;
+}
+
+/* 诗词列表 */
+.poem-list { display: flex; flex-direction: column; gap: 8px; }
+
+.poem-list-item {
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.poem-list-item:hover { border-color: #c4b5fd; }
+
+.poem-list-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+.poem-list-meta { font-size: 13px; color: #888; margin-top: 2px; }
+.poem-list-right { display: flex; align-items: center; gap: 8px; }
+.poem-grade-badge {
+  font-size: 12px; background: #f0f0ff; color: #7c3aed;
+  padding: 2px 8px; border-radius: 10px; font-weight: 500;
+}
+.poem-list-arrow { font-size: 20px; color: #ccc; }
+
+/* 诗词详情 */
+.poem-detail-card {
+  background: #fff; border-radius: 16px; border: 1.5px solid #e8edf2; padding: 20px;
+}
+.poem-detail-header { margin-bottom: 16px; }
+.poem-detail-title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.poem-detail-meta { font-size: 13px; color: #888; }
+.poem-detail-content {
+  font-family: 'STSong', 'SimSun', serif;
+  font-size: 16px;
+  line-height: 2;
+  color: #333;
+  white-space: pre-wrap;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.poem-detail-section { margin-bottom: 12px; }
+.poem-detail-label {
+  font-size: 12px; font-weight: 700; color: #7c3aed;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.poem-detail-text { font-size: 14px; color: #555; line-height: 1.7; margin: 0; }
