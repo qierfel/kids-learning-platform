@@ -82,7 +82,7 @@ export default function Notebook({ user }) {
         body: JSON.stringify({ messages: newMessages, subject }),
       })
 
-      if (!res.ok) throw new Error('Stream request failed')
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -128,7 +128,7 @@ export default function Notebook({ user }) {
         window.speechSynthesis.speak(utter)
       }
     } catch (e) {
-      const errMsg = { role: 'ai', content: '抱歉，网络出现了问题，请重试。', time: Date.now() }
+      const errMsg = { role: 'ai', content: `⚠️ ${e.message || '未知错误'}`, time: Date.now() }
       const finalMessages = [...newMessages, errMsg]
       setMessages(finalMessages)
       setStreamingText('')
