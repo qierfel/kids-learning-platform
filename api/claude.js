@@ -113,6 +113,26 @@ ${lines.join('\n')}
       return res.status(500).json({ error: e.message })
     }
 
+  } else if (type === 'grammar_explain') {
+    const { grammarPoint, level, queryType, summary } = payload
+    if (queryType === 'deep') {
+      prompt = `请为"${grammarPoint}"（${level}级别）补充3-4个不同场景的例句，并简要说明每句要点。格式：序号+例句+中文解释，不超过200字。`
+    } else {
+      prompt = `请为"${grammarPoint}"（${level}级别）补充3个初学者最容易犯的错误，每个错误包括：错误句、正确句、原因说明。不超过200字。`
+    }
+    max_tokens = 400
+
+  } else if (type === 'grammar_practice') {
+    const { grammarPoint, level } = payload
+    prompt = `请针对英语语法点"${grammarPoint}"（${level}级别）出5道练习题。
+要求：填空题或改错题，难度适合${level}考试。
+格式（只输出JSON，不要其他内容）：
+[
+  {"q": "题目（用___表示填空）", "a": "正确答案", "explain": "简短解析"},
+  ...
+]`
+    max_tokens = 600
+
   } else {
     return res.status(400).json({ error: `Unknown type: ${type}` })
   }
