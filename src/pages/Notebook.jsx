@@ -70,46 +70,26 @@ export default function Notebook({ user }) {
       await updateDoc(doc(db, 'questions', tid), { messages: newMessages })
     }
 
-    // Stream AI response
+    // AI response with typing animation
     setIsStreaming(true)
     isStreamingRef.current = true
     setStreamingText('')
 
     try {
-      const res = await fetch('/api/claude-stream', {
+      const res = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages, subject }),
+        body: JSON.stringify({ type: 'chat', payload: { messages: newMessages, subject } }),
       })
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      const fullText = data.text || ''
 
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let buf = ''
-      let fullText = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buf += decoder.decode(value, { stream: true })
-        const lines = buf.split('\n')
-        buf = lines.pop() || ''
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const data = line.slice(6).trim()
-          if (data === '[DONE]') break
-          try {
-            const ev = JSON.parse(data)
-            if (ev.text) {
-              fullText += ev.text
-              setStreamingText(fullText)
-            } else if (ev.error) {
-              fullText = `⚠️ ${ev.error}`
-              setStreamingText(fullText)
-            }
-          } catch { /* ignore */ }
-        }
+      // Typing animation
+      for (let i = 1; i <= fullText.length; i++) {
+        setStreamingText(fullText.slice(0, i))
+        await new Promise(r => setTimeout(r, 18))
       }
 
       // Finalize AI message
@@ -128,7 +108,7 @@ export default function Notebook({ user }) {
         window.speechSynthesis.speak(utter)
       }
     } catch (e) {
-      const errMsg = { role: 'ai', content: `⚠️ ${e.message || '未知错误'}`, time: Date.now() }
+      const errMsg = { role: 'ai', content: `抱歉，出现了错误：${e.message || '请重试'}`, time: Date.now() }
       const finalMessages = [...newMessages, errMsg]
       setMessages(finalMessages)
       setStreamingText('')

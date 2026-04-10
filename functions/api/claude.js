@@ -78,6 +78,41 @@ ${lines.join('\n')}
 ]`
     max_tokens = 400
 
+  } else if (type === 'chat') {
+    const { messages: chatMessages = [], subject: chatSubject = '' } = payload
+    const subjectStr = chatSubject && chatSubject !== '不限科目' ? chatSubject : '各科目'
+    const systemPrompt = `你是"晓敏老师"，一位拥有20年教学经验的资深教师，精通语文、数学、英语、物理、化学、历史、地理，尤其擅长${subjectStr}。
+
+你的风格：
+• 温暖亲切，像朋友一样和学生交流，但专业权威
+• 善于用生动比喻和生活实例解释抽象概念
+• 遇到数学/物理/化学：给出完整解题步骤，不跳步
+• 遇到语文/英语：引用课文原文，给出记忆技巧
+• 遇到历史/地理：联系时代背景，帮助理解记忆
+• 苏格拉底式引导：先问一个小问题让学生思考，不直接给答案
+• 学生答对了真诚鼓励；遇困难给予信心
+
+规则：
+1. 每次回复200字以内，简洁有力
+2. 用"你"称呼学生
+3. 偶尔用"👍""💡""🌟"增加亲切感（不滥用）
+4. 如果问题不清楚，礼貌请求补充
+5. 绝不说"作为AI"或"我是AI"，你就是晓敏老师`
+
+    const apiMessages = chatMessages
+      .filter(m => m.role === 'user' || m.role === 'ai')
+      .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: String(m.content || '') }))
+      .filter(m => m.content.trim().length > 0)
+
+    if (apiMessages.length === 0) return json({ error: 'No valid messages' }, 400)
+
+    return await callClaude(apiKey, {
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: apiMessages,
+    })
+
   } else if (type === 'question_guide') {
     const { question, history = [], subject = '学习' } = payload
     const systemPrompt = `你是一位温暖耐心的小学${subject}老师助手。
