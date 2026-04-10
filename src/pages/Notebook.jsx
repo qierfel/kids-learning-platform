@@ -104,6 +104,9 @@ export default function Notebook({ user }) {
             if (ev.text) {
               fullText += ev.text
               setStreamingText(fullText)
+            } else if (ev.error) {
+              fullText = `⚠️ ${ev.error}`
+              setStreamingText(fullText)
             }
           } catch { /* ignore */ }
         }

@@ -97,7 +97,7 @@ ${lines.join('\n')}
     }
 
     return await callClaude(apiKey, {
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 200,
       system: systemPrompt,
       messages,
@@ -131,7 +131,7 @@ ${lines.join('\n')}
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20251001',
+          model: 'claude-3-5-sonnet-20241022',
           max_tokens: 1024,
           messages: [{
             role: 'user',
@@ -157,7 +157,7 @@ ${lines.join('\n')}
   }
 
   return await callClaude(apiKey, {
-    model: 'claude-haiku-4-5-20251001',
+    model: 'claude-3-5-haiku-20241022',
     max_tokens,
     messages: [{ role: 'user', content: prompt }],
   })
