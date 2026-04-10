@@ -2,7 +2,39 @@
 .grammar-page-title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 .grammar-subtitle { font-size: 14px; font-weight: 400; color: #888; }
 
-/* 分类标签 */
+/* 章节网格 */
+.grammar-chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.grammar-chapter-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 8px;
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+.grammar-chapter-card:hover { border-color: #c4b5fd; background: #faf5ff; }
+.grammar-chapter-card.active { border-color: #7c3aed; background: #f3f0ff; }
+.gc-icon { font-size: 22px; line-height: 1; }
+.gc-num { font-size: 10px; font-weight: 700; color: #7c3aed; letter-spacing: 0.3px; }
+.gc-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+.gc-count { font-size: 11px; color: #999; }
+
+/* 已选章节标题行 */
+.grammar-chapter-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.grammar-chapter-label { font-size: 15px; font-weight: 700; color: #7c3aed; }
+.grammar-chapter-sub { font-size: 12px; color: #aaa; }
+
+/* 旧分类标签（保留兼容） */
 .grammar-cat-tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 16px; padding-bottom: 4px; }
 .grammar-cat-tabs::-webkit-scrollbar { display: none; }
 .grammar-cat-tab { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; color: #555; background: #f3f4f6; border: 1.5px solid transparent; cursor: pointer; white-space: nowrap; }
