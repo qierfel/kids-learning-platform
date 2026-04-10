@@ -18,8 +18,11 @@ export async function onRequestPost(context) {
 
   const apiKey = env.ANTHROPIC_API_KEY
   if (!apiKey) {
+    console.error('[claude] ❌ ANTHROPIC_API_KEY not set')
     return json({ error: 'API key not configured' }, 500)
   }
+
+  console.log(`[claude] → type=${type}`)
 
   let prompt = ''
   let max_tokens = 512
@@ -206,7 +209,9 @@ export async function onRequestOptions() {
 }
 
 async function callClaude(apiKey, body) {
+  const t0 = Date.now()
   try {
+    console.log(`[claude] calling model=${body.model} max_tokens=${body.max_tokens}`)
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -218,12 +223,15 @@ async function callClaude(apiKey, body) {
     })
     if (!response.ok) {
       const err = await response.text()
+      console.error(`[claude] ❌ API error ${response.status}:`, err)
       return json({ error: 'Upstream API error', detail: err }, 502)
     }
     const data = await response.json()
     const text = data.content?.[0]?.text?.trim() || ''
+    console.log(`[claude] ✅ done in ${Date.now() - t0}ms, chars=${text.length}`)
     return json({ text })
   } catch (e) {
+    console.error(`[claude] ❌ exception:`, e.message)
     return json({ error: e.message }, 500)
   }
 }
