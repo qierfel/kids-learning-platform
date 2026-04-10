@@ -58,3 +58,36 @@
   margin-bottom: 6px;
 }
 .poem-detail-text { font-size: 14px; color: #555; line-height: 1.7; margin: 0; }
+
+/* 古诗词 / 文言文 切换标签 */
+.poem-type-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.poem-type-tab {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1.5px solid #e8edf2;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+
+.poem-type-tab:hover {
+  border-color: #c4b5fd;
+  color: #7c3aed;
+}
+
+.poem-type-tab.active {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-color: #7c3aed;
+  color: #fff;
+  font-weight: 600;
+}

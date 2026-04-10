@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '../../firebase/config'
 import { GRADE_WORDS, EXAM_WORDS, IELTS_WORDS } from '../../data/englishWords'
 import { sm2Update, newCard, getTodayPlan, estimatePlan, getStats } from '../../utils/srs'
 import './SRSStudy.css'
@@ -20,10 +18,10 @@ function getWordPool(level) {
   return EXAM_WORDS[level] || []
 }
 
-// Firestore key: srsProgress/{userId}/plans/{level}
-function docRef(userId, level) {
-  return doc(db, 'srsProgress', `${userId}_${level}`)
-}
+// LocalStorage key for SRS progress
+function lsKey(userId, level) { return `srs_${userId}_${level}` }
+function lsGet(userId, level) { try { return JSON.parse(localStorage.getItem(lsKey(userId, level))) } catch { return null } }
+function lsSet(userId, level, data) { localStorage.setItem(lsKey(userId, level), JSON.stringify(data)) }
 
 export default function SRSStudy({ user, onBack }) {
   const [phase, setPhase] = useState('loading') // loading | home | setup | session | stats
@@ -36,14 +34,12 @@ export default function SRSStudy({ user, onBack }) {
   async function loadLevel(lvl) {
     setLevel(lvl)
     setPhase('loading')
-    const ref = docRef(user.uid, lvl)
-    const snap = await getDoc(ref)
-    if (snap.exists()) {
-      const data = snap.data()
-      setPlan(data.plan)
-      setProgress(data.progress || {})
+    const saved = lsGet(user.uid, lvl)
+    if (saved) {
+      setPlan(saved.plan)
+      setProgress(saved.progress || {})
       const pool = getWordPool(lvl)
-      setTodayPlan(getTodayPlan(pool, data.progress || {}, data.plan.wordsPerDay))
+      setTodayPlan(getTodayPlan(pool, saved.progress || {}, saved.plan.wordsPerDay))
       setPhase('home')
     } else {
       setPlan(null)
@@ -53,17 +49,15 @@ export default function SRSStudy({ user, onBack }) {
     }
   }
 
-  // Save progress to Firestore
+  // Save progress to localStorage
   async function saveProgress(newProgress) {
-    const ref = docRef(user.uid, level)
-    await setDoc(ref, { plan, progress: newProgress, updatedAt: Date.now() }, { merge: true })
+    lsSet(user.uid, level, { plan, progress: newProgress, updatedAt: Date.now() })
     setProgress(newProgress)
   }
 
   async function createPlan(wordsPerDay) {
     const newPlan = { wordsPerDay, startDate: Date.now() }
-    const ref = docRef(user.uid, level)
-    await setDoc(ref, { plan: newPlan, progress: {}, updatedAt: Date.now() })
+    lsSet(user.uid, level, { plan: newPlan, progress: {}, updatedAt: Date.now() })
     setPlan(newPlan)
     setProgress({})
     const pool = getWordPool(level)

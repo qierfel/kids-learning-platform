@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import {
-  collection, addDoc, onSnapshot, doc, updateDoc,
-  serverTimestamp, query, where, orderBy
-} from 'firebase/firestore'
-import { db } from '../firebase/config'
 import './Mistakes.css'
+
+function getToken() { return localStorage.getItem('session_token') }
+
+async function apiMistakes(body) {
+  const res = await fetch('/api/mistakes-api', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ...body, token: getToken() }),
+  })
+  return res.json()
+}
 
 const SUBJECTS = ['全部', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
 
@@ -122,14 +128,9 @@ export default function Mistakes({ user }) {
   const [showAdd, setShowAdd] = useState(false)
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'mistakes'),
-      where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    )
-    return onSnapshot(q, snap => {
-      setMistakes(snap.docs.map(d => ({ id: d.id, ...d.data() })))
-    })
+    apiMistakes({ action: 'list' }).then(data => {
+      if (data.mistakes) setMistakes(data.mistakes)
+    }).catch(() => {})
   }, [user.uid])
 
   const filtered = subject === '全部' ? mistakes : mistakes.filter(m => m.subject === subject)
@@ -257,20 +258,17 @@ function AddMistake({ user, onClose, onAdded }) {
   async function submit() {
     if (!question.trim() || !myAnswer.trim() || !correctAnswer.trim()) return
     setLoading(true)
-    const data = {
-      userId: user.uid,
-      subject, topic, grade,
-      question: question.trim(),
-      myAnswer: myAnswer.trim(),
-      correctAnswer: correctAnswer.trim(),
-      status: 'new',
-      explanation: null,
-      similarQuestions: null,
-      createdAt: serverTimestamp(),
-    }
-    const docRef = await addDoc(collection(db, 'mistakes'), data)
+    try {
+      const data = await apiMistakes({
+        action: 'create',
+        subject, topic, grade,
+        question: question.trim(),
+        myAnswer: myAnswer.trim(),
+        correctAnswer: correctAnswer.trim(),
+      })
+      if (data.mistake) onAdded(data.mistake)
+    } catch { /* silent */ }
     setLoading(false)
-    onAdded({ id: docRef.id, ...data, createdAt: new Date() })
   }
 
   return (
@@ -436,7 +434,7 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
       })
       const json = await res.json()
       if (json.text) {
-        await updateDoc(doc(db, 'mistakes', data.id), { explanation: json.text })
+        await apiMistakes({ action: 'update', id: data.id, explanation: json.text })
         const updated = { ...data, explanation: json.text }
         setData(updated)
         onUpdate(updated)
@@ -462,7 +460,7 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
         let parsed = null
         try { parsed = JSON.parse(json.text) } catch { /* ignore parse error */ }
         if (Array.isArray(parsed)) {
-          await updateDoc(doc(db, 'mistakes', data.id), { similarQuestions: parsed })
+          await apiMistakes({ action: 'update', id: data.id, similarQuestions: parsed })
           const updated = { ...data, similarQuestions: parsed }
           setData(updated)
           onUpdate(updated)
@@ -474,7 +472,7 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
 
   async function advanceStatus() {
     const next = STATUS_NEXT[data.status]
-    await updateDoc(doc(db, 'mistakes', data.id), { status: next })
+    await apiMistakes({ action: 'update', id: data.id, status: next })
     const updated = { ...data, status: next }
     setData(updated)
     onUpdate(updated)
@@ -527,7 +525,7 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
           )}
           {data.similarQuestions && (
             <button className="load-similar-btn" onClick={async () => {
-              await updateDoc(doc(db, 'mistakes', data.id), { similarQuestions: null })
+              await apiMistakes({ action: 'update', id: data.id, similarQuestions: null })
               const updated = { ...data, similarQuestions: null }
               setData(updated)
               onUpdate(updated)

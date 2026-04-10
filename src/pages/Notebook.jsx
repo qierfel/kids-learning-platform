@@ -1,12 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import {
-  collection, addDoc, onSnapshot, doc, updateDoc,
-  serverTimestamp, orderBy, query, where, getDocs
-} from 'firebase/firestore'
-import { db } from '../firebase/config'
+import { useState, useEffect, useRef } from 'react'
 import './Notebook.css'
 
 const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
+
+function getToken() { return localStorage.getItem('session_token') }
 
 export default function Notebook({ user }) {
   const [messages, setMessages] = useState([])
@@ -22,57 +19,26 @@ export default function Notebook({ user }) {
   const [historyLoading, setHistoryLoading] = useState(false)
 
   const bottomRef = useRef(null)
-  const isStreamingRef = useRef(false)
   const recognitionRef = useRef(null)
   const textareaRef = useRef(null)
 
-  // Auto-scroll to bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingText])
 
-  // Real-time sync from Firestore (skip during streaming)
-  useEffect(() => {
-    if (!threadId) return
-    return onSnapshot(doc(db, 'questions', threadId), snap => {
-      if (isStreamingRef.current) return // don't overwrite during streaming
-      const data = snap.data()
-      if (data?.messages) setMessages(data.messages)
-    })
-  }, [threadId])
-
-  // Send message
   async function sendMessage() {
     const text = inputText.trim()
     if (!text || isStreaming) return
     setInputText('')
 
-    const userName = user.email.split('@')[0]
+    const userName = user.nickname || user.email.split('@')[0]
     const userMsg = { role: 'user', content: text, userName, time: Date.now() }
     const newMessages = [...messages, userMsg]
     setMessages(newMessages)
 
-    // Save/create thread
     let tid = threadId
-    if (!tid) {
-      const docRef = await addDoc(collection(db, 'questions'), {
-        userId: user.uid,
-        userName,
-        subject,
-        content: text,
-        status: 'open',
-        messages: newMessages,
-        createdAt: serverTimestamp(),
-      })
-      tid = docRef.id
-      setThreadId(tid)
-    } else {
-      await updateDoc(doc(db, 'questions', tid), { messages: newMessages })
-    }
 
-    // AI response with typing animation
     setIsStreaming(true)
-    isStreamingRef.current = true
     setStreamingText('')
 
     try {
@@ -92,15 +58,31 @@ export default function Notebook({ user }) {
         await new Promise(r => setTimeout(r, 18))
       }
 
-      // Finalize AI message
       const aiMsg = { role: 'ai', content: fullText, time: Date.now() }
       const finalMessages = [...newMessages, aiMsg]
       setMessages(finalMessages)
       setStreamingText('')
 
-      await updateDoc(doc(db, 'questions', tid), { messages: finalMessages })
+      // Save to KV
+      if (!tid) {
+        const saveRes = await fetch('/api/threads', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create', token: getToken(),
+            userName, subject, content: text, messages: finalMessages,
+          }),
+        })
+        const saveData = await saveRes.json()
+        if (saveData.thread) { tid = saveData.thread.id; setThreadId(tid) }
+      } else {
+        await fetch('/api/threads', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'update', token: getToken(), id: tid, messages: finalMessages }),
+        })
+      }
 
-      // TTS
       if (ttsEnabled && fullText && window.speechSynthesis) {
         const utter = new window.SpeechSynthesisUtterance(fullText)
         utter.lang = 'zh-CN'
@@ -108,17 +90,19 @@ export default function Notebook({ user }) {
         window.speechSynthesis.speak(utter)
       }
     } catch (e) {
-      const errMsg = { role: 'ai', content: `抱歉，出现了错误：${e.message || '请重试'}`, time: Date.now() }
-      const finalMessages = [...newMessages, errMsg]
-      setMessages(finalMessages)
+      const detail = e.message || '未知错误'
+      const hint = detail.includes('API key') ? '（请检查服务器 API Key 配置）'
+        : detail.includes('Upstream') ? '（AI 服务暂时不可用，请稍后重试）'
+        : detail.includes('Failed to fetch') ? '（网络连接失败，请检查网络）'
+        : ''
+      const errMsg = { role: 'ai', content: `抱歉，出现了错误${hint}：${detail}`, time: Date.now() }
+      setMessages([...newMessages, errMsg])
       setStreamingText('')
     }
 
-    isStreamingRef.current = false
     setIsStreaming(false)
   }
 
-  // Voice input
   function toggleVoice() {
     if (isListening) {
       recognitionRef.current?.stop()
@@ -127,51 +111,42 @@ export default function Notebook({ user }) {
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) {
-      alert('您的浏览器不支持语音输入，请手动输入')
-      return
-    }
+    if (!SpeechRecognition) { alert('您的浏览器不支持语音输入，请手动输入'); return }
 
     const recognition = new SpeechRecognition()
     recognition.lang = subject === '英语' ? 'en-US' : 'zh-CN'
     recognition.continuous = false
     recognition.interimResults = true
-
     recognition.onresult = e => {
       const transcript = Array.from(e.results).map(r => r[0].transcript).join('')
       setInputText(transcript)
     }
-
     recognition.onend = () => setIsListening(false)
     recognition.onerror = () => setIsListening(false)
-
     recognitionRef.current = recognition
     recognition.start()
     setIsListening(true)
   }
 
-  // New conversation
   function newChat() {
     setMessages([])
     setStreamingText('')
     setThreadId(null)
     setInputText('')
     setIsStreaming(false)
-    isStreamingRef.current = false
   }
 
-  // Load history
   async function loadHistory() {
     setShowHistory(true)
     setHistoryLoading(true)
     try {
-      const q = query(
-        collection(db, 'questions'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      )
-      const snap = await getDocs(q)
-      setHistoryList(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+      const res = await fetch('/api/threads', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'list', token: getToken() }),
+      })
+      const data = await res.json()
+      setHistoryList(data.threads || [])
     } catch { /* silent */ }
     setHistoryLoading(false)
   }
@@ -184,7 +159,6 @@ export default function Notebook({ user }) {
     setStreamingText('')
   }
 
-  // Handle textarea auto-grow
   function handleInputChange(e) {
     setInputText(e.target.value)
     const ta = textareaRef.current
@@ -194,12 +168,8 @@ export default function Notebook({ user }) {
     }
   }
 
-  // Handle Enter key
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
   }
 
   // History view
@@ -221,7 +191,7 @@ export default function Notebook({ user }) {
               <div className="history-card-top">
                 <span className={`subject-pill subject-pill-${thread.subject}`}>{thread.subject || '不限科目'}</span>
                 <span className="history-time">
-                  {thread.createdAt?.toDate?.()?.toLocaleDateString?.('zh-CN') || ''}
+                  {thread.createdAt ? new Date(thread.createdAt).toLocaleDateString('zh-CN') : ''}
                 </span>
               </div>
               <div className="history-preview">{thread.content}</div>
@@ -237,7 +207,6 @@ export default function Notebook({ user }) {
 
   return (
     <div className="chat-view">
-      {/* Top bar */}
       <div className="chat-topbar">
         <div className="topbar-teacher">
           <div className="teacher-avatar">👩‍🏫</div>
@@ -254,16 +223,11 @@ export default function Notebook({ user }) {
           >
             {ttsEnabled ? '🔊' : '🔇'}
           </button>
-          <button className="topbar-icon-btn" onClick={loadHistory} title="历史记录">
-            📋
-          </button>
-          <button className="topbar-icon-btn" onClick={newChat} title="新对话">
-            ✏️
-          </button>
+          <button className="topbar-icon-btn" onClick={loadHistory} title="历史记录">📋</button>
+          <button className="topbar-icon-btn" onClick={newChat} title="新对话">✏️</button>
         </div>
       </div>
 
-      {/* Subject selector */}
       <div className="subject-selector">
         {SUBJECTS.map(s => (
           <button
@@ -276,7 +240,6 @@ export default function Notebook({ user }) {
         ))}
       </div>
 
-      {/* Messages area */}
       <div className="chat-messages">
         {!hasMessages && !isStreaming && (
           <div className="chat-welcome">
@@ -291,16 +254,13 @@ export default function Notebook({ user }) {
 
         {messages.map((m, i) => (
           <div key={i} className={`message message-${m.role === 'ai' ? 'ai' : 'user'}`}>
-            <div className="msg-avatar">
-              {m.role === 'ai' ? '👩‍🏫' : '👤'}
-            </div>
+            <div className="msg-avatar">{m.role === 'ai' ? '👩‍🏫' : '👤'}</div>
             <div className={`msg-bubble ${m.role === 'ai' ? 'bubble-ai' : 'bubble-user'}`}>
               {m.content}
             </div>
           </div>
         ))}
 
-        {/* Streaming message */}
         {isStreaming && (
           <div className="message message-ai">
             <div className="msg-avatar">👩‍🏫</div>
@@ -316,7 +276,6 @@ export default function Notebook({ user }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar */}
       <div className="chat-input-bar">
         <button
           className={`mic-btn ${isListening ? 'listening' : ''}`}

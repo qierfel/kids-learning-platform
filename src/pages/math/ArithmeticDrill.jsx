@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../firebase/config'
+function getToken() { return localStorage.getItem('session_token') }
 import './ArithmeticDrill.css'
 
 // ── 题目生成器 ──────────────────────────────────────────────
@@ -175,23 +174,19 @@ export default function ArithmeticDrill({ user, onBack }) {
       clearInterval(timerRef.current)
       setElapsed(Math.floor((Date.now() - startTime) / 1000))
       setPhase('result')
-      // 把错题存入 Firestore
+      // 把错题存入 KV
       const wrong = newResults.filter(r => !r.correct)
       if (wrong.length > 0 && user) {
         wrong.forEach(w => {
-          addDoc(collection(db, 'mistakes'), {
-            userId: user.uid,
-            subject: '数学',
-            topic: config.label,
-            grade: Number(grade),
-            question: w.q,
-            myAnswer: w.user,
-            correctAnswer: w.ans,
-            status: 'new',
-            explanation: null,
-            similarQuestions: null,
-            createdAt: serverTimestamp(),
-          })
+          fetch('/api/mistakes-api', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create', token: getToken(),
+              subject: '数学', topic: config.label, grade: Number(grade),
+              question: w.q, myAnswer: w.user, correctAnswer: w.ans,
+            }),
+          }).catch(() => {})
         })
       }
     } else {

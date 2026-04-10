@@ -1,10 +1,7 @@
 import { useState } from 'react'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
-import { doc, setDoc, getDoc, getDocs, collection } from 'firebase/firestore'
-import { auth, db } from '../firebase/config'
 import './Login.css'
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nickname, setNickname] = useState('')
@@ -15,41 +12,25 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (isRegister && !nickname.trim()) {
-      setError('请输入昵称')
-      return
-    }
+    if (isRegister && !nickname.trim()) { setError('请输入昵称'); return }
     setLoading(true)
     try {
-      if (isRegister) {
-        const cred = await createUserWithEmailAndPassword(auth, email, password)
-        const uid = cred.user.uid
-
-        // 检查是否是第一个注册的用户 → 自动成为管理员并通过
-        const snap = await getDocs(collection(db, 'users'))
-        const isFirstUser = snap.empty
-
-        await setDoc(doc(db, 'users', uid), {
-          uid,
-          email,
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          action: isRegister ? 'register' : 'login',
+          email: email.trim(),
+          password,
           nickname: nickname.trim(),
-          status: isFirstUser ? 'approved' : 'pending',
-          role: isFirstUser ? 'admin' : 'user',
-          createdAt: Date.now(),
-        })
-      } else {
-        await signInWithEmailAndPassword(auth, email, password)
-      }
-    } catch (err) {
-      const msgs = {
-        'auth/user-not-found': '账号不存在',
-        'auth/wrong-password': '密码错误',
-        'auth/email-already-in-use': '该邮箱已注册',
-        'auth/weak-password': '密码至少6位',
-        'auth/invalid-email': '邮箱格式不正确',
-        'auth/invalid-credential': '账号或密码错误',
-      }
-      setError(msgs[err.code] || '操作失败，请重试')
+        }),
+      })
+      const data = await res.json()
+      if (data.error) { setError(data.error); return }
+      localStorage.setItem('session_token', data.token)
+      onLogin(data.user)
+    } catch {
+      setError('网络错误，请重试')
     } finally {
       setLoading(false)
     }

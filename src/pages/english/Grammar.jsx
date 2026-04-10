@@ -110,6 +110,11 @@ export default function Grammar({ user, onBack }) {
 
         {activeTab === 'explain' && (
           <div className="grammar-explain">
+            {activePoint.explain && (
+              <div className="grammar-intro-box">
+                <p className="grammar-intro-text">{activePoint.explain}</p>
+              </div>
+            )}
             <div className="grammar-section-title">句型结构</div>
             {activePoint.structure.map((s, i) => (
               <div key={i} className="grammar-structure-card">

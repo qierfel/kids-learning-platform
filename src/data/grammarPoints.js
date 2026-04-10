@@ -16,6 +16,7 @@ export const GRAMMAR_BOOK = [
         title: '名词',
         level: 'KET',
         summary: '名词分可数与不可数，可数名词有单复数变化。',
+        explain: '名词是表示人、地点、事物或概念的词，是句子最重要的词类之一。可数名词（如 book）可以有单复数变化；不可数名词（如 water、music）没有复数形式，不能直接加数字。学会判断名词是否可数，就能避免大多数名词错误。',
         structure: [
           { label: '规则复数', formula: 'noun + -s / -es / -ies', example: 'book → books, box → boxes, city → cities.' },
           { label: '不可数名词', formula: 'no plural form; use "some / much / a little"', example: 'There is some water in the glass.' },
@@ -33,6 +34,7 @@ export const GRAMMAR_BOOK = [
         title: '代词',
         level: 'KET',
         summary: '代词替代名词，分人称、物主、反身、指示、疑问等。',
+        explain: '代词用来代替前面出现过的名词，让句子不显得重复。主格代词（I/he/she/we/they）用作主语，宾格代词（me/him/her/us/them）用在动词或介词后面。记住：作主语用 I，作宾语用 me，千万不要混用。',
         structure: [
           { label: '人称代词', formula: 'I / you / he / she / it / we / they (主格)  →  me / you / him / her / it / us / them (宾格)', example: 'She gave him a book.' },
           { label: '物主代词', formula: 'my/your/his/her/its/our/their + noun  OR  mine/yours/his/hers/ours/theirs (独立)', example: 'This is my pen. That one is mine.' },
@@ -50,6 +52,7 @@ export const GRAMMAR_BOOK = [
         title: '形容词',
         level: 'KET',
         summary: '形容词修饰名词，置于名词前或连系动词后，有比较级和最高级。',
+        explain: '形容词用来描述名词的特征，比如颜色、大小、形状、感觉等。它可以放在名词前做定语（a big dog），也可以放在连系动词后做表语（The dog is big）。比较时用比较级（bigger）和最高级（biggest）。',
         structure: [
           { label: '定语用法', formula: 'adj + noun', example: 'a beautiful garden.' },
           { label: '表语用法', formula: 'S + linking verb + adj', example: 'The soup smells delicious.' },
@@ -67,6 +70,7 @@ export const GRAMMAR_BOOK = [
         title: '副词',
         level: 'KET',
         summary: '副词修饰动词、形容词或其他副词，常由形容词加 -ly 构成。',
+        explain: '副词用来修饰动词、形容词或整个句子，告诉我们"如何做""在哪里"或"何时做"等信息。很多副词由形容词加 -ly 构成（slow → slowly），但要注意 fast、hard 这些本身既是形容词又是副词的词。特别注意：hard（努力）与 hardly（几乎不）含义完全不同！',
         structure: [
           { label: '修饰动词', formula: 'V + adv  /  adv + V', example: 'She speaks slowly. He carefully opened the box.' },
           { label: '修饰形容词', formula: 'adv + adj', example: 'The movie was extremely boring.' },
@@ -84,6 +88,7 @@ export const GRAMMAR_BOOK = [
         title: '介词',
         level: 'KET',
         summary: '介词表示时间、地点、方向等关系，后接名词或代词宾格。',
+        explain: '介词是一个小词，跟在它后面的名词或代词构成"介词短语"，表示时间、地点或关系。很多动词和形容词有固定的介词搭配，必须死记（good at、listen to、arrive at/in）。介词后面要用代词的宾格（give it to me，不是 to I）。',
         structure: [
           { label: '时间介词', formula: 'at + 时刻/节日; on + 日期/星期; in + 月/年/季节', example: 'at 8 o\'clock; on Monday; in July; in 2024.' },
           { label: '地点介词', formula: 'at + 具体地点; in + 封闭空间; on + 平面', example: 'at the bus stop; in the room; on the table.' },
@@ -101,6 +106,7 @@ export const GRAMMAR_BOOK = [
         title: '连词',
         level: 'KET',
         summary: '连词连接词、短语或句子，分并列连词和从属连词。',
+        explain: '连词就像"纽带"，把词、短语或句子连接在一起。并列连词（and/but/or/so）连接对等的成分；从属连词（because/when/if）引导从句。特别提醒：because 和 so 不能同时出现在同一个句子里；although 和 but 也不能同时出现——各选其一就够了。',
         structure: [
           { label: '并列连词', formula: 'clause + and / but / or / so / yet + clause', example: 'I was tired, but I kept working.' },
           { label: '从属连词（时间/条件）', formula: 'when / if / although / because / while + clause', example: 'Although it was raining, we went out.' },
@@ -118,6 +124,7 @@ export const GRAMMAR_BOOK = [
         title: '冠词',
         level: 'KET',
         summary: '冠词分不定冠词 a/an 和定冠词 the，各有特定用法。',
+        explain: '冠词就在名词前面，告诉听者"是哪一个"。a/an 是不定冠词（表示某一个，首次提到）；the 是定冠词（特指某个已知的事物）。判断用 a 还是 an：看后面单词的发音——元音音素开头用 an（an apple, an hour，hour 的 h 不发音）。',
         structure: [
           { label: '不定冠词', formula: 'a + 辅音开头单词; an + 元音开头单词', example: 'a cat, an apple, an hour.' },
           { label: '定冠词', formula: 'the + 特指/独一无二/上文提到的名词', example: 'The sun rises in the east. Pass me the book on the table.' },
@@ -126,7 +133,7 @@ export const GRAMMAR_BOOK = [
         tips: '注意发音而非字母：an hour（h 不发音）, a university（发/juː/，辅音开头）。the 用于: 乐器（play the piano）、方位（in the north）、河流山脉（the Nile）。',
         traps: [
           { wrong: 'She plays a piano.', right: 'She plays the piano.', explain: '表示演奏乐器用 the，不用不定冠词' },
-          { wrong: 'He is an honest man.', right: 'He is an honest man.', explain: '这条是正确的——honest 发 /ɒnɪst/，元音开头，正确用 an' },
+          { wrong: 'He is a honest man.', right: 'He is an honest man.', explain: 'honest 发 /ɒnɪst/，元音音素开头，正确用 an' },
           { wrong: 'I go to the school by bus.', right: 'I go to school by bus.', explain: '作为功能性建筑（上学），school 前不加冠词；有 the 则表示具体某所学校' },
         ],
       },
@@ -135,6 +142,7 @@ export const GRAMMAR_BOOK = [
         title: '数词',
         level: 'KET',
         summary: '数词分基数词（one, two…）和序数词（first, second…），用法各异。',
+        explain: '数词分两种：基数词表示数量（one, two, three…），序数词表示顺序（first, second, third…），序数词常配合 the 使用（the first day）。两位数之间要用连字符（twenty-one）；hundred/thousand 前有数字时不加 -s（three hundred，不是 three hundreds）。',
         structure: [
           { label: '基数词', formula: 'one / two / three ... twenty-one / a hundred / a thousand', example: 'There are thirty students in our class.' },
           { label: '序数词', formula: 'first / second / third / fourth ... (定冠词 the + 序数词)', example: 'Today is the first day of spring.' },
@@ -164,6 +172,7 @@ export const GRAMMAR_BOOK = [
         title: '一般现在时',
         level: 'KET',
         summary: '表示习惯性动作、客观事实或现在的状态。',
+        explain: '一般现在时用来表达经常发生的事、习惯和客观事实。当主语是 he/she/it 等第三人称单数时，谓语动词要加 -s 或 -es，这是初学者最容易犯的错误。常见标志词：every day、always、usually、often、sometimes、never。',
         structure: [
           { label: '肯定句', formula: 'S + V (三单加 -s/-es)', example: 'She reads books every day.' },
           { label: '否定句', formula: 'S + do/does not + V', example: 'He doesn\'t like coffee.' },
@@ -182,6 +191,7 @@ export const GRAMMAR_BOOK = [
         title: '现在进行时',
         level: 'KET',
         summary: '表示现在正在进行的动作，或按计划即将发生的事。',
+        explain: '现在进行时表示"此时此刻正在做"的动作。结构是 am/is/are + 动词-ing。注意：know、like、love、hate、want、need 等表示状态或心理的动词，不能用进行时——你不会说"我正在喜欢你"。常见标志词：now、at the moment、look！listen！',
         structure: [
           { label: '肯定句', formula: 'S + am/is/are + V-ing', example: 'I am reading a book now.' },
           { label: '否定句', formula: 'S + am/is/are + not + V-ing', example: 'She isn\'t watching TV.' },
@@ -200,6 +210,7 @@ export const GRAMMAR_BOOK = [
         title: '一般过去时',
         level: 'KET',
         summary: '表示过去某时发生的动作或存在的状态。',
+        explain: '一般过去时表示过去已经发生、完成的动作或状态。规则动词加 -ed（walk→walked），但有许多不规则动词需要单独记忆（go→went, eat→ate, buy→bought）。句子里有 yesterday、last week、ago、just now 等词时，通常就用一般过去时。',
         structure: [
           { label: '规则动词', formula: 'S + V-ed', example: 'I visited Beijing last year.' },
           { label: '不规则动词', formula: 'S + irregular past form', example: 'She went to the market yesterday.' },
@@ -218,6 +229,7 @@ export const GRAMMAR_BOOK = [
         title: '过去进行时',
         level: 'PET',
         summary: '表示过去某时刻正在进行的动作，常与 when/while 连用。',
+        explain: '过去进行时就像给过去某一刻拍了张"快照"——那时候正在做某件事。结构是 was/were + 动词-ing。when 引导另一个动作"插进来"（The phone rang when I was eating）；while 引导两件事"同时进行"（While she was cooking, I was watching TV）。',
         structure: [
           { label: '肯定句', formula: 'S + was/were + V-ing', example: 'She was cooking when I arrived.' },
           { label: 'when/while 从句', formula: 'past continuous + when + simple past  /  while + past continuous', example: 'While I was reading, the phone rang.' },
@@ -235,6 +247,7 @@ export const GRAMMAR_BOOK = [
         title: '一般将来时',
         level: 'KET',
         summary: '表示将来要发生的动作，can use will 或 be going to。',
+        explain: '一般将来时表示将来要发生的事。will + 动词原形用于临时决定或预测；be going to + 动词原形用于事先计划好的事。有一个特别重要的规则：在 if、when、before、after 等引导的从句里，要用现在时代替将来时——不能说 "If it will rain"，要说 "If it rains"。',
         structure: [
           { label: 'will + V', formula: 'S + will + V (临时决定/预测)', example: 'I\'ll help you with that.' },
           { label: 'be going to + V', formula: 'S + am/is/are + going to + V (计划/迹象)', example: 'She is going to visit Paris next month.' },
@@ -253,6 +266,7 @@ export const GRAMMAR_BOOK = [
         title: '现在完成时',
         level: 'PET',
         summary: '表示过去发生的动作对现在产生的影响，或从过去持续到现在的状态。',
+        explain: '现在完成时把"过去"和"现在"连接起来，表示过去发生的事情对现在有影响。结构是 have/has + 过去分词。和一般过去时的区别：完成时不说具体的过去时间（不能说"I have seen him yesterday"），如果要说具体时间，就改用一般过去时（I saw him yesterday）。',
         structure: [
           { label: '肯定句', formula: 'S + have/has + V-ed (past participle)', example: 'I have visited Japan twice.' },
           { label: '否定句', formula: 'S + have/has + not + V-ed', example: 'She hasn\'t finished her homework yet.' },
@@ -271,6 +285,7 @@ export const GRAMMAR_BOOK = [
         title: '过去完成时',
         level: 'PET',
         summary: '表示过去某时间之前已完成的动作（过去的过去）。',
+        explain: '过去完成时表示"过去的过去"——两件过去的事情，用过去完成时说清楚哪件发生得更早。结构是 had + 过去分词。常与 by the time/before/when 搭配，构成"先（had done）……后（did）……"的逻辑。',
         structure: [
           { label: '肯定句', formula: 'S + had + V-ed', example: 'She had already left when I arrived.' },
           { label: '常见搭配', formula: 'by the time / before / when / after + simple past', example: 'By the time he called, I had already eaten.' },
@@ -288,6 +303,7 @@ export const GRAMMAR_BOOK = [
         title: '将来完成时',
         level: 'FCE',
         summary: '表示到将来某时间点为止将已完成的动作。',
+        explain: '将来完成时表示"到将来某个时间点，某件事将已经完成了"。结构是 will have + 过去分词，常与 by + 将来时间搭配（By next Monday, I will have finished the project）。这个时态使用频率较低，但理解它的逻辑对提高语感很有帮助。',
         structure: [
           { label: '肯定句', formula: 'S + will have + V-ed', example: 'By next June, I will have graduated.' },
           { label: '常见搭配', formula: 'by + future time point', example: 'She will have finished the report by Monday.' },
@@ -305,6 +321,7 @@ export const GRAMMAR_BOOK = [
         title: '现在完成进行时',
         level: 'FCE',
         summary: '强调从过去持续到现在的动作过程，且动作可能还在继续。',
+        explain: '现在完成进行时强调从过去某时开始的动作一直持续到现在，而且动作还可能在继续。结构是 have/has been + 动词-ing。与现在完成时的区别：I\'ve been reading this book（还没读完，在持续）vs I\'ve read this book（已经读完了）。',
         structure: [
           { label: '肯定句', formula: 'S + have/has + been + V-ing', example: 'I have been studying for three hours.' },
           { label: '与完成时比较', formula: 'have/has been V-ing (强调持续过程) vs have/has V-ed (强调结果)', example: 'I\'ve been reading this book. vs I\'ve read this book.' },
@@ -334,6 +351,7 @@ export const GRAMMAR_BOOK = [
         title: '被动语态基础',
         level: 'PET',
         summary: '当动作承受者是主语时使用被动语态，强调动作本身而非执行者。',
+        explain: '被动语态用于强调动作的承受者，或者当我们不知道/不需要说明谁做了这件事时使用。把主动句变为被动句：原来的宾语变为主语，动词变成 be + 过去分词，原来的主语变成 by + 短语（可省）。例如：Tom broke the window → The window was broken by Tom。',
         structure: [
           { label: '基本结构', formula: 'S (受事) + be + V-ed (past participle) + (by + agent)', example: 'The cake was made by my mother.' },
           { label: '一般现在时被动', formula: 'S + am/is/are + V-ed', example: 'English is spoken all over the world.' },
@@ -351,6 +369,7 @@ export const GRAMMAR_BOOK = [
         title: '各时态被动语态',
         level: 'PET',
         summary: '被动语态可用于不同时态，关键是 be 动词随时态变化。',
+        explain: '被动语态可以用在不同时态里，核心规律是：把对应时态 be 动词的形式 + 过去分词。例如：现在进行时被动（is/are being done）、将来时被动（will be done）、现在完成时被动（has/have been done）。牢记每种时态中 be 动词是如何变化的。',
         structure: [
           { label: '现在进行时被动', formula: 'S + am/is/are + being + V-ed', example: 'The road is being repaired now.' },
           { label: '将来时被动', formula: 'S + will be + V-ed', example: 'The report will be submitted tomorrow.' },
@@ -369,6 +388,7 @@ export const GRAMMAR_BOOK = [
         title: '特殊动词被动结构',
         level: 'FCE',
         summary: '双宾语动词和短语动词变被动时有特殊规则。',
+        explain: '有双宾语的动词（give, tell, show）变被动时有两种方式：可以把间接宾语（人）或直接宾语（物）变成主语。短语动词（look after, take care of）变被动时，必须把整个短语看作一个整体，介词或副词不能省略（He was taken care of by the nurse）。',
         structure: [
           { label: '双宾语变被动', formula: 'Indirect obj becomes S + be + V-ed + direct obj  OR  direct obj becomes S + be + V-ed + to/for + indirect obj', example: 'She was given a prize. / A prize was given to her.' },
           { label: '短语动词被动', formula: 'S + be + V-ed + particle (短语动词不拆开)', example: 'The problem was looked into by the police.' },
@@ -397,6 +417,7 @@ export const GRAMMAR_BOOK = [
         title: '祈使语气',
         level: 'KET',
         summary: '表示命令、请求、建议，以动词原形开头，主语通常省略。',
+        explain: '祈使句用来发出命令、请求或建议，直接用动词原形开头，不写出主语 you。表示礼貌时在前面或后面加 please（Please come in. / Come in, please）。否定祈使句在动词前加 Don\'t（Don\'t run in the hallway）。',
         structure: [
           { label: '肯定祈使', formula: 'V + (object/complement)', example: 'Open the window, please.' },
           { label: '否定祈使', formula: 'Don\'t + V ...', example: 'Don\'t touch that!' },
@@ -414,6 +435,7 @@ export const GRAMMAR_BOOK = [
         title: '虚拟语气——if 条件句',
         level: 'FCE',
         summary: '虚拟条件句表示与事实相反的假设，分现在/过去虚拟。',
+        explain: '虚拟语气用来表达"假如"或"与现实相反"的假设，不是真实的情况。与现在相反：if 从句用过去式（if I had a car...），主句用 would/could + 原形。与过去相反：if 从句用 had + 过去分词，主句用 would have + 过去分词。注意：虚拟语气中 if 从句里 be 动词统一用 were（不管主语是谁）。',
         structure: [
           { label: '与现在相反', formula: 'If + S + V-ed (过去式), S + would/could/might + V', example: 'If I had more time, I would travel the world.' },
           { label: '与过去相反', formula: 'If + S + had + V-ed, S + would/could/might + have + V-ed', example: 'If she had studied harder, she would have passed.' },
@@ -431,6 +453,7 @@ export const GRAMMAR_BOOK = [
         title: '虚拟语气——wish / if only',
         level: 'FCE',
         summary: '用 wish 或 if only 表达与现实不符的愿望。',
+        explain: 'wish 后的从句表达与现实不符的愿望，语法与 if 虚拟一样——时态"退一步"。希望现在不一样用过去式（I wish I could fly）；希望过去不一样用过去完成时（I wish I had studied harder）。区别：hope 接真实可能实现的愿望（I hope it will be fine tomorrow），wish 接与现实相反的遗憾。',
         structure: [
           { label: '与现在相反的愿望', formula: 'S + wish + S + V-ed (过去式)', example: 'I wish I knew the answer.' },
           { label: '与过去相反的愿望', formula: 'S + wish + S + had + V-ed', example: 'She wishes she had taken the opportunity.' },
@@ -448,6 +471,7 @@ export const GRAMMAR_BOOK = [
         title: '虚拟语气——suggest / insist 等',
         level: 'FCE',
         summary: '某些动词（suggest, insist, recommend, demand 等）后接 that 从句用虚拟语气（should + V 或省略 should 直接用原形）。',
+        explain: '在 suggest、insist、demand、recommend 等动词后的 that 从句里，动词要用原形（或 should + 原形），不受主语人称影响，也不随主句时态变化。例如：The teacher suggests that everyone (should) bring a pencil——bring 不能改成 brings 或 brought。',
         structure: [
           { label: 'that 从句虚拟', formula: 'suggest/insist/recommend/demand + that + S + (should) + V', example: 'The doctor suggested that he (should) rest for a week.' },
           { label: 'It is necessary/important + that', formula: 'It is necessary/vital/important + that + S + (should) + V', example: 'It is essential that everyone (should) attend the meeting.' },
@@ -476,6 +500,7 @@ export const GRAMMAR_BOOK = [
         title: '不定式（to + V）',
         level: 'PET',
         summary: '不定式用作主语、宾语、表语、定语、目的状语等。',
+        explain: '不定式（to + 动词原形）可以在句子里充当名词、形容词或副词的角色。最常见的用法：表示目的（She studied hard to pass the exam）；某些动词后接不定式（want to, hope to, decide to）。感官动词（see/hear/feel）和使役动词（make/let/have）后接宾语时省略 to。',
         structure: [
           { label: '作目的状语', formula: 'to + V (in order to / so as to)', example: 'She went to the library to borrow books.' },
           { label: '宾语补足语', formula: 'V + sb + to + V (ask/tell/want/allow/help)', example: 'My teacher asked me to rewrite the essay.' },
@@ -493,6 +518,7 @@ export const GRAMMAR_BOOK = [
         title: '动名词（V-ing）',
         level: 'PET',
         summary: '动名词具有名词功能，可作主语、宾语、表语、介词宾语等。',
+        explain: '动名词（动词-ing）形式像动词，功能像名词，可以做主语或宾语。关键记忆点：有些动词后面只能接动名词，如 enjoy、finish、avoid、mind、keep、stop（stop doing = 停止做，与 stop to do 含义不同）。介词后面必须接动名词，不能接不定式（good at swimming，不是 good at to swim）。',
         structure: [
           { label: '作主语', formula: 'V-ing + V', example: 'Swimming is great exercise.' },
           { label: '固定搭配宾语', formula: 'enjoy/finish/avoid/mind/keep/suggest + V-ing', example: 'I enjoy listening to music.' },
@@ -510,6 +536,7 @@ export const GRAMMAR_BOOK = [
         title: '现在分词',
         level: 'PET',
         summary: '现在分词（V-ing）可作定语、状语、宾语补足语。',
+        explain: '现在分词（动词-ing）作定语时表示主动或正在进行（a running dog = 正在跑的狗）；作状语时，它的隐含主语必须与句子主语相同，否则就是错误的"悬垂分词"。比如"Walking to school, it began to rain"是错的——不是"天气"在走路，应改为"Walking to school, I got caught in the rain"。',
         structure: [
           { label: '定语用法', formula: 'V-ing + noun  /  noun + V-ing phrase', example: 'the running water; the girl sitting by the window.' },
           { label: '状语用法', formula: 'V-ing (clause) + main clause (同一主语)', example: 'Seeing the traffic, she took the subway instead.' },
@@ -527,6 +554,7 @@ export const GRAMMAR_BOOK = [
         title: '过去分词',
         level: 'PET',
         summary: '过去分词（V-ed）可作定语、状语（被动/完成含义）、宾语补足语。',
+        explain: '过去分词（动词-ed）作定语时表示被动或已完成的状态（a broken window = 被打破的窗户；a fallen leaf = 已落下的叶子）。"have/get + 宾语 + 过去分词"是重要结构，表示请别人做某事（I had my hair cut = 我去理了发）。',
         structure: [
           { label: '定语用法', formula: 'V-ed + noun  /  noun + V-ed phrase', example: 'a broken window; the letter written in French.' },
           { label: '状语用法（被动/完成）', formula: 'V-ed (phrase) + main clause', example: 'Surprised by the news, she sat down quietly.' },
@@ -556,6 +584,7 @@ export const GRAMMAR_BOOK = [
         title: '主语与谓语',
         level: 'KET',
         summary: '主语是句子的核心话题，谓语是对主语的陈述，二者必须在人称和数上一致。',
+        explain: '英语句子的核心是主语和谓语，两者在数上必须一致（主谓一致）。单数主语配单数谓语，复数主语配复数谓语。特别注意：each of...、everyone/everybody 后面的谓语用单数；a number of...（大量的）后面用复数，the number of...（……的数量）后面用单数。',
         structure: [
           { label: '主谓一致（单数）', formula: 'singular S + singular V', example: 'The cat sleeps on the sofa.' },
           { label: '主谓一致（复数）', formula: 'plural S + plural V', example: 'The children are playing outside.' },
@@ -573,6 +602,7 @@ export const GRAMMAR_BOOK = [
         title: '宾语与补语',
         level: 'KET',
         summary: '宾语接受动作，补语补充说明主语或宾语。',
+        explain: '宾语是动词动作的对象（She reads books）；补语用来补充说明主语或宾语的状态。连系动词（look/feel/become/seem/smell/taste/sound）后的表语要用形容词（The soup tastes good），不能用副词——你不能说"The soup tastes well"（除非表示汤"品尝能力很好"，这完全不对）。',
         structure: [
           { label: '直接宾语', formula: 'V + DO', example: 'She bought a dress.' },
           { label: '双宾语', formula: 'V + IO + DO  /  V + DO + to/for + IO', example: 'He gave me a gift. / He gave a gift to me.' },
@@ -590,6 +620,7 @@ export const GRAMMAR_BOOK = [
         title: '定语与状语',
         level: 'PET',
         summary: '定语修饰名词，状语修饰动词/形容词/副词或整个句子。',
+        explain: '定语修饰名词，说明它是"哪个/什么样的"（a tall boy 里 tall 是定语）；状语修饰动词，说明动作"如何/何时/在哪里/为何"发生（She sang beautifully——beautifully 是状语）。多个形容词同时修饰一个名词时，有固定顺序：观点→大小→形状→年龄→颜色→来源→材料。',
         structure: [
           { label: '前置定语', formula: 'adj / noun / V-ing / V-ed + noun', example: 'a beautiful red handmade bag.' },
           { label: '后置定语', formula: 'noun + prep phrase / relative clause / to-V phrase', example: 'the girl in blue; the book that I bought; something to eat.' },
@@ -619,6 +650,7 @@ export const GRAMMAR_BOOK = [
         title: 'S + V（主谓）',
         level: 'KET',
         summary: '句子只由主语和不及物动词构成，动词后不带宾语。',
+        explain: '最简单的英语句型，只有主语和不及物动词。不及物动词（arrive/appear/happen/sleep）不能直接接宾语，要接具体地点等，需加介词（arrive at the station）。如果忘记介词，就会犯一个很常见的错误。',
         structure: [
           { label: '主谓句型', formula: 'S + Vi (+ adverbial)', example: 'Birds fly. / She smiled quietly.' },
         ],
@@ -634,6 +666,7 @@ export const GRAMMAR_BOOK = [
         title: 'S + V + C（主系表）',
         level: 'KET',
         summary: '连系动词后接表语（形容词/名词），描述主语的状态或特征。',
+        explain: '连系动词（be/look/feel/seem/become/sound/smell/taste）后面接表语，描述主语的状态。表语用形容词或名词，不用副词。记忆技巧：连系动词大多与感觉有关（看/听/闻/尝/感觉），可以把它们想象成感知"状态"的动词，后面跟的是状态描述词（形容词）。',
         structure: [
           { label: '主系表句型', formula: 'S + linking verb + adj/noun', example: 'The milk smells sour. / She became a doctor.' },
           { label: '常见连系动词', formula: 'be, seem, appear, become, get, grow, turn, stay, remain, feel, smell, taste, sound, look', example: 'The music sounds wonderful.' },
@@ -650,6 +683,7 @@ export const GRAMMAR_BOOK = [
         title: 'S + V + O（主谓宾）',
         level: 'KET',
         summary: '及物动词后接宾语，宾语是动作的承受者。',
+        explain: '及物动词直接接宾语，是最常见的句型。注意有些及物动词后面只能接动名词（enjoy swimming），有些只能接不定式（want to go），这需要单独记忆。stop to smoke（停下来去抽烟）和 stop smoking（停止抽烟）含义截然不同！',
         structure: [
           { label: '主谓宾句型', formula: 'S + Vt + O', example: 'She loves dancing.' },
           { label: '宾语从句', formula: 'S + V + that/if/wh- clause', example: 'I think that she is right.' },
@@ -666,6 +700,7 @@ export const GRAMMAR_BOOK = [
         title: 'S + V + IO + DO（主谓双宾）',
         level: 'PET',
         summary: '某些动词可接两个宾语：间接宾语（人）和直接宾语（物）。',
+        explain: '可以接两个宾语的动词包括 give、send、tell、show、teach、lend、buy、make 等。顺序是：动词 + 间接宾语（人）+ 直接宾语（物）；或者：动词 + 直接宾语（物）+ to/for + 间接宾语（人）。注意 explain、suggest 不能直接接双宾语，要用介词（explain the rule to me）。',
         structure: [
           { label: '双宾语句型', formula: 'S + V + IO + DO  (give, send, tell, show, teach, lend, buy, make, cook)', example: 'She taught us English.' },
           { label: '转换为介词短语', formula: 'S + V + DO + to/for + IO', example: 'She taught English to us. / He bought a gift for her.' },
@@ -682,6 +717,7 @@ export const GRAMMAR_BOOK = [
         title: 'S + V + O + C（主谓宾补）',
         level: 'PET',
         summary: '某些动词需要宾语补足语来补充说明宾语的状态。',
+        explain: '宾语补足语紧跟在宾语之后，补充说明宾语的状态或身份。宾补可以是形容词（keep you healthy）、名词（call him a genius）或不定式（ask her to wait）。宾语和宾补之间有主谓逻辑关系：宾语"做"或"是"宾补所指的事。',
         structure: [
           { label: '宾补为形容词', formula: 'make/find/keep/consider + O + adj', example: 'Exercise keeps you healthy.' },
           { label: '宾补为名词', formula: 'call/name/elect/appoint + O + noun', example: 'They elected her president.' },
@@ -711,6 +747,7 @@ export const GRAMMAR_BOOK = [
         title: '名词性从句',
         level: 'PET',
         summary: '名词性从句包括主语从句、宾语从句、表语从句和同位语从句。',
+        explain: '名词性从句在句子里充当名词的角色，可以做主语（What she said surprised me）、宾语（I know that she\'s right）或表语。最重要：无论用什么引导词（that/whether/where/what），从句内部要用陈述句语序，不能倒装。"I know where she is."对，"I know where is she."错。',
         structure: [
           { label: '宾语从句', formula: 'V + that/if/whether/wh- word + clause', example: 'I know that she is honest.' },
           { label: '主语从句', formula: 'That/Whether/What + clause + V  /  It + V + that-clause', example: 'What he said surprised everyone. / It is clear that she is talented.' },
@@ -728,6 +765,7 @@ export const GRAMMAR_BOOK = [
         title: '定语从句',
         level: 'PET',
         summary: '定语从句修饰名词，用关系代词（who/which/that）或关系副词（when/where/why）引导。',
+        explain: '定语从句放在名词后面修饰它，作用像形容词。who/whom 指人，which 指物，that 指人或物（但在非限定性从句中只能用 who/which）。注意：关系代词已经代替了从句里的名词，从句中不能再出现那个代词（The book which I bought it → 去掉 it）。',
         structure: [
           { label: '限制性定语从句', formula: 'antecedent + who/which/that/when/where/why + clause', example: 'The girl who sits next to me is my friend.' },
           { label: '非限制性定语从句', formula: 'antecedent + , + which/who/whom + clause', example: 'My father, who is a doctor, loves reading.' },
@@ -737,7 +775,7 @@ export const GRAMMAR_BOOK = [
         traps: [
           { wrong: 'The book which I bought it is interesting.', right: 'The book which I bought is interesting.', explain: '定语从句中，关系代词已充当宾语，不能再加代词 it' },
           { wrong: 'My mother, that is a nurse, works night shifts.', right: 'My mother, who is a nurse, works night shifts.', explain: '非限制性定语从句不用 that，用 who 或 which' },
-          { wrong: 'This is the reason why I failed.', right: 'This is the reason why I failed. (also acceptable: the reason that...)', explain: '注意：the reason why 是正确用法，不用 the reason because' },
+          { wrong: 'This is the reason because I failed.', right: 'This is the reason why I failed.', explain: '引导原因定语从句用 why，不用 because' },
         ],
       },
       {
@@ -745,6 +783,7 @@ export const GRAMMAR_BOOK = [
         title: '时间状语从句',
         level: 'PET',
         summary: '时间状语从句说明主句动作发生的时间，由 when, while, as, before, after, since, until 等引导。',
+        explain: '时间状语从句告诉我们主句动作"什么时候"发生，由 when/while/as/before/after/until/since/as soon as 引导。最重要的规则：主句是将来时态时，时间从句要用一般现在时，不用 will。"When I arrive"而不是"When I will arrive"——这是非常高频的考点。',
         structure: [
           { label: 'when / while / as', formula: 'when + point in time; while + period; as + simultaneous', example: 'As she was leaving, the phone rang.' },
           { label: 'before / after / until', formula: 'before/after/until + clause', example: 'Don\'t leave until I come back.' },
@@ -762,6 +801,7 @@ export const GRAMMAR_BOOK = [
         title: '条件状语从句',
         level: 'PET',
         summary: '条件状语从句由 if, unless, as long as, provided that 等引导，主句与从句时态有特定搭配。',
+        explain: '条件状语从句由 if/unless/as long as 引导，说明动作发生的条件。真实条件句：if 从句用现在时，主句用 will/can + 原形。关键规则：if 从句里不用 will（除非是虚拟语气）。unless = if...not，后面接肯定形式（Unless you hurry = If you don\'t hurry）。',
         structure: [
           { label: '真实条件句', formula: 'If + present tense, S + will/can/may + V', example: 'If it rains, we will cancel the picnic.' },
           { label: '虚拟条件句', formula: 'If + past tense, S + would/could + V', example: 'If I were taller, I would play basketball.' },
@@ -779,6 +819,7 @@ export const GRAMMAR_BOOK = [
         title: '让步状语从句',
         level: 'FCE',
         summary: '让步状语从句由 although, though, even though, even if, however, no matter 等引导，表示"尽管……"。',
+        explain: '让步状语从句表示"尽管……也……"，由 although/though/even if/even though/however/no matter what 等引导。关键规则：although/though 已经包含了"但是"的意思，不能再加 but；even if 表示假设让步；even though 表示事实让步（与 although 近义）。',
         structure: [
           { label: 'although / though', formula: 'Although/Though + clause, main clause', example: 'Although it was late, he kept working.' },
           { label: 'even if / even though', formula: 'even if (假设让步) / even though (事实让步)', example: 'Even if it rains, we will go out.' },
@@ -796,6 +837,7 @@ export const GRAMMAR_BOOK = [
         title: '原因与结果状语从句',
         level: 'PET',
         summary: '原因从句（because/since/as/for）说明原因；结果从句（so...that/such...that）说明结果。',
+        explain: '原因从句（because/since/as）说明原因；结果从句（so...that/such...that）表示结果。区分 so 和 such：so 后面直接接形容词或副词（so fast, so beautiful），such 后面接名词短语（such a fast runner, such beautiful weather）。so...that 和 so that 含义不同：前者表结果，后者表目的。',
         structure: [
           { label: '原因从句', formula: 'because + direct cause; since/as + known cause', example: 'She stayed home because she was ill.' },
           { label: 'so...that 结果从句', formula: 'so + adj/adv + that + clause', example: 'He spoke so quickly that we couldn\'t understand.' },
@@ -804,8 +846,8 @@ export const GRAMMAR_BOOK = [
         tips: 'so 后接形容词/副词；such 后接名词短语。so...that vs so that：前者表结果，后者表目的。',
         traps: [
           { wrong: 'She was so tired that she couldn\'t to sleep.', right: 'She was so tired that she couldn\'t sleep.', explain: '情态动词 couldn\'t 后接动词原形，不加 to' },
-          { wrong: 'It was such cold weather that we stayed inside.', right: 'It was such cold weather that we stayed inside.', explain: '这是正确的——such + 形容词 + 不可数名词（没有 a/an）' },
           { wrong: 'He is so a good student that everyone likes him.', right: 'He is such a good student that everyone likes him.', explain: '后面有名词（student）用 such，不用 so；so 后接形容词不接名词' },
+          { wrong: 'It was such hot weather that we stayed inside.', right: 'It was such hot weather that we stayed inside.', explain: '这是正确的——such + 形容词 + 不可数名词（没有 a/an）' },
         ],
       },
     ],
@@ -825,6 +867,7 @@ export const GRAMMAR_BOOK = [
         title: 'can / could',
         level: 'KET',
         summary: 'can 表示能力、许可或可能性；could 是 can 的过去式，也表示礼貌请求。',
+        explain: 'can 是初学英语最先学的情态动词，表示"会/能/可以"。情态动词最重要的规则：后面只接动词原形，不加 to，也不加 -s/-ed（只能说 can swim，不能说 can swims 或 can to swim）。could 是 can 的过去式，也用于更礼貌的请求（Could you help me? 比 Can you help me? 更礼貌）。',
         structure: [
           { label: '能力', formula: 'can/could + V (现在能力 / 过去能力)', example: 'She can swim very fast. / He could run 10 km when young.' },
           { label: '许可/请求', formula: 'Can/Could + I/you + V? (could 更礼貌)', example: 'Could you help me, please?' },
@@ -842,6 +885,7 @@ export const GRAMMAR_BOOK = [
         title: 'may / might',
         level: 'PET',
         summary: 'may 表示许可或较大可能性；might 表示较小可能性或虚拟语气。',
+        explain: 'may 表示"可能"（约50%把握）或"允许"（You may go now）；might 表示"也许"（约30%把握），也用于虚拟语气。情态动词后接原形，没有人称变化。might have + 过去分词表示"过去可能发生了（某事）"，是推测过去的用法。',
         structure: [
           { label: '许可', formula: 'may + V (正式许可)', example: 'You may leave the room now.' },
           { label: '可能性', formula: 'may/might + V (可能但不确定)', example: 'She may be at home. / It might rain tonight.' },
@@ -859,6 +903,7 @@ export const GRAMMAR_BOOK = [
         title: 'must / have to / mustn\'t / don\'t have to',
         level: 'PET',
         summary: 'must 表示内在义务或强烈推测；have to 表示外在义务；mustn\'t 表示禁止；don\'t have to 表示不必要。',
+        explain: 'must 和 have to 都表示"必须"，但来源不同：must 是说话者的主观要求，have to 是客观必须。最容易混淆的是：mustn\'t 表示"禁止做"，don\'t have to 表示"不必做"（没有义务，但可以做）——这两个含义截然相反！一定要分清楚。',
         structure: [
           { label: '义务', formula: 'must + V (说话者认为必须) / have to + V (客观必须)', example: 'You must try harder. / I have to wear a uniform.' },
           { label: '禁止 vs 不必要', formula: 'mustn\'t + V (禁止) / don\'t have to + V (不必要)', example: 'You mustn\'t smoke here. / You don\'t have to wait.' },
@@ -876,6 +921,7 @@ export const GRAMMAR_BOOK = [
         title: 'should / ought to / had better',
         level: 'PET',
         summary: '表示建议、义务或期望；should have done 表示过去本应做但没做。',
+        explain: 'should 和 ought to 都表示"应该"，语气较温和，常用于给建议。should have + 过去分词表示"本来应该做但没做"，带有遗憾的语气（You should have called me）。had better 语气比 should 强，暗示"不做会有不好的结果"，后面不加 to（had better go，不是 had better to go）。',
         structure: [
           { label: '建议/义务', formula: 'should/ought to + V', example: 'You should see a doctor. / You ought to apologize.' },
           { label: '过去应该（但没做）', formula: 'should have + V-ed', example: 'I should have studied more for the exam.' },
@@ -893,6 +939,7 @@ export const GRAMMAR_BOOK = [
         title: 'will / would',
         level: 'PET',
         summary: 'will 表示将来、意愿或习惯；would 是 will 的过去式，也用于虚拟语气和礼貌表达。',
+        explain: 'will 用于表达将来的事情、临时决定（"I\'ll help you move the boxes"）或预测。would 是 will 的过去式，也用于礼貌请求（Would you mind opening the window?）和过去的习惯（When I was young, I would play in the park every day）。would rather + 动词原形表示"宁愿"。',
         structure: [
           { label: '将来/意愿', formula: 'will + V', example: 'I will help you move tomorrow.' },
           { label: '礼貌请求', formula: 'Would you + V? / Would you mind + V-ing?', example: 'Would you please close the door?' },
@@ -910,6 +957,7 @@ export const GRAMMAR_BOOK = [
         title: 'need / dare',
         level: 'FCE',
         summary: 'need 和 dare 可作情态动词（后接原形，无人称变化）或行为动词（后接不定式）。',
+        explain: 'need 和 dare 比较特殊，可以用作情态动词（needn\'t/daren\'t，后接原形，不变形），也可以用作普通动词（needs to/dares to，有人称变化）。需要重点记忆：needn\'t have done 和 didn\'t need to do 含义不同——前者表示"做了但没必要"，后者表示"没必要所以没做"。',
         structure: [
           { label: '情态动词用法（疑问/否定）', formula: 'Need/Dare + S + V?  /  S + needn\'t/daren\'t + V', example: 'Need you go so soon? / You needn\'t worry.' },
           { label: '行为动词用法', formula: 'need to + V  /  dare to + V (有人称变化)', example: 'She needs to rest. / He didn\'t dare to speak.' },
@@ -938,6 +986,7 @@ export const GRAMMAR_BOOK = [
         title: '强调句（It is...that/who...）',
         level: 'PET',
         summary: '用 It is/was...that/who... 结构强调句子的某一成分（主语、宾语、状语）。',
+        explain: '强调句用 "It is/was + 强调内容 + that/who + 剩余部分" 的结构，把想要突出的成分放在聚光灯下。判断方法：去掉 It is/was 和 that/who，剩下部分能组成完整句子就是强调句。不管强调的是什么（除了人用 who），都用 that 引导，不能用 when/where/which。',
         structure: [
           { label: '基本结构', formula: 'It is/was + 强调部分 + that/who + 其余部分', example: 'It was Tom who broke the window.' },
           { label: '强调状语', formula: 'It is/was + adv/prep phrase + that + clause', example: 'It was in Paris that they first met.' },
@@ -946,8 +995,8 @@ export const GRAMMAR_BOOK = [
         tips: '辨别强调句与主语从句：去掉 It is...that 后，其余部分能否组成完整句子——能则为强调句，不能则为主语从句。',
         traps: [
           { wrong: 'It was the book which I lost.', right: 'It was the book that I lost.', explain: '强调句中用 that（不用 which），强调人时可用 who' },
-          { wrong: 'It is now that she realizes the truth.', right: 'It is only now that she realizes the truth.', explain: '这里是强调时间状语 only now，原句结构正确，注意检查是否漏词' },
           { wrong: 'It was yesterday when he called.', right: 'It was yesterday that he called.', explain: '强调句中连接词一律用 that，不用 when/where/which' },
+          { wrong: 'It is Tom that are wrong.', right: 'It is Tom that is wrong.', explain: '强调句中 be 动词与被强调的主语一致（Tom 是单数用 is）' },
         ],
       },
       {
@@ -955,6 +1004,7 @@ export const GRAMMAR_BOOK = [
         title: '倒装句',
         level: 'FCE',
         summary: '某些情况下主谓语序颠倒，分为完全倒装和部分倒装（助动词提前）。',
+        explain: '倒装就是把助动词移到主语前面。当否定词（never/seldom/hardly）或 only 放在句首时，主句要部分倒装（助动词提前）。地点或方向副词（here/there/away）开头时，用完全倒装。注意：主语是代词时不倒装（Here he comes，不是 Here comes he）。',
         structure: [
           { label: '否定副词开头（部分倒装）', formula: 'Never/Seldom/Hardly/Not only/No sooner + aux + S + V', example: 'Never have I seen such a beautiful sunset.' },
           { label: 'Only 开头（部分倒装）', formula: 'Only + adv/phrase + aux + S + V', example: 'Only then did I understand the truth.' },
@@ -972,6 +1022,7 @@ export const GRAMMAR_BOOK = [
         title: '感叹句',
         level: 'KET',
         summary: '感叹句表达强烈情感，用 What 或 How 引导。',
+        explain: '感叹句表达强烈情感（惊喜、赞叹等），由 What 或 How 引导。区别：What 后面有名词（What a beautiful day!）；How 后面直接接形容词或副词，没有名词（How beautiful!）。不可数名词或复数名词前不加 a/an（What beautiful weather! What lovely flowers!）。',
         structure: [
           { label: 'What 引导', formula: 'What + (a/an) + adj + noun + S + V!', example: 'What a beautiful painting this is!' },
           { label: 'How 引导', formula: 'How + adj/adv + S + V!', example: 'How quickly time flies!' },
@@ -980,7 +1031,7 @@ export const GRAMMAR_BOOK = [
         traps: [
           { wrong: 'What a beautiful the weather is!', right: 'What beautiful weather it is!', explain: 'weather 是不可数名词，What 后不加 a/an' },
           { wrong: 'How a fast runner he is!', right: 'What a fast runner he is!  /  How fast he runs!', explain: '后面有名词（runner）用 What；How 后只接形容词/副词，不加名词' },
-          { wrong: 'How great a game it was!', right: 'What a great game it was!  /  How great the game was!', explain: '接名词用 What；How + great（形容词）后接 the game was 即可' },
+          { wrong: 'How great a game it was!', right: 'What a great game it was!', explain: '接名词用 What；How 后接形容词+从句即可（How great the game was!）' },
         ],
       },
       {
@@ -988,6 +1039,7 @@ export const GRAMMAR_BOOK = [
         title: '反意疑问句',
         level: 'PET',
         summary: '反意疑问句附于陈述句之后寻求确认，前肯后否或前否后肯。',
+        explain: '反意疑问句附在陈述句后面，请求对方确认。规则很简单：陈述部分肯定→疑问部分否定；陈述部分否定（包含 never/hardly/seldom 等否定词）→疑问部分肯定。几个特殊情况必须记牢：I am... → aren\'t I；Let\'s... → shall we；祈使句 → will you。',
         structure: [
           { label: '基本规则', formula: '肯定陈述 + 否定问尾  /  否定陈述 + 肯定问尾', example: 'She is a teacher, isn\'t she? / He didn\'t go, did he?' },
           { label: '情态动词', formula: 'S + modal, modal not + S?', example: 'You can swim, can\'t you? / He shouldn\'t do that, should he?' },
@@ -997,7 +1049,7 @@ export const GRAMMAR_BOOK = [
         traps: [
           { wrong: 'She has never been abroad, hasn\'t she?', right: 'She has never been abroad, has she?', explain: '主句含否定词 never，问尾用肯定形式' },
           { wrong: 'Let\'s play, shan\'t we?', right: 'Let\'s play, shall we?', explain: 'Let\'s... 开头的反意疑问句固定用 shall we' },
-          { wrong: 'Nobody came, did they?', right: 'Nobody came, did they?', explain: '这是正确的——nobody 是否定词，问尾用肯定 did they' },
+          { wrong: 'Nobody came, didn\'t they?', right: 'Nobody came, did they?', explain: 'nobody 是否定词，问尾用肯定 did they' },
         ],
       },
       {
@@ -1005,6 +1057,7 @@ export const GRAMMAR_BOOK = [
         title: '省略句',
         level: 'PET',
         summary: '为避免重复，省略已在上文出现或可从语境理解的成分。',
+        explain: '省略句是避免重复的语言策略，把已经提到过或可以理解的成分省略掉。最常见的是用助动词代替整个谓语（She sings well, and so does her sister）。so + 助动词 + 主语表示"……也是"；neither/nor + 助动词 + 主语表示"……也不是"。注意助动词要与上文时态一致。',
         structure: [
           { label: '助动词代替谓语', formula: 'S + aux (替代上文谓语短语)', example: 'She plays piano and so does her sister.' },
           { label: '条件从句省略', formula: 'if 从句可省略 if，将 had/were/should 提前', example: 'Had I known, I would have helped. (= If I had known...)' },
@@ -1012,8 +1065,8 @@ export const GRAMMAR_BOOK = [
         ],
         tips: 'so + 助动词 + 主语（表赞同：我也是）；nor/neither + 助动词 + 主语（表否定赞同：我也不）。注意助动词选择要与上文时态一致。',
         traps: [
-          { wrong: 'I like reading and she does too.', right: 'I like reading and so does she.', explain: 'so + 助动词 + 主语，语序倒装，不是 she does too 的 so 位置错误（she does too 也可以，但 so does she 更地道）' },
           { wrong: 'Neither I do.', right: 'Neither do I.', explain: 'neither/nor 开头表示"我也不"，需要倒装：Neither do I.' },
+          { wrong: 'So she does.', right: 'So does she.', explain: 'so + 助动词 + 主语（倒装），不是 so + 主语 + 助动词' },
           { wrong: 'Were I rich, I would travel.', right: 'Were I rich, I would travel.', explain: '这是正确的——were 提前省略 if，表示虚拟条件' },
         ],
       },

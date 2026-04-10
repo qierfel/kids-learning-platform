@@ -1,6 +1,4 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
-import { auth } from '../firebase/config'
 import './Layout.css'
 
 const PRIMARY_NAV = [
@@ -21,11 +19,11 @@ const TOOL_NAV = [
   { to: '/notebook', label: '问题讨论' },
 ]
 
-export default function Layout({ user, profile }) {
+export default function Layout({ user, profile, onLogout }) {
   const navigate = useNavigate()
 
-  async function handleLogout() {
-    await signOut(auth)
+  function handleLogout() {
+    onLogout()
     navigate('/login')
   }
 
