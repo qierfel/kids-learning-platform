@@ -1,22 +1,28 @@
 // Cloudflare Pages Function — SSE streaming for AI teacher chat
 // Path: /functions/api/claude-stream.js → maps to /api/claude-stream
+//
+// IMPORTANT: Do NOT use context.waitUntil() for streaming.
+// When returning new Response(readable), CF keeps the worker alive
+// until the ReadableStream is closed. Start the write work via IIFE.
 
 export async function onRequestPost(context) {
   const { request, env } = context
   const apiKey = env.ANTHROPIC_API_KEY
+
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'API key not configured' }), {
-      status: 500,
-      headers: { 'content-type': 'application/json', ...corsHeaders() },
-    })
+    return sseError('API key not configured on server')
   }
 
   let body
   try { body = await request.json() } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: corsHeaders() })
+    return sseError('Invalid JSON body')
   }
 
   const { messages = [], subject = '' } = body
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return sseError('No messages provided')
+  }
+
   const subjectStr = subject && subject !== '不限科目' ? subject : '各科目'
 
   const systemPrompt = `你是"晓敏老师"，一位拥有20年教学经验的资深教师，精通语文、数学、英语、物理、化学、历史、地理，尤其擅长${subjectStr}。
@@ -39,18 +45,20 @@ export async function onRequestPost(context) {
 
   const apiMessages = messages
     .filter(m => m.role === 'user' || m.role === 'ai')
-    .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content }))
+    .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: String(m.content || '') }))
+    .filter(m => m.content.trim().length > 0)
 
   if (apiMessages.length === 0) {
-    return new Response(JSON.stringify({ error: 'No messages' }), { status: 400, headers: corsHeaders() })
+    return sseError('No valid messages to process')
   }
 
-  // Use TransformStream for SSE — works natively in Cloudflare Workers
   const { readable, writable } = new TransformStream()
   const writer = writable.getWriter()
   const encoder = new TextEncoder()
 
-  const streamWork = async () => {
+  // CF Workers: returning Response(readable) keeps the worker alive
+  // until the stream is closed. Start writing via IIFE — no waitUntil needed.
+  ;(async () => {
     try {
       const upstream = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -69,48 +77,51 @@ export async function onRequestPost(context) {
       })
 
       if (!upstream.ok) {
-        await writer.write(encoder.encode(`data: ${JSON.stringify({ error: 'Upstream error' })}\n\n`))
-        return
-      }
+        const errText = await upstream.text()
+        await writer.write(encoder.encode(`data: ${JSON.stringify({ error: `Anthropic API error: ${upstream.status}` })}\n\n`))
+        console.error('Anthropic error:', errText)
+      } else {
+        const reader = upstream.body.getReader()
+        const decoder = new TextDecoder()
+        let buf = ''
 
-      const reader = upstream.body.getReader()
-      const decoder = new TextDecoder()
-      let buf = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buf += decoder.decode(value, { stream: true })
-        const lines = buf.split('\n')
-        buf = lines.pop() || ''
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const data = line.slice(6).trim()
-          if (data === '[DONE]') continue
-          try {
-            const event = JSON.parse(data)
-            if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
-              await writer.write(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`))
-            }
-          } catch { /* ignore parse errors */ }
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buf += decoder.decode(value, { stream: true })
+          const lines = buf.split('\n')
+          buf = lines.pop() || ''
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue
+            const data = line.slice(6).trim()
+            if (data === '[DONE]') continue
+            try {
+              const event = JSON.parse(data)
+              if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+                await writer.write(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`))
+              }
+            } catch { /* ignore malformed SSE lines */ }
+          }
         }
       }
     } catch (e) {
-      await writer.write(encoder.encode(`data: ${JSON.stringify({ error: e.message })}\n\n`))
+      try {
+        await writer.write(encoder.encode(`data: ${JSON.stringify({ error: e.message })}\n\n`))
+      } catch { /* writer might already be closed */ }
     } finally {
-      await writer.write(encoder.encode('data: [DONE]\n\n'))
-      await writer.close()
+      try {
+        await writer.write(encoder.encode('data: [DONE]\n\n'))
+        await writer.close()
+      } catch { /* ignore close errors */ }
     }
-  }
-
-  // Fire the stream work — response streams to client while this runs
-  context.waitUntil(streamWork())
+  })()
 
   return new Response(readable, {
+    status: 200,
     headers: {
       'content-type': 'text/event-stream; charset=utf-8',
       'cache-control': 'no-cache, no-transform',
-      'connection': 'keep-alive',
+      'x-accel-buffering': 'no',
       ...corsHeaders(),
     },
   })
@@ -118,6 +129,19 @@ export async function onRequestPost(context) {
 
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: corsHeaders() })
+}
+
+// Return an immediate SSE stream with a single error event
+function sseError(message) {
+  const body = `data: ${JSON.stringify({ error: message })}\n\ndata: [DONE]\n\n`
+  return new Response(body, {
+    status: 200, // must be 200 for frontend to read SSE body
+    headers: {
+      'content-type': 'text/event-stream; charset=utf-8',
+      'cache-control': 'no-cache',
+      ...corsHeaders(),
+    },
+  })
 }
 
 function corsHeaders() {
