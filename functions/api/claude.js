@@ -123,6 +123,35 @@ ${lines.join('\n')}
 ]`
     max_tokens = 600
 
+  } else if (type === 'photo_ocr') {
+    const { imageBase64, mediaType = 'image/jpeg' } = payload
+    if (!imageBase64) return json({ error: 'imageBase64 required' }, 400)
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5-20251001',
+          max_tokens: 1024,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+              { type: 'text', text: `请仔细识别这张试卷/作业照片中的错题信息，以JSON格式返回（只输出JSON，不要\`\`\`json标记）：\n{\n  "subject": "科目（语文/数学/英语/物理/化学/历史/地理之一）",\n  "topic": "具体知识点（如：一元一次方程/古诗词默写/欧姆定律等）",\n  "question": "完整的题目内容（包括题干和选项）",\n  "myAnswer": "学生的错误答案（若可见）",\n  "correctAnswer": "正确答案（若有红笔批改则提取）",\n  "errorType": "错误类型（概念错误/计算错误/粗心大意/方法错误/未掌握知识点之一）"\n}\n如某项无法识别填空字符串。题目内容要尽量完整准确。` }
+            ]
+          }],
+        }),
+      })
+      if (!response.ok) { const err = await response.text(); return json({ error: 'Upstream API error', detail: err }, 502) }
+      const data = await response.json()
+      const text = data.content?.[0]?.text?.trim() || ''
+      try {
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+        if (jsonMatch) { return json({ parsed: JSON.parse(jsonMatch[0]) }) }
+      } catch { /* fall through */ }
+      return json({ text })
+    } catch (e) { return json({ error: e.message }, 500) }
+
   } else {
     return json({ error: `Unknown type: ${type}` }, 400)
   }
