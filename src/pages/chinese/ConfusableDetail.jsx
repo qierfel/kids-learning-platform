@@ -7,7 +7,6 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
-  const [currentQuestions, setCurrentQuestions] = useState(null)
   const [nextReady, setNextReady] = useState(false)
 
   // 生成练习题：每个字的所有词都出题，随机打乱
@@ -32,7 +31,8 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
     }))
   }
 
-  const questions = currentQuestions ?? buildQuestions()
+  // 用惰性初始化，保证题目只生成一次，不随重渲染变化
+  const [questions, setQuestions] = useState(() => buildQuestions())
 
   function handleAnswer(char) {
     if (quizAnswer !== null) return
@@ -52,7 +52,7 @@ export default function ConfusableDetail({ item, quizMode, onBack }) {
   }
 
   function restart() {
-    setCurrentQuestions(buildQuestions())
+    setQuestions(buildQuestions())
     setQuizIndex(0)
     setQuizAnswer(null)
     setScore(0)
