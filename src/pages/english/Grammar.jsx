@@ -7,6 +7,7 @@ const LEVEL_COLOR = { KET: '#10b981', PET: '#f59e0b', FCE: '#7c3aed' }
 export default function Grammar({ user, onBack }) {
   const [activeChapter, setActiveChapter] = useState(0)
   const [activePoint, setActivePoint] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('explain')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiResult, setAiResult] = useState('')
@@ -78,7 +79,9 @@ export default function Grammar({ user, onBack }) {
 
   // ── Detail view ──────────────────────────────────────────────
   if (activePoint) {
-    const chapter = GRAMMAR_BOOK[activeChapter]
+    const chapter = activePoint._chapterTitle
+      ? { chapter: activePoint._chapter, title: activePoint._chapterTitle }
+      : GRAMMAR_BOOK[activeChapter]
     return (
       <div className="grammar-detail">
         <button className="grammar-back" onClick={() => setActivePoint(null)}>
@@ -223,6 +226,17 @@ export default function Grammar({ user, onBack }) {
   const chapter = GRAMMAR_BOOK[activeChapter]
   const totalPoints = GRAMMAR_BOOK.reduce((sum, c) => sum + c.points.length, 0)
 
+  // Search: flat list across all chapters
+  const q = searchQuery.trim().toLowerCase()
+  const allPoints = q
+    ? GRAMMAR_BOOK.flatMap(c => c.points.map(p => ({ ...p, _chapter: c.chapter, _chapterTitle: c.title })))
+        .filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          (p.summary || '').toLowerCase().includes(q) ||
+          (p.level || '').toLowerCase().includes(q)
+        )
+    : null
+
   return (
     <div className="grammar-page">
       <h2 className="grammar-page-title">
@@ -230,47 +244,90 @@ export default function Grammar({ user, onBack }) {
         <span className="grammar-subtitle">语法书 · {GRAMMAR_BOOK.length} 章 · {totalPoints} 考点</span>
       </h2>
 
-      {/* Chapter grid */}
-      <div className="grammar-chapter-grid">
-        {GRAMMAR_BOOK.map((c, i) => (
-          <button
-            key={c.id}
-            className={`grammar-chapter-card ${activeChapter === i ? 'active' : ''}`}
-            onClick={() => setActiveChapter(i)}
-          >
-            <span className="gc-icon">{c.icon}</span>
-            <span className="gc-num">{c.chapter}</span>
-            <span className="gc-title">{c.title}</span>
-            <span className="gc-count">{c.points.length} 考点</span>
-          </button>
-        ))}
+      {/* Search bar */}
+      <div className="grammar-search-row">
+        <input
+          className="grammar-search-input"
+          type="text"
+          placeholder="🔍 搜索语法点（如 tense、主语、KET）"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button className="grammar-search-clear" onClick={() => setSearchQuery('')}>✕</button>
+        )}
       </div>
 
-      {/* Points for selected chapter */}
-      <div className="grammar-chapter-header">
-        <span className="grammar-chapter-label">{chapter.icon} {chapter.chapter} · {chapter.title}</span>
-        <span className="grammar-chapter-sub">{chapter.points.length} 个语法点</span>
-      </div>
-
-      <div className="grammar-point-list">
-        {chapter.points.map(p => (
-          <div key={p.id} className="grammar-point-card" onClick={() => openPoint(p)}>
-            <div className="grammar-point-left">
-              <div className="grammar-point-title">{p.title}</div>
-              <div className="grammar-point-summary">{p.summary}</div>
-            </div>
-            <div className="grammar-point-right">
-              <span
-                className="grammar-level-badge"
-                style={{ background: LEVEL_COLOR[p.level] + '20', color: LEVEL_COLOR[p.level] }}
+      {/* Search results */}
+      {allPoints ? (
+        <div className="grammar-point-list">
+          {allPoints.length === 0 ? (
+            <p className="grammar-empty">没有找到匹配的语法点</p>
+          ) : (
+            allPoints.map(p => (
+              <div key={p.id} className="grammar-point-card" onClick={() => openPoint(p)}>
+                <div className="grammar-point-left">
+                  <div className="grammar-point-title">{p.title}</div>
+                  <div className="grammar-point-summary">{p._chapter} · {p._chapterTitle}</div>
+                </div>
+                <div className="grammar-point-right">
+                  <span
+                    className="grammar-level-badge"
+                    style={{ background: LEVEL_COLOR[p.level] + '20', color: LEVEL_COLOR[p.level] }}
+                  >
+                    {p.level}
+                  </span>
+                  <span className="grammar-arrow">›</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Chapter grid */}
+          <div className="grammar-chapter-grid">
+            {GRAMMAR_BOOK.map((c, i) => (
+              <button
+                key={c.id}
+                className={`grammar-chapter-card ${activeChapter === i ? 'active' : ''}`}
+                onClick={() => setActiveChapter(i)}
               >
-                {p.level}
-              </span>
-              <span className="grammar-arrow">›</span>
-            </div>
+                <span className="gc-icon">{c.icon}</span>
+                <span className="gc-num">{c.chapter}</span>
+                <span className="gc-title">{c.title}</span>
+                <span className="gc-count">{c.points.length} 考点</span>
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
+
+          {/* Points for selected chapter */}
+          <div className="grammar-chapter-header">
+            <span className="grammar-chapter-label">{chapter.icon} {chapter.chapter} · {chapter.title}</span>
+            <span className="grammar-chapter-sub">{chapter.points.length} 个语法点</span>
+          </div>
+
+          <div className="grammar-point-list">
+            {chapter.points.map(p => (
+              <div key={p.id} className="grammar-point-card" onClick={() => openPoint(p)}>
+                <div className="grammar-point-left">
+                  <div className="grammar-point-title">{p.title}</div>
+                  <div className="grammar-point-summary">{p.summary}</div>
+                </div>
+                <div className="grammar-point-right">
+                  <span
+                    className="grammar-level-badge"
+                    style={{ background: LEVEL_COLOR[p.level] + '20', color: LEVEL_COLOR[p.level] }}
+                  >
+                    {p.level}
+                  </span>
+                  <span className="grammar-arrow">›</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

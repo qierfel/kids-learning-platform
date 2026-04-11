@@ -118,3 +118,16 @@
 .again-btn { flex: 1; padding: 12px; border-radius: 12px; background: #7c3aed; color: #fff; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
 .flash-again-btn { flex: 1; padding: 12px; border-radius: 12px; background: #f5f3ff; color: #7c3aed; font-size: 14px; border: 1.5px solid #ddd6fe; cursor: pointer; }
 .back-flat-btn { flex: 1; padding: 12px; border-radius: 12px; background: #f3f4f6; color: #555; font-size: 14px; border: none; cursor: pointer; }
+
+/* Browse mode */
+.browse-btn { padding: 12px; border-radius: 14px; background: #f0fdf4; color: #16a34a; font-size: 15px; font-weight: 600; border: 1.5px solid #bbf7d0; cursor: pointer; }
+.wq-browse-search-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.wq-browse-search { flex: 1; padding: 10px 14px; border: 1.5px solid #e8edf2; border-radius: 12px; font-size: 14px; background: #fff; outline: none; transition: border-color 0.15s; }
+.wq-browse-search:focus { border-color: #7c3aed; }
+.wq-browse-clear { background: #f3f4f6; border: none; border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; color: #555; flex-shrink: 0; }
+.wq-browse-list { display: flex; flex-direction: column; gap: 8px; max-height: 70vh; overflow-y: auto; }
+.wq-browse-card { background: #fff; border: 1.5px solid #e8edf2; border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.wq-browse-word { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+.wq-browse-meaning { font-size: 14px; color: #6366f1; }
+.wq-browse-example { font-size: 12px; color: #888; margin-top: 2px; font-style: italic; }
+.wq-browse-empty { text-align: center; color: #888; padding: 40px 0; font-size: 14px; }

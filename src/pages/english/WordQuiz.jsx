@@ -24,10 +24,11 @@ function buildQuestions(pool) {
 }
 
 export default function WordQuiz({ onBack }) {
-  const [mode, setMode] = useState('setup') // setup | quiz | result | flashcard
+  const [mode, setMode] = useState('setup') // setup | quiz | result | flashcard | browse
   const [subMode, setSubMode] = useState('grade') // grade | exam
   const [grade, setGrade] = useState(3)
   const [examLevel, setExamLevel] = useState('KET')
+  const [wordSearch, setWordSearch] = useState('')
 
   const [questions, setQuestions] = useState([])
   const [current, setCurrent] = useState(0)
@@ -123,6 +124,46 @@ export default function WordQuiz({ onBack }) {
         <div className="setup-actions">
           <button className="start-btn" onClick={startQuiz}>开始测验（选择题）</button>
           <button className="flash-btn" onClick={startFlashcard}>闪卡记忆</button>
+          <button className="browse-btn" onClick={() => { setWordSearch(''); setMode('browse') }}>🔍 浏览单词</button>
+        </div>
+      </div>
+    )
+  }
+
+  if (mode === 'browse') {
+    const wq = wordSearch.trim().toLowerCase()
+    const browsePool = wq
+      ? pool.filter(w => w.word.toLowerCase().includes(wq) || w.meaning.toLowerCase().includes(wq))
+      : pool
+    return (
+      <div className="wordquiz">
+        <div className="wq-topbar">
+          <button className="back-btn" onClick={() => setMode('setup')}>← 返回</button>
+          <span className="wq-counter">{browsePool.length} / {pool.length} 词</span>
+        </div>
+        <div className="wq-browse-search-row">
+          <input
+            className="wq-browse-search"
+            type="text"
+            placeholder="🔍 搜索单词或中文释义"
+            value={wordSearch}
+            autoFocus
+            onChange={e => setWordSearch(e.target.value)}
+          />
+          {wordSearch && <button className="wq-browse-clear" onClick={() => setWordSearch('')}>✕</button>}
+        </div>
+        <div className="wq-browse-list">
+          {browsePool.length === 0 ? (
+            <p className="wq-browse-empty">没有找到匹配的单词</p>
+          ) : (
+            browsePool.map((w, i) => (
+              <div key={i} className="wq-browse-card">
+                <span className="wq-browse-word">{w.word}</span>
+                <span className="wq-browse-meaning">{w.meaning}</span>
+                {w.example && <span className="wq-browse-example">{w.example}</span>}
+              </div>
+            ))
+          )}
         </div>
       </div>
     )

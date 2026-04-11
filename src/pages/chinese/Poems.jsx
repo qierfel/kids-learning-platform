@@ -9,8 +9,13 @@ const BASE_URL = '/kids-learning-platform/audio/poems/'
 export default function Poems() {
   const [grade, setGrade] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const filtered = grade === 'all' ? poems : poems.filter(p => p.grade === Number(grade))
+  const q = searchQuery.trim().toLowerCase()
+  const filtered = poems.filter(p =>
+    (grade === 'all' || p.grade === Number(grade)) &&
+    (!q || p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q) || p.dynasty.toLowerCase().includes(q) || (p.lines || []).some(l => l.includes(q)))
+  )
 
   if (selected) {
     return <PoemDetail poem={selected} onBack={() => setSelected(null)} />
@@ -20,6 +25,19 @@ export default function Poems() {
     <div className="poems">
       <h2 className="page-title">古诗词</h2>
 
+      <div className="poem-search-row">
+        <input
+          className="poem-search-input"
+          type="text"
+          placeholder="🔍 搜索诗题、作者、朝代或诗句"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button className="poem-search-clear" onClick={() => setSearchQuery('')}>✕</button>
+        )}
+      </div>
+
       <div className="grade-tabs">
         <button className={grade === 'all' ? 'grade-btn active' : 'grade-btn'} onClick={() => setGrade('all')}>全部</button>
         {GRADES.map(g => (
@@ -28,14 +46,18 @@ export default function Poems() {
       </div>
 
       <div className="poem-list">
-        {filtered.map((poem, i) => (
-          <div key={i} className="poem-card" onClick={() => setSelected(poem)}>
-            <div className="poem-card-title">{poem.title}</div>
-            <div className="poem-card-meta">{poem.dynasty} · {poem.author}</div>
-            <div className="poem-card-preview">{poem.lines[0]}</div>
-            {audioManifest[poem.title] && <span className="audio-badge">🔊</span>}
-          </div>
-        ))}
+        {filtered.length === 0 ? (
+          <p className="poem-empty">没有找到匹配的古诗词</p>
+        ) : (
+          filtered.map((poem, i) => (
+            <div key={i} className="poem-card" onClick={() => setSelected(poem)}>
+              <div className="poem-card-title">{poem.title}</div>
+              <div className="poem-card-meta">{poem.dynasty} · {poem.author}</div>
+              <div className="poem-card-preview">{poem.lines[0]}</div>
+              {audioManifest[poem.title] && <span className="audio-badge">🔊</span>}
+            </div>
+          ))
+        )}
       </div>
     </div>
   )

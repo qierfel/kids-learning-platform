@@ -15,10 +15,13 @@ export default function Confusables() {
   const [type, setType] = useState('all')
   const [selected, setSelected] = useState(null)
   const [quizMode, setQuizMode] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
+  const q = searchQuery.trim()
   const filtered = confusables.filter(item =>
     (grade === 'all' || item.grade === Number(grade)) &&
-    (type === 'all' || item.type === type)
+    (type === 'all' || item.type === type) &&
+    (!q || item.chars.some(c => c.includes(q)))
   )
 
   if (selected) {
@@ -32,6 +35,19 @@ export default function Confusables() {
   return (
     <div className="confusables">
       <h2 className="page-title">同音字 / 形近字</h2>
+
+      <div className="confusable-search-row">
+        <input
+          className="confusable-search-input"
+          type="text"
+          placeholder="🔍 搜索汉字（如 的、得、地）"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button className="confusable-search-clear" onClick={() => setSearchQuery('')}>✕</button>
+        )}
+      </div>
 
       <div className="filters">
         <div className="filter-group">
