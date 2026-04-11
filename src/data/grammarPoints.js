@@ -1072,6 +1072,275 @@ export const GRAMMAR_BOOK = [
       },
     ],
   },
+
+  // ──────────────────────────────────────────────
+  // 第十一章  数量词
+  // ──────────────────────────────────────────────
+  {
+    id: 'quantifiers',
+    chapter: '第十一章',
+    title: '数量词',
+    icon: '🔢',
+    points: [
+      {
+        id: 'some_any',
+        title: 'some / any',
+        level: 'KET',
+        summary: 'some 用于肯定句，any 用于否定句和疑问句，但邀请/请求句用 some。',
+        explain: 'some 和 any 都表示"一些"，但用法完全不同。some 通常用在肯定句中，any 用在否定句和一般疑问句中。但有一个重要例外：当疑问句是邀请或请求对方做某事时，用 some（因为我们期望对方说"是"）。这是 KET 和 PET 非常常见的考点。',
+        structure: [
+          { label: '肯定句', formula: 'some + 可数复数 / 不可数名词', example: 'There are some apples on the table. I need some help.' },
+          { label: '否定句', formula: 'not + any + 名词', example: 'There aren\'t any students here. I don\'t have any money.' },
+          { label: '疑问句（一般）', formula: 'any + 名词（询问是否存在）', example: 'Is there any milk left? Have you got any brothers?' },
+          { label: '疑问句（邀请/请求）', formula: 'some + 名词（期望肯定回答）', example: 'Would you like some tea? Can I have some water?' },
+        ],
+        tips: '记忆口诀：肯定用 some，否定疑问用 any；但"请求/邀请"句用 some（因为说话者期望对方说"是"）。',
+        traps: [
+          { wrong: 'Would you like any coffee?', right: 'Would you like some coffee?', explain: '表示邀请时用 some，因为说话者期望对方接受' },
+          { wrong: 'I have some problems. / I don\'t have some time.', right: 'I don\'t have any time.', explain: '否定句中用 any，不用 some' },
+          { wrong: 'Are there some seats available?', right: 'Are there any seats available?', explain: '一般疑问句（非邀请）用 any' },
+        ],
+      },
+      {
+        id: 'much_many_lot',
+        title: 'much / many / a lot of',
+        level: 'KET',
+        summary: 'many 修饰可数复数，much 修饰不可数名词，a lot of 两者均可用。',
+        explain: '表示"大量"时要区分 many、much 和 a lot of。many 只和可数复数名词搭配，much 只和不可数名词搭配；而 a lot of / lots of 两种都能用，是最灵活的选择。注意：much 在肯定句中听起来比较正式，日常口语中更多用 a lot of。',
+        structure: [
+          { label: 'many + 可数复数', formula: 'many + plural nouns', example: 'There are many students in the class. How many chairs are there?' },
+          { label: 'much + 不可数', formula: 'much + uncountable noun', example: 'There isn\'t much time. How much water do you need?' },
+          { label: 'a lot of / lots of', formula: 'a lot of / lots of + 可数或不可数', example: 'She has a lot of friends. We need lots of water.' },
+        ],
+        tips: 'How many...? 问可数名词的数量；How much...? 问不可数名词的数量（也用于问价格）。much 在肯定句较正式，日常用 a lot of 更自然。',
+        traps: [
+          { wrong: 'I have much friends.', right: 'I have many friends. / I have a lot of friends.', explain: 'friends 是可数名词，用 many 或 a lot of，不用 much' },
+          { wrong: 'How many money do you have?', right: 'How much money do you have?', explain: 'money 是不可数名词，用 How much' },
+          { wrong: 'There are lots of informations.', right: 'There is a lot of information.', explain: 'information 不可数，不能加 s，谓语用单数 is' },
+        ],
+      },
+      {
+        id: 'few_little',
+        title: 'few / little / a few / a little',
+        level: 'PET',
+        summary: 'few/little 表示"几乎没有"（否定含义），a few/a little 表示"有一点"（肯定含义）。',
+        explain: '这四个词是英语中的经典易混点。few 和 a few 配可数复数名词；little 和 a little 配不可数名词。关键区别在于"a"：有 a 是肯定含义（虽然不多，但有）；没有 a 是否定含义（几乎没有）。这个细微差别直接影响句子意思。',
+        structure: [
+          { label: 'a few + 可数复数', formula: '有一些（数量不多，但够用）', example: 'I have a few friends here. Let\'s wait a few minutes.' },
+          { label: 'few + 可数复数', formula: '几乎没有（数量太少，含否定）', example: 'Few students passed the exam. (大多数没过)' },
+          { label: 'a little + 不可数', formula: '有一点（不多，但够用）', example: 'There\'s a little milk left. I need a little help.' },
+          { label: 'little + 不可数', formula: '几乎没有（含否定）', example: 'There is little hope. He has little money.' },
+        ],
+        tips: '记忆方法：加 a 就有希望（有一些），不加 a 就没希望（几乎没有）。可以把 a 理解为"有"的标志。',
+        traps: [
+          { wrong: 'I have few money.', right: 'I have little money.', explain: 'money 是不可数名词，用 little/a little，不用 few/a few' },
+          { wrong: 'She has a few patience.', right: 'She has a little patience.', explain: 'patience 是不可数名词，用 a little' },
+          { wrong: 'Few people came, so it was a great party.', right: 'A few people came, so it was a great party.', explain: 'few 含否定意味（人太少），而 a few 是"有一些人来了"，符合语境' },
+        ],
+      },
+      {
+        id: 'enough_too',
+        title: 'enough / too',
+        level: 'PET',
+        summary: 'enough 表示"足够"，too 表示"过于/太"，位置固定且不可互换。',
+        explain: 'enough 和 too 都常与形容词/副词搭配，但位置相反，含义也不同。too 放在形容词或副词之前，表示"超出了合适的程度"（否定含义）；enough 放在形容词或副词之后，名词之前，表示"达到了需要的程度"。"too...to do"和"...enough to do"是两个重要句型。',
+        structure: [
+          { label: 'too + adj/adv', formula: 'too + adj/adv (+ to do)', example: 'The coffee is too hot (to drink). He drives too fast.' },
+          { label: 'adj/adv + enough', formula: 'adj/adv + enough (+ to do)', example: 'She is old enough to drive. He runs fast enough to win.' },
+          { label: 'enough + noun', formula: 'enough + 名词', example: 'Do we have enough time? There isn\'t enough food.' },
+        ],
+        tips: 'too 在形容词前，enough 在形容词后。"too...to do" = 太……以至于不能；"...enough to do" = 足够……可以。注意：enough 修饰名词时放名词之前（enough food）。',
+        traps: [
+          { wrong: 'She is enough old to vote.', right: 'She is old enough to vote.', explain: 'enough 修饰形容词时放在形容词之后' },
+          { wrong: 'He is too young for driving a car.', right: 'He is too young to drive a car.', explain: 'too...to + 动词原形，不接 for + V-ing' },
+          { wrong: 'I have enough of money.', right: 'I have enough money.', explain: 'enough + 名词，中间不加 of（enough of 后接代词/特指名词才用：enough of this nonsense）' },
+        ],
+      },
+    ],
+  },
+
+  // ──────────────────────────────────────────────
+  // 第十二章  间接引语
+  // ──────────────────────────────────────────────
+  {
+    id: 'reported_speech',
+    chapter: '第十二章',
+    title: '间接引语',
+    icon: '💬',
+    points: [
+      {
+        id: 'reported_statements',
+        title: '陈述句变间接引语',
+        level: 'PET',
+        summary: '直接引语变间接引语：时态往前移一步，人称和时间地点词也要相应变化。',
+        explain: '间接引语（Reported Speech）是将别人说的话用自己的话转述出来。陈述句变间接引语时，需要：①用 that 引导（可省略）；②时态整体往过去移一步；③人称代词相应变化；④时间/地点副词也要变化（now→then, today→that day, here→there 等）。这是 PET 和 FCE 的核心考点。',
+        structure: [
+          { label: '一般现在时→一般过去时', formula: '"I like it." → She said (that) she liked it.', example: '"I love pizza." → He said he loved pizza.' },
+          { label: '一般过去时→过去完成时', formula: '"I saw her." → He said he had seen her.', example: '"I finished the work." → She said she had finished the work.' },
+          { label: '现在完成时→过去完成时', formula: '"I have met him." → She said she had met him.', example: '"We have arrived." → They said they had arrived.' },
+          { label: '情态动词变化', formula: 'will→would, can→could, may→might, must→had to', example: '"I will help." → She said she would help.' },
+        ],
+        tips: '时间副词变化表：now→then, today→that day, yesterday→the day before, tomorrow→the next day, here→there, this→that。如果说话的情景仍然有效（如科学事实），时态可以不变。',
+        traps: [
+          { wrong: 'She said she will come tomorrow.', right: 'She said she would come the next day.', explain: 'will 变 would，tomorrow 变 the next day' },
+          { wrong: 'He told that he was tired.', right: 'He said (that) he was tired. / He told me (that) he was tired.', explain: 'tell 后必须有宾语（tell sb that...）；say 后不接宾语直接接 that' },
+          { wrong: 'She said me she was happy.', right: 'She told me she was happy. / She said she was happy.', explain: 'say 后不能直接跟宾语；tell 后必须跟宾语' },
+        ],
+      },
+      {
+        id: 'reported_questions',
+        title: '疑问句变间接引语',
+        level: 'PET',
+        summary: '疑问句变间接引语后变为陈述语序，一般疑问句用 if/whether，特殊疑问句保留疑问词。',
+        explain: '疑问句变成间接引语时，最关键的变化是：语序从疑问句语序变回陈述句语序（主语在前，动词在后），且不再用助动词 do/does/did。一般疑问句用 if 或 whether 引导；特殊疑问句保留原来的疑问词。这个语序变化是最容易出错的地方。',
+        structure: [
+          { label: '一般疑问句→if/whether', formula: 'asked + if/whether + S + V (陈述语序)', example: '"Are you ready?" → She asked if I was ready.' },
+          { label: '特殊疑问句→疑问词', formula: 'asked + 疑问词 + S + V (陈述语序)', example: '"Where do you live?" → He asked where I lived.' },
+          { label: '时态和人称照常变化', formula: '同陈述句规则', example: '"What time is it?" → She asked what time it was.' },
+        ],
+        tips: '记住：间接引语中疑问句变为陈述语序，不用助动词 do/does/did，不加问号。"Did you...?" → asked if I had...（时态也要往过去移）',
+        traps: [
+          { wrong: 'She asked where did I live.', right: 'She asked where I lived.', explain: '间接引语中恢复陈述语序，不用疑问语序，不加 did' },
+          { wrong: 'He asked me if was I tired.', right: 'He asked me if I was tired.', explain: 'if 引导间接疑问句，主语在前：if I was' },
+          { wrong: 'She asked what time is it.', right: 'She asked what time it was.', explain: '间接引语不用问号，时态变过去，语序用陈述式' },
+        ],
+      },
+      {
+        id: 'reported_commands',
+        title: '祈使句变间接引语',
+        level: 'PET',
+        summary: '命令/请求变间接引语用 tell/ask + sb + to do（或 not to do）结构。',
+        explain: '祈使句（命令/请求）变成间接引语时结构简单，不需要改变时态，直接用 told/asked + 宾语 + to do 或 not to do。tell sb to do 用于命令，ask sb to do 用于请求。注意否定命令用 told sb not to do（not 放在 to 前面）。',
+        structure: [
+          { label: '命令句', formula: 'told + sb + to + V原形', example: '"Sit down!" → The teacher told us to sit down.' },
+          { label: '请求句', formula: 'asked + sb + to + V原形', example: '"Please help me." → She asked me to help her.' },
+          { label: '否定命令', formula: 'told/asked + sb + not to + V原形', example: '"Don\'t be late!" → He told us not to be late.' },
+        ],
+        tips: '祈使句间接引语不改时态，只是把动词原形变成 to + V。否定命令：not 放在 to 的前面（not to do），不是 to not do（这是非正式用法）。',
+        traps: [
+          { wrong: 'She told me don\'t touch it.', right: 'She told me not to touch it.', explain: '祈使句否定间接引语用 told sb not to do，不保留原来的 don\'t' },
+          { wrong: 'He asked to me sit down.', right: 'He asked me to sit down.', explain: 'ask sb to do，宾语 me 直接跟在 ask 后面，不加 to' },
+          { wrong: 'The teacher told us that sit down.', right: 'The teacher told us to sit down.', explain: '祈使句间接引语用 tell sb to do，不用 that' },
+        ],
+      },
+    ],
+  },
+
+  // ──────────────────────────────────────────────
+  // 第十三章  动词短语
+  // ──────────────────────────────────────────────
+  {
+    id: 'phrasal_verbs',
+    chapter: '第十三章',
+    title: '动词短语',
+    icon: '🔗',
+    points: [
+      {
+        id: 'phrasal_verbs_intro',
+        title: '动词短语基础',
+        level: 'PET',
+        summary: '动词短语由动词+介词/副词构成，整体意思往往与单词字面意思不同。',
+        explain: '动词短语（Phrasal Verb）是英语的重要特色，由动词加上一个或两个介词/副词小品词构成，整体表达一个新的含义，往往与单词的字面意思相差很远。比如 give up（放弃）不是"给出去"，look after（照顾）不是"向后看"。动词短语按结构分为可分离型（把宾语插在中间）和不可分离型（宾语只能放后面）。',
+        structure: [
+          { label: '动词 + 副词（可分离）', formula: 'V + adv + noun  OR  V + noun + adv (代词必须插入中间)', example: 'turn off the light / turn the light off / turn it off (不能 turn off it)' },
+          { label: '动词 + 介词（不可分离）', formula: 'V + prep + noun（宾语只能在介词后）', example: 'look after the baby（不能 look the baby after）' },
+          { label: '动词 + 副词 + 介词', formula: 'V + adv + prep + noun（三词短语，不可分离）', example: 'look forward to, put up with, get on with' },
+        ],
+        tips: '代词（it/them/him 等）作宾语时，必须插在可分离动词短语中间：turn it off ✅ 不能 turn off it ❌。三词短语都不可分离。',
+        traps: [
+          { wrong: 'Turn off it when you leave.', right: 'Turn it off when you leave.', explain: '代词作宾语时必须插在动词和小品词中间' },
+          { wrong: 'She looks the children after.', right: 'She looks after the children.', explain: 'look after 是不可分离短语，宾语只能放在 after 后面' },
+          { wrong: 'I\'m looking forward to meet you.', right: 'I\'m looking forward to meeting you.', explain: 'look forward to 后接名词或动名词（V-ing），不接动词原形' },
+        ],
+      },
+      {
+        id: 'common_phrasal_verbs',
+        title: '高频动词短语',
+        level: 'PET',
+        summary: '掌握 give up、look after、put off、find out 等 KET/PET 核心动词短语。',
+        explain: '动词短语数量庞大，但考试中高频出现的相对集中。按动词分组记忆效率最高。以下是 KET/PET 阶段最常考的动词短语，每个都要记住整体意思，不要试图"猜"字面意思——那样往往是错的。',
+        structure: [
+          { label: 'give 类', formula: 'give up（放弃）/ give back（归还）/ give away（赠送/泄露）/ give out（分发）', example: 'Don\'t give up! She gave back the book she had borrowed.' },
+          { label: 'look 类', formula: 'look after（照顾）/ look for（寻找）/ look forward to（期待）/ look up（查阅）/ look out（当心）', example: 'Can you look after my dog? I\'m looking for my keys.' },
+          { label: 'put 类', formula: 'put off（推迟）/ put on（穿上）/ put out（熄灭）/ put up with（忍受）/ put away（收拾好）', example: 'Don\'t put off until tomorrow what you can do today.' },
+          { label: 'get/come/go 类', formula: 'get on with（与……相处）/ get over（克服/从……恢复）/ come across（偶遇）/ go on（继续）/ go through（经历）', example: 'I get on well with my colleagues. She got over her illness quickly.' },
+        ],
+        tips: '记忆技巧：把动词短语放在句子里记，不要单独背。每天记 5 个，放在例句里理解意思，比死记硬背效率高三倍。',
+        traps: [
+          { wrong: 'I\'m looking forward to see you.', right: 'I\'m looking forward to seeing you.', explain: 'to 在这里是介词，后接动名词（V-ing）' },
+          { wrong: 'We must put off with the noise.', right: 'We must put up with the noise.', explain: '忍受是 put up with，不是 put off with；put off 是推迟' },
+          { wrong: 'She gave up to try.', right: 'She gave up trying.', explain: 'give up 后接动名词（V-ing），不接不定式' },
+        ],
+      },
+      {
+        id: 'fce_phrasal_verbs',
+        title: 'FCE 进阶动词短语',
+        level: 'FCE',
+        summary: 'FCE 阶段需掌握 carry out、bring about、set up、take on 等更复杂的动词短语。',
+        explain: 'FCE 阶段的动词短语更多来自正式书面语，常用于描述商业、学术和社会话题。这些短语语义更复杂，有时一个动词短语有多种含义（如 take on 可以是"承担"也可以是"雇用"）。除了记住基本意思，还要学会从上下文判断具体含义。',
+        structure: [
+          { label: 'bring 类', formula: 'bring about（导致/造成）/ bring up（养育/提出话题）/ bring out（推出/出版）/ bring back（唤起回忆）', example: 'The new policy brought about significant changes. She was brought up by her grandparents.' },
+          { label: 'carry / set / take 类', formula: 'carry out（执行/开展）/ set up（建立/创办）/ take on（承担/雇用）/ take over（接管）/ set off（出发/引爆）', example: 'The research was carried out over two years. They set up a new company.' },
+          { label: 'come / run / break 类', formula: 'come up with（想出/提出）/ run out of（用完）/ break down（故障/崩溃）/ break through（突破）/ come up against（遭遇困难）', example: 'She came up with a brilliant idea. My car broke down on the way.' },
+        ],
+        tips: '多义动词短语要靠上下文判断：take on a challenge（承担挑战）vs take on new staff（雇新员工）。在写作中使用动词短语能让文章更地道，但要确认用法正确。',
+        traps: [
+          { wrong: 'They carried out a research about pollution.', right: 'They carried out research into / on pollution.', explain: 'research 是不可数名词，不加 a；搭配 into 或 on 表示研究领域' },
+          { wrong: 'We ran out money.', right: 'We ran out of money.', explain: 'run out of sth（用完某物），不能省略 of' },
+          { wrong: 'She brought up a child by herself.', right: 'She brought up a child by herself. / She brought a child up by herself.', explain: '这两种都对——bring up 是可分离动词短语；但用代词时必须分开：brought her up' },
+        ],
+      },
+    ],
+  },
+
+  // ──────────────────────────────────────────────
+  // 第十四章  There be 句型与特殊结构
+  // ──────────────────────────────────────────────
+  {
+    id: 'there_be',
+    chapter: '第十四章',
+    title: 'There be 与其他结构',
+    icon: '🏗️',
+    points: [
+      {
+        id: 'there_be_basic',
+        title: 'There be 句型',
+        level: 'KET',
+        summary: 'There be 表示"某处有某物"，be 动词根据后面的名词单复数变化。',
+        explain: 'There be 句型用来描述某处存在某人或某物，相当于汉语的"有"。关键点是：be 动词的单复数由后面跟的名词决定（就近原则），不是由 there 决定。There is 接单数或不可数名词，there are 接复数名词。否定句在 be 后加 not，疑问句把 be 提前。',
+        structure: [
+          { label: '肯定句', formula: 'There is + 单数/不可数 + 地点 / There are + 复数 + 地点', example: 'There is a cat on the roof. There are many books on the shelf.' },
+          { label: '否定句', formula: 'There is/are + not + ...', example: 'There isn\'t any sugar left. There aren\'t enough chairs.' },
+          { label: '疑问句', formula: 'Is/Are there + ...? Yes, there is/are. / No, there isn\'t/aren\'t.', example: 'Is there a post office near here? Are there any eggs?' },
+          { label: '各时态', formula: 'was/were; will be; has/have been; is/are going to be', example: 'There was a market here. There will be a meeting tomorrow.' },
+        ],
+        tips: '就近原则：There is a book and two pens.（以 a book 为准，用 is）。口语中常用 there\'s 代替 there are（非正式），但写作中要保持正确。',
+        traps: [
+          { wrong: 'There are a book on the table.', right: 'There is a book on the table.', explain: 'book 是单数，用 there is' },
+          { wrong: 'There is two cats.', right: 'There are two cats.', explain: 'two cats 是复数，用 there are' },
+          { wrong: 'Is there any problem? — Yes, there is.', right: '表达准确，但 any → a：Is there a problem?', explain: '已知存在单数问题时用 a，泛问是否存在时用 any；回答肯定时 there is 正确' },
+        ],
+      },
+      {
+        id: 'it_cleft',
+        title: 'It 作形式主语 / 形式宾语',
+        level: 'PET',
+        summary: 'it 代替真正的主语（不定式或从句），放在句首让句子结构更平衡。',
+        explain: '当主语是 to do 短语或 that 从句时，英语习惯把 it 放在句首作形式主语，把真正的主语移到句子后半部分。这样句子前重后轻，更自然流畅。同样，it 也可以作形式宾语（S + V + it + adj/n + to do/that...），让句子结构更平衡。',
+        structure: [
+          { label: 'it 作形式主语（不定式）', formula: 'It + be + adj + to do sth', example: 'It is important to exercise regularly. It\'s not easy to learn a language.' },
+          { label: 'it 作形式主语（从句）', formula: 'It + be + adj/n + that 从句', example: 'It is clear that she is talented. It\'s a pity that you can\'t come.' },
+          { label: 'it 作形式宾语', formula: 'S + V + it + adj/n + to do / that...', example: 'I find it difficult to concentrate. She made it clear that she disagreed.' },
+        ],
+        tips: '常见搭配：It is important/necessary/possible/strange/a shame/a pity/no surprise that... 以及 It takes sb time to do sth（某人做某事需要多长时间）。',
+        traps: [
+          { wrong: 'To learn English is important.', right: 'It is important to learn English.', explain: '英语习惯用 it 作形式主语，把不定式移后，避免句子头重脚轻' },
+          { wrong: 'I found difficult to understand him.', right: 'I found it difficult to understand him.', explain: '形式宾语结构：find it + adj + to do，it 不能省略' },
+          { wrong: 'It is obvious he is lying.', right: 'It is obvious that he is lying.', explain: '形式主语后接 that 从句时，that 通常不省略（正式写作中）' },
+        ],
+      },
+    ],
+  },
 ];
 
 // 兼容旧代码
