@@ -29,8 +29,8 @@ export default function Login({ onLogin }) {
       if (data.error) { setError(data.error); return }
       localStorage.setItem('session_token', data.token)
       onLogin(data.user)
-    } catch {
-      setError('网络错误，请重试')
+    } catch (e) {
+      setError(`网络错误：${e.message || '请重试'}`)
     } finally {
       setLoading(false)
     }
