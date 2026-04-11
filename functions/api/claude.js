@@ -2,6 +2,15 @@
 // 路径 /functions/api/claude.js → 自动映射到 /api/claude
 
 export async function onRequestPost(context) {
+  try {
+    return await handleRequest(context)
+  } catch (e) {
+    console.error('[claude] ❌ unhandled exception:', e.message, e.stack)
+    return json({ error: `Server error: ${e.message}` }, 500)
+  }
+}
+
+async function handleRequest(context) {
   const { request, env } = context
 
   let body
