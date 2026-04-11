@@ -199,6 +199,61 @@ ${lines.join('\n')}
       return json({ text })
     } catch (e) { return json({ error: e.message }, 500) }
 
+  } else if (type === 'speaking_tutor') {
+    const { messages: chatMessages = [], level = 'KET' } = payload
+    const levelDesc = level === 'KET' ? 'beginner (A2)' : level === 'PET' ? 'elementary (B1)' : 'intermediate (B2)'
+    const systemPrompt = `You are Emma, a friendly and encouraging English tutor for Chinese students. The student's level is ${levelDesc}.
+
+Your style:
+• Always respond in English only
+• Keep responses short (2-4 sentences max)
+• Correct grammar mistakes gently: first acknowledge what they said, then show the correct form
+• Ask follow-up questions to keep the conversation going
+• Use simple vocabulary appropriate for ${levelDesc} level
+• Be warm and encouraging — celebrate their efforts
+• Never say you are an AI`
+
+    const apiMessages = chatMessages
+      .filter(m => m.role === 'user' || m.role === 'ai')
+      .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: String(m.content || '') }))
+      .filter(m => m.content.trim().length > 0)
+    if (apiMessages.length === 0) return json({ error: 'No messages' }, 400)
+    return await callClaude(apiKey, {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: apiMessages,
+    })
+
+  } else if (type === 'writing_grade') {
+    const { level = 'KET', prompt: writingPrompt, text: essay, targetWords = 50 } = payload
+    const wordCount = essay.trim().split(/\s+/).length
+    prompt = `You are an English examiner grading a ${level} level writing task.
+
+Task: "${writingPrompt}"
+Target word count: ${targetWords} words
+Student's submission (${wordCount} words):
+"""
+${essay}
+"""
+
+Grade this writing and respond in Chinese with this exact format:
+【总评】B+ (or appropriate grade A/B+/B/C+/C/D)
+【语法】(2-3 sentences on grammar errors, give corrected examples)
+【词汇】(1-2 sentences on vocabulary range and accuracy)
+【内容】(1-2 sentences on relevance to task and ideas)
+【建议】(2-3 specific improvement suggestions)
+【错误列表】(list up to 3 specific grammar/spelling errors in format: "错误: xxx → 正确: yyy")`
+    max_tokens = 600
+
+  } else if (type === 'reading_explain') {
+    const { passage, question } = payload
+    prompt = `Based on this English reading passage:
+"${passage.slice(0, 500)}"
+
+Explain in Chinese (简明扼要，不超过100字): ${question || '这篇文章的主旨和重点词汇'}`
+    max_tokens = 200
+
   } else {
     return json({ error: `Unknown type: ${type}` }, 400)
   }

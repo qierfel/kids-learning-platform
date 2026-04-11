@@ -1,0 +1,74 @@
+/* Speaking.css — only styles specific to the English Speaking tutor.
+   All shared classes (chat-view, chat-topbar, chat-messages, chat-input-bar,
+   message-ai, message-user, msg-bubble, bubble-ai, bubble-user, subject-pill,
+   subject-selector, mic-btn, send-btn, thinking, cursor, streaming, etc.)
+   come from Notebook.css which is imported alongside this file. */
+
+/* Emma's avatar has a blue tint instead of the purple used for 晓敏老师 */
+.speaking-emma-avatar {
+  background: #dbeafe;
+}
+
+/* Back button needs a bit more width for the arrow label */
+.speaking-back-btn {
+  width: auto;
+  padding: 0 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+/* Level selector: reuse subject-selector scroll container but center pills */
+.speaking-level-selector {
+  justify-content: flex-start;
+}
+
+/* Each level pill shows the CEFR tag inline */
+.speaking-level-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.speaking-level-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 1px 5px;
+}
+
+.speaking-level-pill.active .speaking-level-tag {
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 1;
+}
+
+/* Active level pill: use a blue/green English-themed colour instead of indigo */
+.speaking-level-pill.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+/* AI bubbles: sky-blue background to distinguish from the grey in Notebook */
+.speaking-bubble-ai {
+  background: #eff6ff;
+  color: #1e3a5f;
+  border-radius: 4px 18px 18px 18px;
+}
+
+/* User bubbles: indigo (same shade as Notebook but kept explicit for clarity) */
+.speaking-bubble-user {
+  background: #4338ca;
+  color: #fff;
+  border-radius: 18px 4px 18px 18px;
+}
+
+/* Welcome bubble: wider to fit the three-line greeting comfortably */
+.speaking-welcome-bubble {
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 1.75;
+}

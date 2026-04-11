@@ -1,0 +1,339 @@
+/* Listening.css — English Listening Practice module */
+
+/* ── Page Layout ── */
+.listening-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Header ── */
+.listening-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.listening-back-btn {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.listening-back-btn:hover {
+  background: #e2e8f0;
+}
+
+.listening-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listening-icon {
+  font-size: 22px;
+}
+
+.listening-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.listening-subtitle {
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+/* ── Tab Bar ── */
+.listening-tabs {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.listening-tab {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -2px;
+}
+
+.listening-tab:hover {
+  color: #2563eb;
+}
+
+.listening-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}
+
+/* ── Content Area ── */
+.listening-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.listening-tip {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0 8px 8px 0;
+}
+
+/* ── Text Cards ── */
+.text-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.text-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.text-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.text-card.playing {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.text-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.text-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grade-badge {
+  display: inline-block;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+.text-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.text-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Play / Stop Button ── */
+.play-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #3b82f6;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.play-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.play-btn.stop {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.play-btn.stop:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ── Expand Button ── */
+.expand-btn {
+  padding: 7px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.expand-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* ── Text Preview / Full ── */
+.text-card-preview {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #374151;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* ── Resource Grid ── */
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.resource-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.resource-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.resource-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.resource-info {
+  flex: 1;
+}
+
+.resource-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+
+.resource-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.resource-arrow {
+  font-size: 18px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: transform 0.15s, color 0.15s;
+}
+
+.resource-card:hover .resource-arrow {
+  transform: translateX(3px);
+  color: #3b82f6;
+}
+
+.resource-note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .listening-header {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .listening-title {
+    font-size: 16px;
+  }
+
+  .listening-subtitle {
+    display: none;
+  }
+
+  .listening-content {
+    padding: 14px;
+  }
+
+  .text-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .text-card-actions {
+    width: 100%;
+  }
+
+  .play-btn,
+  .expand-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+}

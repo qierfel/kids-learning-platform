@@ -1,0 +1,345 @@
+/* Writing module — full layout styles */
+
+.writing-page {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Page header */
+.writing-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.writing-page-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #888;
+}
+
+/* Level tabs (pills) */
+.writing-level-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.writing-level-tab {
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  letter-spacing: 0.5px;
+}
+.writing-level-tab:hover:not(.active) {
+  background: #ede9fe;
+  color: #7c3aed;
+  border-color: #c4b5fd;
+}
+
+/* Prompt list */
+.writing-prompts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.writing-prompt-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 16px;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.writing-prompt-item:hover {
+  border-color: var(--hover-border, #7c3aed);
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.08);
+}
+.writing-prompt-item-left {
+  flex: 1;
+}
+.writing-prompt-item-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+.writing-prompt-item-meta {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+.writing-prompt-arrow {
+  font-size: 24px;
+  color: #ccc;
+  flex-shrink: 0;
+}
+
+/* Back link */
+.writing-back-link {
+  font-size: 14px;
+  color: #7c3aed;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 18px 0;
+  display: block;
+  font-weight: 500;
+}
+.writing-back-link:hover {
+  color: #5b21b6;
+}
+
+/* Active prompt card */
+.writing-prompt-card {
+  background: #fafbff;
+  border: 2px solid #c4b5fd;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.writing-prompt-level-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+.writing-prompt-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Writing area */
+.writing-area-wrapper {
+  margin-bottom: 16px;
+}
+.writing-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px 16px;
+  border: 1.5px solid #e8edf2;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.writing-textarea:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+}
+.writing-textarea:disabled {
+  background: #f9fafb;
+  color: #888;
+}
+.writing-wordcount {
+  text-align: right;
+  font-size: 13px;
+  color: #999;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Submit button */
+.writing-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  margin-bottom: 20px;
+}
+.writing-submit-btn:hover:not(:disabled) {
+  background: #6d28d9;
+}
+.writing-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Loading state */
+.writing-loading {
+  text-align: center;
+  padding: 24px;
+  font-size: 15px;
+  color: #7c3aed;
+  font-weight: 500;
+  background: #f5f3ff;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  animation: writing-pulse 1.5s ease-in-out infinite;
+}
+@keyframes writing-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Error */
+.writing-error {
+  text-align: center;
+  padding: 14px;
+  font-size: 14px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+/* Result card */
+.writing-result-card {
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 4px;
+}
+.writing-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.writing-result-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.writing-overall-score {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Result sections */
+.writing-result-section {
+  padding: 12px 14px;
+  background: #f8f9ff;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+.writing-result-section:last-of-type {
+  margin-bottom: 0;
+}
+.writing-result-suggestions {
+  background: #f0fdf4;
+}
+.writing-result-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+.writing-result-suggestions .writing-result-section-title {
+  color: #16a34a;
+}
+.writing-result-section-text {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.75;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Raw fallback text */
+.writing-result-raw {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  margin: 0 0 16px 0;
+}
+
+/* Result action buttons */
+.writing-result-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.writing-add-mistake-btn {
+  padding: 10px 18px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #fcd34d;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.writing-add-mistake-btn:hover {
+  background: #fde68a;
+}
+.writing-try-again-btn {
+  padding: 10px 18px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.writing-try-again-btn:hover {
+  background: #e9ecf0;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .writing-page-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 20px;
+  }
+  .writing-level-tab {
+    padding: 7px 18px;
+    font-size: 13px;
+  }
+  .writing-prompt-item {
+    padding: 14px 16px;
+  }
+  .writing-overall-score {
+    font-size: 22px;
+  }
+  .writing-result-actions {
+    flex-direction: column;
+  }
+  .writing-add-mistake-btn,
+  .writing-try-again-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
