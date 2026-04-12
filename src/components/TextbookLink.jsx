@@ -1,12 +1,8 @@
-import { TEXTBOOK_LINKS, textbookUrl } from '../data/textbookLinks'
+import { TEXTBOOK_LINKS } from '../data/textbookLinks'
 import './TextbookLink.css'
 
-// 按年级直达的官方电子教材选择器
-// 数据来自教育部「国家中小学智慧教育平台」公开 API
-//
-// 用法：
-//   <TextbookLink subject="数学" />                  // 显示数学全部 12 本
-//   <TextbookLink subject="数学" grade={1} semester="上" />  // 高亮指定一本
+// 按年级直达的电子教材选择器
+// 数据来源：电子课本网（dzkbw.com），免登录、免费
 export default function TextbookLink({ subject, grade, semester }) {
   const data = TEXTBOOK_LINKS[subject]
   if (!data) return null
@@ -16,9 +12,9 @@ export default function TextbookLink({ subject, grade, semester }) {
       <div className="textbook-picker-header">
         <span className="textbook-picker-icon">📖</span>
         <div className="textbook-picker-text">
-          <div className="textbook-picker-title">官方电子教材</div>
+          <div className="textbook-picker-title">电子教材</div>
           <div className="textbook-picker-desc">
-            国家中小学智慧教育平台 · {data.publisher}{subject}
+            {data.publisher}{subject} · 免登录在线查看
           </div>
         </div>
       </div>
@@ -29,7 +25,7 @@ export default function TextbookLink({ subject, grade, semester }) {
             <a
               key={`${b.grade}-${b.semester}`}
               className={`textbook-chip ${active ? 'active' : ''}`}
-              href={textbookUrl(b.id)}
+              href={b.url}
               target="_blank"
               rel="noopener noreferrer"
               title={`${b.grade}年级${b.semester}册`}
