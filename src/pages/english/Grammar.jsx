@@ -69,7 +69,11 @@ export default function Grammar({ user, onBack }) {
       })
       const json = await res.json()
       try {
-        const parsed = JSON.parse(json.text)
+        // Claude 可能返回 ```json ... ``` 包裹的文本，先剥离
+        let raw = (json.text || '').replace(/^```json?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+        // 兜底：用正则提取 JSON 数组
+        const match = raw.match(/\[[\s\S]*\]/)
+        const parsed = JSON.parse(match ? match[0] : raw)
         if (Array.isArray(parsed)) setQuizItems(parsed)
         else setAiResult(json.text || '')
       } catch { setAiResult(json.text || '') }
