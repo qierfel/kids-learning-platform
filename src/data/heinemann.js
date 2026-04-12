@@ -1,4 +1,43 @@
-const GK_PDF_BASE = '/media/2007版清华幼儿英语 语感启蒙/绘本，教材与动画/Heinemann海尼曼 Gk、G1、G2（高清PDF 共298本）/Heinemann海尼曼_GK级（70本 高清pdf）'
+const GK_PDF_BASE = '/media/Heinemann海尼曼_GK级（70本 高清pdf）'
+
+// PDF文件名与音频标题有差异，使用实际文件名精确映射
+const GK_PDF_FILES = {
+  1: "1 At The Market.pdf",        2: "2 Rex.pdf",
+  3: "3 Funny Things.pdf",         4: "4 The Baby Animals.pdf",
+  5: "5 Over The River.pdf",       6: "6 My Big Bear.pdf",
+  7: "7 Making Soup.pdf",          8: "8 My Family.pdf",
+  9: "9 Mouse.pdf",                10: "10 Mop.pdf",
+  11: "11 Mom.pdf",                12: "12 Dad.pdf",
+  13: "13 At The Zoo.pdf",         14: "14 On The Way To School.pdf",
+  15: "15 The Park.pdf",           16: "16 Tom.pdf",
+  17: "17 I Can Read.pdf",         18: "18 Baby.pdf",
+  19: "19 Playing Dress Up.pdf",   20: "20 Little Cub.pdf",
+  21: "21 My Room.pdf",            22: "22 The Baby.pdf",
+  23: "23 Going Sledding.pdf",     24: "24 Making A Snowman.pdf",
+  25: "25 My Lunch.pdf",           26: "26 Toys.pdf",
+  27: "27 Little Things.pdf",      28: "28 Packing My Bag.pdf",
+  29: "29 Setting The Table.pdf",  30: "30 The Flower.pdf",
+  31: "31 Playing Together.pdf",   32: "32 Polly.pdf",
+  33: "33 At The Farm.pdf",        34: "34 The Sidewalk.pdf",
+  35: "35 The Hat.pdf",            36: "36 The Pet Store.pdf",
+  37: "37 Going On A Vacation.pdf",38: "38 Wheels.pdf",
+  39: "39 Hiding.pdf",             40: "40 The Show.pdf",
+  41: "41 Hop Hop Hop.pdf",        42: "42 The Puppet Show.pdf",
+  43: "43 Rain.pdf",               44: "44 My Baby Sister.pdf",
+  45: "45 So Big.pdf",             46: "46 The Parade.pdf",
+  47: "47 Fun At School.pdf",      48: "48 At School.pdf",
+  49: "49 My Big Brother.pdf",     50: "50 Getting Ready.pdf",
+  51: "51 Play And Ride.pdf",      52: "52 My Bear.pdf",
+  53: "53 What Is Very Long.pdf",  54: "54 The Play.pdf",
+  55: "55 Our Pets.pdf",           56: "56 Making A Pizza.pdf",
+  57: "57 A Visit From Aunt Bee.pdf", 58: "58 Birds.pdf",
+  59: "59 Flap Flap Fly.pdf",      60: "60 At The Pond.pdf",
+  61: "61 Going On A Train Ride.pdf", 62: "62 Spots.pdf",
+  63: "63 Playing With Blocks.pdf",64: "64 Drawing.pdf",
+  65: "65 Helping.pdf",            66: "66 Baking.pdf",
+  67: "67 Out To Play.pdf",        68: "68 Painting.pdf",
+  69: "69 Animals That Go Fast.pdf",70: "70 Things That Go Fast.pdf",
+}
 
 const GK_RAW = [
   { num: 1,  title: "At the market" },
@@ -76,7 +115,7 @@ const GK_RAW = [
 const GK_BOOKS = GK_RAW.map(b => ({
   ...b,
   audio: `/media/海尼曼GK外教音频/Book ${b.num} ${b.title}.mp3`,
-  pdf:   `${GK_PDF_BASE}/${b.num} ${b.title}.pdf`,
+  pdf:   `${GK_PDF_BASE}/${GK_PDF_FILES[b.num]}`,
 }))
 
 const G1_RAW = [
