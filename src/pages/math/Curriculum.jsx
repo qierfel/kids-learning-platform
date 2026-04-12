@@ -11,13 +11,19 @@ export default function Curriculum({ onBack }) {
   const [selected, setSelected] = useState(`${grades[0].grade}-${grades[0].semester}`)
   const [openUnit, setOpenUnit] = useState(null)
   const [openTopic, setOpenTopic] = useState(null)
+  // AI 功能状态
+  const [activeTab, setActiveTab] = useState('info') // info | explain | practice
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiExplain, setAiExplain] = useState('')
+  const [quizItems, setQuizItems] = useState(null)
+  const [userAnswers, setUserAnswers] = useState({})
+  const [showAns, setShowAns] = useState(false)
 
   const current = useMemo(
     () => grades.find(g => `${g.grade}-${g.semester}` === selected),
     [grades, selected]
   )
 
-  // 统计：单元数 + 知识点总数
   const stats = useMemo(() => {
     if (!current) return { units: 0, topics: 0 }
     return {
@@ -26,6 +32,77 @@ export default function Curriculum({ onBack }) {
     }
   }, [current])
 
+  function selectTopic(id) {
+    setOpenTopic(openTopic === id ? null : id)
+    setActiveTab('info')
+    setAiExplain('')
+    setQuizItems(null)
+    setUserAnswers({})
+    setShowAns(false)
+  }
+
+  async function fetchExplain(topic) {
+    setAiLoading(true)
+    setAiExplain('')
+    try {
+      const res = await fetch('/api/claude', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          type: 'math_explain',
+          payload: {
+            topic: topic.name,
+            grade: current.grade,
+            objectives: topic.objectives,
+            keyPoints: topic.keyPoints,
+          },
+        }),
+      })
+      const json = await res.json()
+      setAiExplain(json.text || '请求失败')
+    } catch { setAiExplain('网络错误，请重试') }
+    setAiLoading(false)
+  }
+
+  async function fetchPractice(topic) {
+    setAiLoading(true)
+    setQuizItems(null)
+    setUserAnswers({})
+    setShowAns(false)
+    setAiExplain('')
+    try {
+      const res = await fetch('/api/claude', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          type: 'math_practice',
+          payload: {
+            topic: topic.name,
+            grade: current.grade,
+            difficulty: topic.difficulty,
+          },
+        }),
+      })
+      const json = await res.json()
+      let raw = (json.text || '').replace(/^```json?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+      const match = raw.match(/\[[\s\S]*\]/)
+      const parsed = JSON.parse(match ? match[0] : raw)
+      if (Array.isArray(parsed)) setQuizItems(parsed)
+      else setAiExplain(json.text || '')
+    } catch { setAiExplain('出题失败，请重试') }
+    setAiLoading(false)
+  }
+
+  // 找当前展开的 topic 对象
+  const currentTopic = useMemo(() => {
+    if (!current || !openTopic) return null
+    for (const u of current.units) {
+      const t = u.topics.find(t => t.id === openTopic)
+      if (t) return t
+    }
+    return null
+  }, [current, openTopic])
+
   return (
     <div className="curriculum">
       <button className="back-btn" onClick={onBack}>← 数学</button>
@@ -33,7 +110,6 @@ export default function Curriculum({ onBack }) {
         课程体系 <span className="edition">{mathCurriculum.edition}</span>
       </h2>
 
-      {/* 年级选择 */}
       <div className="grade-tabs">
         {grades.map(g => {
           const key = `${g.grade}-${g.semester}`
@@ -44,7 +120,7 @@ export default function Curriculum({ onBack }) {
               onClick={() => {
                 setSelected(key)
                 setOpenUnit(null)
-                setOpenTopic(null)
+                selectTopic(null)
               }}
             >
               {g.grade}年级{g.semester}册
@@ -72,7 +148,7 @@ export default function Curriculum({ onBack }) {
                     className="unit-header"
                     onClick={() => {
                       setOpenUnit(isOpen ? null : unit.id)
-                      setOpenTopic(null)
+                      selectTopic(null)
                     }}
                   >
                     <div className="unit-order">{unit.order}</div>
@@ -93,7 +169,7 @@ export default function Curriculum({ onBack }) {
                             <div key={topic.id} className="topic">
                               <div
                                 className="topic-header"
-                                onClick={() => setOpenTopic(tOpen ? null : topic.id)}
+                                onClick={() => selectTopic(topic.id)}
                               >
                                 <div className="topic-name">{topic.name}</div>
                                 <div
@@ -110,14 +186,105 @@ export default function Curriculum({ onBack }) {
 
                               {tOpen && (
                                 <div className="topic-body">
-                                  {topic.objectives?.length > 0 && (
-                                    <Section title="学习目标" items={topic.objectives} />
+                                  {/* 三个 tab */}
+                                  <div className="topic-tabs">
+                                    {[['info', '📋 概要'], ['explain', '📖 讲解'], ['practice', '✏️ 练习']].map(([id, label]) => (
+                                      <button
+                                        key={id}
+                                        className={`topic-tab ${activeTab === id ? 'active' : ''}`}
+                                        onClick={() => setActiveTab(id)}
+                                      >
+                                        {label}
+                                      </button>
+                                    ))}
+                                  </div>
+
+                                  {activeTab === 'info' && (
+                                    <div className="topic-info">
+                                      {topic.objectives?.length > 0 && (
+                                        <Section title="学习目标" items={topic.objectives} />
+                                      )}
+                                      {topic.keyPoints?.length > 0 && (
+                                        <Section title="核心概念" items={topic.keyPoints} accent />
+                                      )}
+                                      {topic.commonMistakes?.length > 0 && (
+                                        <Section title="常见易错" items={topic.commonMistakes} warn />
+                                      )}
+                                    </div>
                                   )}
-                                  {topic.keyPoints?.length > 0 && (
-                                    <Section title="核心概念" items={topic.keyPoints} accent />
+
+                                  {activeTab === 'explain' && (
+                                    <div className="topic-explain">
+                                      {!aiExplain && !aiLoading && (
+                                        <button className="ai-btn" onClick={() => fetchExplain(topic)}>
+                                          🤖 AI 讲解这个知识点
+                                        </button>
+                                      )}
+                                      {aiLoading && activeTab === 'explain' && !aiExplain && (
+                                        <div className="ai-loading">正在生成讲解...</div>
+                                      )}
+                                      {aiExplain && (
+                                        <div className="ai-result">{aiExplain}</div>
+                                      )}
+                                    </div>
                                   )}
-                                  {topic.commonMistakes?.length > 0 && (
-                                    <Section title="常见易错" items={topic.commonMistakes} warn />
+
+                                  {activeTab === 'practice' && (
+                                    <div className="topic-practice">
+                                      {!quizItems && (
+                                        <button
+                                          className="ai-btn"
+                                          onClick={() => fetchPractice(topic)}
+                                          disabled={aiLoading}
+                                        >
+                                          {aiLoading ? '出题中...' : '🤖 AI 出练习题'}
+                                        </button>
+                                      )}
+
+                                      {quizItems && (
+                                        <>
+                                          {quizItems.map((q, i) => (
+                                            <div key={i} className="quiz-item">
+                                              <div className="quiz-q">
+                                                <span className="quiz-num">{i + 1}.</span>
+                                                {q.type && <span className="quiz-type">{q.type}</span>}
+                                                {q.q}
+                                              </div>
+                                              <input
+                                                className="quiz-input"
+                                                placeholder="写下你的答案"
+                                                value={userAnswers[i] || ''}
+                                                onChange={e => setUserAnswers(prev => ({ ...prev, [i]: e.target.value }))}
+                                              />
+                                              {showAns && (
+                                                <div className="quiz-ans">
+                                                  ✅ {q.a}
+                                                  {q.explain && <span className="quiz-explain"> —— {q.explain}</span>}
+                                                </div>
+                                              )}
+                                            </div>
+                                          ))}
+                                          <div className="quiz-actions">
+                                            {!showAns && (
+                                              <button className="quiz-show-btn" onClick={() => setShowAns(true)}>
+                                                查看答案
+                                              </button>
+                                            )}
+                                            <button
+                                              className="ai-btn"
+                                              onClick={() => fetchPractice(topic)}
+                                              disabled={aiLoading}
+                                            >
+                                              {aiLoading ? '出题中...' : '换一批'}
+                                            </button>
+                                          </div>
+                                        </>
+                                      )}
+
+                                      {aiExplain && !quizItems && (
+                                        <div className="ai-result">{aiExplain}</div>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               )}

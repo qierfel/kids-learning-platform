@@ -133,6 +133,33 @@ ${lines.join('\n')}
 ]`
     max_tokens = 600
 
+  } else if (type === 'math_explain') {
+    const { topic, grade, objectives, keyPoints } = payload
+    prompt = `你是一位小学${grade}年级的数学老师，请用孩子能听懂的语言讲解「${topic}」这个知识点。
+
+学习目标：${(objectives || []).join('；')}
+核心概念：${(keyPoints || []).join('；')}
+
+要求：
+1. 先用1-2句话说清楚这是什么
+2. 举1-2个贴近生活的例子帮助理解
+3. 给出1道示范例题，写出完整解题过程
+4. 语气亲切，适合${grade}年级孩子阅读
+不超过300字。`
+    max_tokens = 500
+
+  } else if (type === 'math_practice') {
+    const { topic, grade, difficulty } = payload
+    const diffLabel = ['', '入门', '基础', '中等', '较难', '挑战'][difficulty || 3]
+    prompt = `请针对小学${grade}年级数学知识点「${topic}」出5道练习题。
+要求：难度为${diffLabel}，题型多样（填空、选择、判断、应用题均可），贴合苏教版教材。
+格式（只输出JSON，不要其他内容）：
+[
+  {"q": "题目", "type": "填空/选择/判断/应用", "a": "正确答案", "explain": "简短解析（1-2句）"},
+  ...
+]`
+    max_tokens = 800
+
   } else if (type === 'photo_ocr') {
     const { imageBase64, mediaType = 'image/jpeg' } = payload
     if (!imageBase64) return res.status(400).json({ error: 'imageBase64 required' })
