@@ -60,6 +60,20 @@ export default function Curriculum({ onBack }) {
             <span>{stats.topics} 个知识点</span>
           </div>
 
+          <a
+            className="textbook-link"
+            href="https://basic.smartedu.cn/tchMaterial"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="textbook-icon">📖</span>
+            <div className="textbook-text">
+              <div className="textbook-title">查看官方电子教材</div>
+              <div className="textbook-desc">国家中小学智慧教育平台（免费 · 苏教版 · 数学）</div>
+            </div>
+            <span className="textbook-arrow">→</span>
+          </a>
+
           <div className="units">
             {current.units.map(unit => {
               const isOpen = openUnit === unit.id
