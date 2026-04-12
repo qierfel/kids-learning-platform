@@ -71,7 +71,7 @@ export default function Chinese() {
         </button>
       </div>
 
-      <TextbookLink subject="语文" edition={stage === 'primary' ? '人教版小学语文' : '人教版初中语文'} />
+      {stage === 'primary' && <TextbookLink subject="语文" />}
 
       <div className="tool-grid">
         {tools.map(t => (

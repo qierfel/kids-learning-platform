@@ -61,7 +61,7 @@ export default function Curriculum({ onBack }) {
             <span>{stats.topics} 个知识点</span>
           </div>
 
-          <TextbookLink subject="数学" edition={`苏教版${current.grade}年级${current.semester}册`} />
+          <TextbookLink subject="数学" grade={current.grade} semester={current.semester} />
 
           <div className="units">
             {current.units.map(unit => {
