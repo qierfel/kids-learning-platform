@@ -1,0 +1,108 @@
+.wh-page { padding: 0 0 60px; }
+
+.wh-page-title {
+  font-size: 20px; font-weight: 800; color: #1a1a2e; margin-bottom: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.wh-page-sub { font-size: 13px; font-weight: 400; color: #888; }
+
+/* ── 辑 Tabs ── */
+.wh-vol-tabs {
+  display: flex; overflow-x: auto; border-bottom: 2px solid #e8edf2;
+  margin-bottom: 16px; gap: 0; scrollbar-width: none;
+}
+.wh-vol-tabs::-webkit-scrollbar { display: none; }
+.wh-vol-tab {
+  flex: 1; min-width: 64px; padding: 10px 8px; background: none; border: none;
+  font-size: 13px; font-weight: 500; color: #888; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.wh-vol-tab.active { font-weight: 700; }
+.wh-vol-label { font-size: 10px; opacity: 0.8; }
+
+/* ── 搜索 ── */
+.wh-search-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.wh-search-input {
+  flex: 1; padding: 9px 14px; border: 1.5px solid #e8edf2; border-radius: 12px;
+  font-size: 14px; outline: none; background: #fff; transition: border-color 0.15s;
+}
+.wh-search-input:focus { border-color: #6366f1; }
+.wh-search-clear {
+  background: #f3f4f6; border: none; border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; cursor: pointer; color: #555;
+}
+
+.wh-loading { text-align: center; padding: 40px; color: #aaa; font-size: 14px; }
+
+/* ── 讲座卡片 ── */
+.wh-lecture-list { display: flex; flex-direction: column; gap: 8px; }
+.wh-lecture-card {
+  display: block; text-align: left; background: #fff;
+  border: 1.5px solid #e8edf2; border-left: 4px solid #6366f1;
+  border-radius: 12px; padding: 14px 16px; cursor: pointer;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+.wh-lecture-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); background: #fafbff; }
+.wh-lecture-card:disabled { opacity: 0.5; cursor: wait; }
+.wh-lec-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.wh-lec-title-en { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 3px; }
+.wh-lec-title-zh { font-size: 13px; color: #555; margin-bottom: 4px; }
+.wh-lec-meta { font-size: 11px; color: #aaa; }
+
+/* ── 详情页 ── */
+.wh-detail-header {
+  position: sticky; top: 0; background: #fff; z-index: 10;
+  padding: 12px 0 14px; border-bottom: 1.5px solid #e8edf2; margin-bottom: 20px;
+}
+.wh-back {
+  background: none; border: none; font-size: 14px; color: #6366f1;
+  cursor: pointer; padding: 0 0 8px; font-weight: 500;
+}
+.wh-detail-title-row { margin-bottom: 10px; }
+.wh-detail-title { font-size: 18px; font-weight: 800; color: #1a1a2e; margin: 0 0 4px; }
+.wh-detail-title-zh { font-size: 13px; color: #888; margin: 0; }
+.wh-detail-actions { display: flex; gap: 8px; }
+.wh-play-all-btn {
+  padding: 8px 18px; background: #6366f1; color: #fff; border: none;
+  border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.wh-play-all-btn.playing { background: #ef4444; }
+
+/* ── 段落 ── */
+.wh-paragraphs { display: flex; flex-direction: column; gap: 16px; }
+
+.wh-para-block {
+  background: #fff; border: 1.5px solid #e8edf2; border-radius: 14px; padding: 14px 16px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.wh-para-block.playing {
+  border-color: #c7d2fe; box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+
+.wh-para-en {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+}
+.wh-para-play {
+  background: #f0f4ff; border: none; border-radius: 8px;
+  padding: 5px 9px; font-size: 15px; cursor: pointer; flex-shrink: 0; margin-top: 2px;
+}
+.wh-para-play:hover { background: #e0e7ff; }
+
+.wh-en-text {
+  flex: 1; font-size: 15px; color: #1a1a2e; line-height: 1.9; margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.wh-word { color: #1a1a2e; }
+.wh-word-active {
+  background: #fef08a; border-radius: 3px; padding: 0 2px;
+  color: #1a1a2e; font-weight: 600;
+}
+
+.wh-para-zh {
+  font-size: 14px; color: #555; line-height: 1.8;
+  border-top: 1px solid #f0f2f5; padding-top: 10px;
+  background: #fafafa; border-radius: 0 0 10px 10px;
+  margin: -14px -16px -14px; padding: 10px 16px 14px;
+}
