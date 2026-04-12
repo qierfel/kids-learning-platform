@@ -14,7 +14,7 @@ export default function TextbookLink({ subject, grade, semester }) {
         <div className="textbook-picker-text">
           <div className="textbook-picker-title">电子教材</div>
           <div className="textbook-picker-desc">
-            {data.publisher}{subject} · 免登录在线查看
+            国家智慧教育平台 · {data.publisher}{subject} · 首次需免费注册
           </div>
         </div>
       </div>
