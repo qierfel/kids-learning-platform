@@ -23,7 +23,7 @@ const totalHeinemann = HEINEMANN.levels.reduce((s, l) => s + l.books.length, 0)
 
 const SERIES = [
   { id: 'raz',       label: 'RAZ',    labelFull: 'Reading A-Z',        color: '#6366f1', total: razLevels.reduce((s,l)=>s+l.count,0) },
-  { id: 'heinemann', label: '海尼曼', labelFull: 'Heinemann GK · G1',  color: '#f59e0b', total: totalHeinemann },
+  { id: 'heinemann', label: '海尼曼', labelFull: 'Heinemann GK·G1·G2', color: '#f59e0b', total: totalHeinemann },
   { id: 'oxford',    label: '牛津树', labelFull: 'Oxford Reading Tree', color: '#10b981', total: OXFORD_TREE.books.length },
 ]
 
@@ -320,7 +320,9 @@ export default function GradedReading({ onBack }) {
                 <div className="gr-book-cover" style={{ background: `${color}30` }}>
                   <span className="gr-book-icon">{active && isPlaying ? '🔊' : book.pdf ? '📚' : '📖'}</span>
                 </div>
-                <div className="gr-book-num" style={{ color }}>Book {book.num}</div>
+                <div className="gr-book-num" style={{ color }}>
+                  Book {book.num}{book.level ? ` · Lv.${book.level}` : ''}
+                </div>
                 <div className="gr-book-title">{book.title}</div>
                 {book.pdf && <div className="gr-pdf-badge">PDF</div>}
                 {active && isPlaying && <div className="gr-playing-dot" style={{ background: color }} />}
