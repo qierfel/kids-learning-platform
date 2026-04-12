@@ -276,3 +276,55 @@
 .quiz-show-btn:hover { background: #059669; }
 
 .quiz-actions .ai-btn { flex: 1; }
+
+/* ── Difficulty bar ── */
+.practice-diff-bar {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Level up banner ── */
+.level-up-banner {
+  margin: 12px 0;
+  padding: 14px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1.5px solid #6ee7b7;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.level-up-banner.max {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fbbf24;
+}
+
+.level-up-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 10px;
+}
+
+.level-up-banner.max .level-up-text {
+  color: #92400e;
+  margin-bottom: 0;
+}
+
+.level-up-btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.level-up-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+.level-up-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }

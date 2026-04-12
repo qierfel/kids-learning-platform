@@ -18,6 +18,7 @@ export default function Curriculum({ onBack }) {
   const [quizItems, setQuizItems] = useState(null)
   const [userAnswers, setUserAnswers] = useState({})
   const [showAns, setShowAns] = useState(false)
+  const [practiceDiff, setPracticeDiff] = useState(0) // 0 = 用知识点默认难度
 
   const current = useMemo(
     () => grades.find(g => `${g.grade}-${g.semester}` === selected),
@@ -39,6 +40,7 @@ export default function Curriculum({ onBack }) {
     setQuizItems(null)
     setUserAnswers({})
     setShowAns(false)
+    setPracticeDiff(0)
   }
 
   async function fetchExplain(topic) {
@@ -64,12 +66,14 @@ export default function Curriculum({ onBack }) {
     setAiLoading(false)
   }
 
-  async function fetchPractice(topic) {
+  async function fetchPractice(topic, diffOverride) {
+    const diff = diffOverride || practiceDiff || topic.difficulty
     setAiLoading(true)
     setQuizItems(null)
     setUserAnswers({})
     setShowAns(false)
     setAiExplain('')
+    if (diffOverride) setPracticeDiff(diffOverride)
     try {
       const res = await fetch('/api/claude', {
         method: 'POST',
@@ -79,7 +83,7 @@ export default function Curriculum({ onBack }) {
           payload: {
             topic: topic.name,
             grade: current.grade,
-            difficulty: topic.difficulty,
+            difficulty: diff,
           },
         }),
       })
@@ -229,8 +233,31 @@ export default function Curriculum({ onBack }) {
                                     </div>
                                   )}
 
-                                  {activeTab === 'practice' && (
+                                  {activeTab === 'practice' && (() => {
+                                    const curDiff = practiceDiff || topic.difficulty
+                                    const nextDiff = Math.min(curDiff + 1, 5)
+                                    // 判定全对：showAns 且每题用户答案包含正确答案关键内容
+                                    const allCorrect = showAns && quizItems && quizItems.every((q, i) => {
+                                      const ua = (userAnswers[i] || '').trim()
+                                      const ca = String(q.a).trim()
+                                      return ua && (ua === ca || ca.includes(ua) || ua.includes(ca))
+                                    })
+
+                                    return (
                                     <div className="topic-practice">
+                                      <div className="practice-diff-bar">
+                                        当前难度：
+                                        <span
+                                          className="difficulty-badge"
+                                          style={{
+                                            background: DIFFICULTY_COLORS[curDiff] + '22',
+                                            color: DIFFICULTY_COLORS[curDiff],
+                                          }}
+                                        >
+                                          {DIFFICULTY_LABELS[curDiff]}
+                                        </span>
+                                      </div>
+
                                       {!quizItems && (
                                         <button
                                           className="ai-btn"
@@ -264,6 +291,27 @@ export default function Curriculum({ onBack }) {
                                               )}
                                             </div>
                                           ))}
+
+                                          {/* 全对 → 升级提示 */}
+                                          {allCorrect && curDiff < 5 && (
+                                            <div className="level-up-banner">
+                                              <div className="level-up-text">🎉 全部正确！挑战更高难度？</div>
+                                              <button
+                                                className="level-up-btn"
+                                                onClick={() => fetchPractice(topic, nextDiff)}
+                                                disabled={aiLoading}
+                                              >
+                                                {aiLoading ? '出题中...' : `⬆️ 升级到「${DIFFICULTY_LABELS[nextDiff]}」`}
+                                              </button>
+                                            </div>
+                                          )}
+
+                                          {allCorrect && curDiff >= 5 && (
+                                            <div className="level-up-banner max">
+                                              <div className="level-up-text">🏆 最高难度全对！这个知识点你完全掌握了！</div>
+                                            </div>
+                                          )}
+
                                           <div className="quiz-actions">
                                             {!showAns && (
                                               <button className="quiz-show-btn" onClick={() => setShowAns(true)}>
@@ -275,7 +323,7 @@ export default function Curriculum({ onBack }) {
                                               onClick={() => fetchPractice(topic)}
                                               disabled={aiLoading}
                                             >
-                                              {aiLoading ? '出题中...' : '换一批'}
+                                              {aiLoading ? '出题中...' : '换一批（同难度）'}
                                             </button>
                                           </div>
                                         </>
@@ -285,7 +333,8 @@ export default function Curriculum({ onBack }) {
                                         <div className="ai-result">{aiExplain}</div>
                                       )}
                                     </div>
-                                  )}
+                                    )
+                                  })()}
                                 </div>
                               )}
                             </div>
