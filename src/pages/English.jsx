@@ -10,17 +10,74 @@ import HumanHistory from './english/HumanHistory'
 import ReadingHub from './english/ReadingHub'
 import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
+import './English.css'
 
-const TOOLS = [
-  { id: 'srs',         icon: '📅', label: '词汇记忆',  desc: '记忆曲线 · 每日任务 · KET/PET/FCE', ready: true },
-  { id: 'words',       icon: '📖', label: '单词速练',  desc: '沪教版 · KET · PET · FCE 闪卡', ready: true },
-  { id: 'dictionary',  icon: '🔎', label: '查词 · 生词本', desc: '即查即存 · 闪卡复习', ready: true },
-  { id: 'grammar',     icon: '📐', label: '语法讲解',  desc: '14章65个知识点 · AI练习题', ready: true },
-  { id: 'reading_hub', icon: '📖', label: '阅读',      desc: '分级 · 绘本 · 章节书 · 考试阅读', ready: true },
-  { id: 'history',     icon: '🌍', label: '人类大历史', desc: '中英双语 · 98讲 · TTS朗读', ready: true },
-  { id: 'listening',   icon: '🎧', label: '听力练习',  desc: 'TTS朗读 · 分级故事 · B站资源', ready: true },
-  { id: 'speaking',    icon: '🗣️', label: '口语对话',  desc: 'AI外教 Emma · 实时纠错', ready: true },
-  { id: 'writing',     icon: '✏️', label: '写作练习',  desc: 'AI批改 · 自动录入错题本', ready: true },
+const CATEGORIES = [
+  {
+    id: 'listening',
+    label: '听力',
+    color: '#06b6d4',
+    bg: '#ecfeff',
+    tools: [
+      { id: 'listening', icon: '🎧', label: '听力练习', desc: 'TTS朗读 · 分级故事', ready: true },
+      { id: 'history',   icon: '🌍', label: '人类大历史', desc: '中英双语 · 98讲 · TTS朗读', ready: true },
+    ],
+  },
+  {
+    id: 'speaking',
+    label: '口语',
+    color: '#f59e0b',
+    bg: '#fffbeb',
+    tools: [
+      { id: 'speaking', icon: '🗣️', label: '口语对话', desc: 'AI外教 Emma · 实时纠错', ready: true },
+    ],
+  },
+  {
+    id: 'reading',
+    label: '阅读',
+    color: '#10b981',
+    bg: '#ecfdf5',
+    tools: [
+      { id: 'reading_hub', icon: '📖', label: '阅读', desc: '分级 · 绘本 · 章节书 · 考试阅读', ready: true },
+    ],
+  },
+  {
+    id: 'writing',
+    label: '写作',
+    color: '#8b5cf6',
+    bg: '#f5f3ff',
+    tools: [
+      { id: 'writing', icon: '✏️', label: '写作练习', desc: 'AI批改 · 自动录入错题本', ready: true },
+    ],
+  },
+  {
+    id: 'grammar',
+    label: '语法',
+    color: '#0ea5e9',
+    bg: '#f0f9ff',
+    tools: [
+      { id: 'grammar', icon: '📐', label: '语法讲解', desc: '14章65个知识点 · AI练习题', ready: true },
+    ],
+  },
+  {
+    id: 'vocab',
+    label: '词汇',
+    color: '#ef4444',
+    bg: '#fef2f2',
+    tools: [
+      { id: 'srs',   icon: '📅', label: '词汇记忆', desc: '记忆曲线 · 每日任务 · KET/PET/FCE', ready: true },
+      { id: 'words', icon: '📖', label: '单词速练', desc: '沪教版 · KET · PET · FCE 闪卡', ready: true },
+    ],
+  },
+  {
+    id: 'dictionary',
+    label: '字典',
+    color: '#6366f1',
+    bg: '#eef2ff',
+    tools: [
+      { id: 'dictionary', icon: '🔎', label: '查词 · 生词本', desc: '即查即存 · 闪卡复习', ready: true },
+    ],
+  },
 ]
 
 export default function English({ user }) {
@@ -45,20 +102,40 @@ export default function English({ user }) {
   if (activeTool === 'writing')     return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
 
   return (
-    <div className="subject-page">
-      <h2 className="subject-title">英语 <span className="edition">听说读写 · 词汇 · 语法 · 查词</span></h2>
+    <div className="subject-page en-page">
+      <h2 className="subject-title">
+        英语
+        <span className="edition">听说读写 · 词汇 · 字典</span>
+      </h2>
       <TextbookLink subject="英语" />
-      <div className="tool-grid">
-        {TOOLS.map(t => (
-          <div
-            key={t.id}
-            className={`tool-card ${t.ready ? '' : 'coming-soon'}`}
-            onClick={() => t.ready && setActiveTool(t.id)}
-          >
-            <div className="tool-icon">{t.icon}</div>
-            <div className="tool-label">{t.label}</div>
-            <div className="tool-desc">{t.desc}</div>
-            {!t.ready && <span className="badge">即将上线</span>}
+
+      <div className="en-categories">
+        {CATEGORIES.map(cat => (
+          <div key={cat.id} className="en-category">
+            <div
+              className="en-cat-label"
+              style={{ color: cat.color, borderColor: cat.color }}
+            >
+              {cat.label}
+            </div>
+            <div className="en-cat-tools">
+              {cat.tools.map(t => (
+                <div
+                  key={t.id}
+                  className={`en-tool-card ${t.ready ? '' : 'coming-soon'}`}
+                  style={{ '--cat-color': cat.color, '--cat-bg': cat.bg }}
+                  onClick={() => t.ready && setActiveTool(t.id)}
+                >
+                  <div className="en-tool-icon">{t.icon}</div>
+                  <div className="en-tool-info">
+                    <div className="en-tool-label">{t.label}</div>
+                    <div className="en-tool-desc">{t.desc}</div>
+                  </div>
+                  {!t.ready && <span className="badge">即将上线</span>}
+                  <div className="en-tool-arrow">›</div>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
