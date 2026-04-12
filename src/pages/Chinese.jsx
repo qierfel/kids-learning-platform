@@ -2,12 +2,14 @@ import { useState } from 'react'
 import Confusables from './chinese/Confusables'
 import Poems from './chinese/Poems'
 import ChineseJunior from './chinese/ChineseJunior'
+import ChineseDictionary from './chinese/ChineseDictionary'
 import './Subject.css'
 
 const PRIMARY_TOOLS = [
   { id: 'confusables', icon: '字', label: '同音/形近字', desc: '对比 · 组词 · 练习', ready: true },
-  { id: 'poems', icon: '诗', label: '古诗词', desc: '朗读 · 背诵打卡 · 1-6年级', ready: true },
-  { id: 'idioms', icon: '成', label: '成语故事', desc: '图文解释 · 例句 · 小测验', ready: false },
+  { id: 'poems',       icon: '诗', label: '古诗词',      desc: '朗读 · 背诵打卡 · 1-6年级', ready: true },
+  { id: 'dictionary',  icon: '🔎', label: '查词 · 生词本', desc: '汉字词语 · 拼音 · 例句', ready: true },
+  { id: 'idioms',      icon: '成', label: '成语故事',    desc: '图文解释 · 例句 · 小测验', ready: false },
 ]
 
 const JUNIOR_TOOLS = [
@@ -33,6 +35,14 @@ export default function Chinese() {
       <div className="subject-page">
         <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
         <Poems />
+      </div>
+    )
+  }
+  if (activeTool === 'dictionary') {
+    return (
+      <div className="subject-page">
+        <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
+        <ChineseDictionary />
       </div>
     )
   }

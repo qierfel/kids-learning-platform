@@ -1,0 +1,86 @@
+.zh-dictionary-page { padding: 0 0 40px; }
+
+.zhdict-tabs { display: flex; border-bottom: 2px solid #e8edf2; margin-bottom: 20px; }
+.zhdict-tab { flex: 1; padding: 12px; background: none; border: none; font-size: 15px; font-weight: 500; color: #888; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; }
+.zhdict-tab.active { color: #e85d4a; border-bottom-color: #e85d4a; font-weight: 600; }
+.zhdict-tab-badge { background: #e85d4a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 6px; line-height: 1.4; }
+
+.zhdict-lookup { padding: 0 2px; }
+.zhdict-search-form { display: flex; gap: 8px; margin-bottom: 20px; }
+.zhdict-search-input { flex: 1; padding: 12px 16px; border: 2px solid #e8edf2; border-radius: 14px; font-size: 16px; outline: none; transition: border-color 0.15s; background: #fff; }
+.zhdict-search-input:focus { border-color: #e85d4a; }
+.zhdict-search-btn { padding: 12px 22px; background: #e85d4a; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+.zhdict-search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.zhdict-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px 16px; border-radius: 12px; font-size: 14px; margin-bottom: 16px; }
+
+.zhdict-result { background: #fff; border: 1.5px solid #e8edf2; border-radius: 16px; padding: 20px; }
+.zhdict-word-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.zhdict-word { font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 0; }
+.zhdict-pinyin { font-size: 14px; color: #888; }
+.zhdict-play-btn { background: #fff5f5; border: none; border-radius: 8px; padding: 6px 10px; font-size: 16px; cursor: pointer; }
+.zhdict-play-btn:hover { background: #fee2e2; }
+.zhdict-add-btn { margin-left: auto; padding: 7px 16px; background: #e85d4a; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.zhdict-add-btn.in-book { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; }
+
+.zhdict-section { margin-bottom: 16px; }
+.zhdict-section-label { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.zhdict-def-item { font-size: 14px; color: #1a1a2e; line-height: 1.7; margin-bottom: 4px; }
+.zhdict-def-num { color: #e85d4a; font-weight: 600; margin-right: 4px; }
+
+.zhdict-example { display: flex; align-items: flex-start; gap: 8px; background: #fff8f7; border-left: 3px solid #fca5a5; padding: 8px 12px; border-radius: 0 8px 8px 0; margin-bottom: 6px; }
+.zhdict-example-text { flex: 1; font-size: 14px; color: #444; line-height: 1.6; }
+.zhdict-ex-play { background: none; border: none; font-size: 14px; cursor: pointer; flex-shrink: 0; padding: 0; }
+
+.zhdict-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.zhdict-tag { background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 4px 12px; font-size: 13px; color: #e85d4a; cursor: pointer; }
+.zhdict-tag:hover { background: #fee2e2; }
+.zhdict-tag.antonym { background: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+.zhdict-tag.antonym:hover { background: #e0f2fe; }
+
+.zhdict-tips { background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #713f12; line-height: 1.6; }
+.zhdict-tips-icon { margin-right: 4px; }
+
+.zhdict-hint { text-align: center; padding: 40px 20px; color: #aaa; font-size: 14px; line-height: 2.2; }
+
+/* 生词本 */
+.zhdict-book { padding: 0 2px; }
+.zhdict-book-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.zhdict-book-count { font-size: 13px; color: #888; }
+.zhdict-quiz-start-btn { padding: 8px 16px; background: #e85d4a; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+.zhdict-book-search-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.zhdict-book-search { flex: 1; padding: 9px 14px; border: 1.5px solid #e8edf2; border-radius: 12px; font-size: 14px; outline: none; }
+.zhdict-book-search:focus { border-color: #e85d4a; }
+.zhdict-book-search-clear { background: #f3f4f6; border: none; border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer; color: #555; }
+
+.zhdict-book-empty { text-align: center; padding: 50px 20px; color: #aaa; font-size: 14px; line-height: 2.2; }
+.zhdict-book-no-result { text-align: center; color: #aaa; padding: 30px; font-size: 14px; }
+.zhdict-book-list { display: flex; flex-direction: column; gap: 8px; }
+.zhdict-book-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #e8edf2; border-radius: 12px; padding: 12px 16px; }
+.zhdict-book-item-left { flex: 1; min-width: 0; }
+.zhdict-book-item-word { font-size: 18px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.zhdict-book-item-pinyin { font-size: 12px; color: #888; font-weight: 400; }
+.zhdict-book-item-def { font-size: 13px; color: #555; line-height: 1.5; }
+.zhdict-book-remove { background: none; border: none; color: #ccc; font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0; }
+.zhdict-book-remove:hover { background: #fef2f2; color: #ef4444; }
+
+/* 闪卡 */
+.zhdict-quiz { padding: 0 2px; }
+.zhdict-quiz-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.zhdict-quiz-exit { background: #f3f4f6; border: none; border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer; color: #555; }
+.zhdict-quiz-counter { font-size: 13px; color: #888; }
+
+.zhdict-quiz-card { background: #fff; border: 2px solid #e8edf2; border-radius: 20px; min-height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 30px; text-align: center; margin-bottom: 20px; transition: box-shadow 0.1s; user-select: none; }
+.zhdict-quiz-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.zhdict-quiz-card.flipped { background: #fff8f7; border-color: #fca5a5; }
+.zhdict-quiz-front, .zhdict-quiz-back { width: 100%; }
+.zhdict-quiz-word { font-size: 48px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+.zhdict-quiz-pinyin { font-size: 16px; color: #888; margin-bottom: 12px; }
+.zhdict-quiz-tap { font-size: 13px; color: #bbb; }
+.zhdict-quiz-def { font-size: 18px; color: #1a1a2e; line-height: 1.7; }
+
+.zhdict-quiz-nav { display: flex; gap: 10px; }
+.zhdict-quiz-nav button { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #e8edf2; background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; color: #444; }
+.zhdict-quiz-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+.zhdict-quiz-nav button:not(:disabled):hover { background: #fff5f5; border-color: #fca5a5; color: #e85d4a; }

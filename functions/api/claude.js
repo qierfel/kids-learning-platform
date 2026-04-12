@@ -254,6 +254,21 @@ Grade this writing and respond in Chinese with this exact format:
 Explain in Chinese (简明扼要，不超过100字): ${question || '这篇文章的主旨和重点词汇'}`
     max_tokens = 200
 
+  } else if (type === 'chinese_dict') {
+    const { word } = payload
+    prompt = `你是一部专业的中文词典。请查询"${word}"，用严格的JSON格式返回，不要有任何其他文字：
+{
+  "word": "${word}",
+  "pinyin": "拼音（带声调）",
+  "definitions": ["释义1", "释义2"],
+  "examples": ["例句1", "例句2"],
+  "synonyms": ["近义词1", "近义词2"],
+  "antonyms": ["反义词1"],
+  "tips": "易混淆用法或记忆技巧（如没有可省略此字段）"
+}
+注意：definitions最多3条，examples最多2条，synonyms/antonyms各最多3个，全部用中文。`
+    max_tokens = 400
+
   } else {
     return json({ error: `Unknown type: ${type}` }, 400)
   }
