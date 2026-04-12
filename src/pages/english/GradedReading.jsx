@@ -27,18 +27,20 @@ const SERIES = [
   { id: 'oxford',    label: '牛津树', labelFull: 'Oxford Reading Tree', color: '#10b981', total: OXFORD_TREE.books.length },
 ]
 
-// ── 通用播放器 ─────────────────────────────────────────────────
-function AudioPlayer({ book, color, audioRef, isPlaying, progress, duration, audioError, onToggle, onSeek }) {
+// ── 通用音频播放器 ─────────────────────────────────────────────
+function AudioPlayer({ book, color, audioRef, isPlaying, progress, duration, audioError, onToggle, onSeek, compact }) {
   function fmt(sec) {
     if (!sec || isNaN(sec)) return '0:00'
     return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}`
   }
   return (
-    <div className="gr-player" style={{ borderColor: color }}>
-      <div className="gr-player-title">
-        <span className="gr-player-icon">🔊</span>
-        <span>{book.title}</span>
-      </div>
+    <div className={`gr-player ${compact ? 'compact' : ''}`} style={{ borderColor: color }}>
+      {!compact && (
+        <div className="gr-player-title">
+          <span className="gr-player-icon">🔊</span>
+          <span>{book.title}</span>
+        </div>
+      )}
       <div className="gr-player-controls">
         <button className="gr-play-btn" onClick={onToggle} style={{ background: color }}>
           {isPlaying ? '⏸' : '▶'}
@@ -54,17 +56,104 @@ function AudioPlayer({ book, color, audioRef, isPlaying, progress, duration, aud
   )
 }
 
-export default function GradedReading({ onBack }) {
-  const [series, setSeries] = useState('raz')
-  const [selectedLevel, setSelectedLevel] = useState(null)     // RAZ level string
-  const [selectedStage, setSelectedStage] = useState(null)     // Oxford stage number
-  const [heinLevel, setHeinLevel] = useState('gk')             // Heinemann level: 'gk' | 'g1'
-  const [playingBook, setPlayingBook] = useState(null)
+// ── 书本阅读器（音频 + PDF）────────────────────────────────────
+function BookReader({ book, color, onClose }) {
+  const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [duration, setDuration] = useState(0)
+  const [progress, setProgress]   = useState(0)
+  const [duration, setDuration]   = useState(0)
   const [audioError, setAudioError] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [pdfError, setPdfError]   = useState(false)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onTime = () => setProgress(audio.currentTime)
+    const onDur  = () => setDuration(audio.duration)
+    const onEnd  = () => setIsPlaying(false)
+    const onErr  = () => setAudioError(true)
+    audio.addEventListener('timeupdate', onTime)
+    audio.addEventListener('loadedmetadata', onDur)
+    audio.addEventListener('ended', onEnd)
+    audio.addEventListener('error', onErr)
+    // auto-play
+    audio.src = book.audio
+    audio.load()
+    audio.play().then(() => setIsPlaying(true)).catch(() => {})
+    return () => {
+      audio.pause()
+      audio.removeEventListener('timeupdate', onTime)
+      audio.removeEventListener('loadedmetadata', onDur)
+      audio.removeEventListener('ended', onEnd)
+      audio.removeEventListener('error', onErr)
+    }
+  }, [book.audio])
+
+  function togglePlay() {
+    const audio = audioRef.current
+    if (!audio) return
+    if (isPlaying) { audio.pause(); setIsPlaying(false) }
+    else { audio.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true)) }
+  }
+  function seek(e) {
+    const audio = audioRef.current
+    if (!audio || !duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * duration
+  }
+
+  return (
+    <div className="gr-reader">
+      <audio ref={audioRef} />
+      {/* 顶部栏 */}
+      <div className="gr-reader-header" style={{ borderBottomColor: color }}>
+        <button className="gr-back-btn" onClick={onClose}>← 书单</button>
+        <div className="gr-reader-title">
+          <span className="gr-reader-badge" style={{ background: color }}>Book {book.num}</span>
+          <span className="gr-reader-name">{book.title}</span>
+        </div>
+        <AudioPlayer
+          book={book} color={color} audioRef={audioRef}
+          isPlaying={isPlaying} progress={progress} duration={duration}
+          audioError={audioError} onToggle={togglePlay} onSeek={seek}
+          compact
+        />
+      </div>
+
+      {/* PDF 区域 */}
+      <div className="gr-reader-body">
+        {pdfError ? (
+          <div className="gr-pdf-placeholder">
+            <div className="gr-pdf-placeholder-icon">📄</div>
+            <div className="gr-pdf-placeholder-text">PDF 尚未下载完成</div>
+            <div className="gr-pdf-placeholder-sub">音频已可播放，PDF 下载完后自动可用</div>
+          </div>
+        ) : (
+          <iframe
+            key={book.pdf}
+            className="gr-pdf-frame"
+            src={book.pdf}
+            title={book.title}
+            onError={() => setPdfError(true)}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default function GradedReading({ onBack }) {
+  const [series, setSeries]               = useState('raz')
+  const [selectedLevel, setSelectedLevel] = useState(null)
+  const [selectedStage, setSelectedStage] = useState(null)
+  const [heinLevel, setHeinLevel]         = useState('gk')
+  const [readingBook, setReadingBook]     = useState(null)   // 阅读器打开的书（有PDF）
+  const [playingBook, setPlayingBook]     = useState(null)   // 卡片内联播放的书（无PDF）
+  const [isPlaying, setIsPlaying]         = useState(false)
+  const [progress, setProgress]           = useState(0)
+  const [duration, setDuration]           = useState(0)
+  const [audioError, setAudioError]       = useState(false)
+  const [searchQuery, setSearchQuery]     = useState('')
   const audioRef = useRef(null)
 
   useEffect(() => {
@@ -97,6 +186,14 @@ export default function GradedReading({ onBack }) {
     audio.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true))
   }
 
+  function openBook(book) {
+    if (book.pdf) {
+      setReadingBook(book)
+    } else {
+      playBook(book)
+    }
+  }
+
   function togglePlay() {
     const audio = audioRef.current
     if (!audio) return
@@ -114,11 +211,23 @@ export default function GradedReading({ onBack }) {
 
   function changeSeries(s) {
     setSeries(s); setSelectedLevel(null); setSelectedStage(null)
-    setPlayingBook(null); setSearchQuery('')
+    setPlayingBook(null); setReadingBook(null); setSearchQuery('')
   }
 
   const seriesInfo = SERIES.find(s => s.id === series)
   const color = seriesInfo.color
+
+  // ── 阅读器（海尼曼 GK 有PDF）────────────────────────────────
+  if (readingBook) {
+    const c = LEVEL_COLORS[selectedLevel] || color
+    return (
+      <BookReader
+        book={readingBook}
+        color={series === 'raz' ? c : color}
+        onClose={() => setReadingBook(null)}
+      />
+    )
+  }
 
   // ── 书单页（RAZ）─────────────────────────────────────────────
   if (series === 'raz' && selectedLevel) {
@@ -148,7 +257,7 @@ export default function GradedReading({ onBack }) {
             return (
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: lcolor, background: `${lcolor}18` } : {}}
-                onClick={() => playBook(book)}>
+                onClick={() => openBook(book)}>
                 <div className="gr-book-cover" style={{ background: `${lcolor}30` }}>
                   <span className="gr-book-icon">{active && isPlaying ? '🔊' : '📖'}</span>
                 </div>
@@ -192,7 +301,7 @@ export default function GradedReading({ onBack }) {
               onClick={() => { setHeinLevel(lv.id); setSearchQuery(''); setPlayingBook(null) }}
             >
               {lv.label}
-              <span className="gr-stage-tab-sub">{lv.books.length}本</span>
+              <span className="gr-stage-tab-sub">{lv.books.length}本{lv.hasPdf ? ' · PDF' : ''}</span>
             </button>
           ))}
         </div>
@@ -207,12 +316,13 @@ export default function GradedReading({ onBack }) {
             return (
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: color, background: `${color}18` } : {}}
-                onClick={() => playBook(book)}>
+                onClick={() => openBook(book)}>
                 <div className="gr-book-cover" style={{ background: `${color}30` }}>
-                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : '📖'}</span>
+                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : book.pdf ? '📚' : '📖'}</span>
                 </div>
                 <div className="gr-book-num" style={{ color }}>Book {book.num}</div>
                 <div className="gr-book-title">{book.title}</div>
+                {book.pdf && <div className="gr-pdf-badge">PDF</div>}
                 {active && isPlaying && <div className="gr-playing-dot" style={{ background: color }} />}
               </button>
             )
@@ -242,7 +352,6 @@ export default function GradedReading({ onBack }) {
           </div>
         </div>
         {playingBook && <AudioPlayer book={playingBook} color={color} audioRef={audioRef} isPlaying={isPlaying} progress={progress} duration={duration} audioError={audioError} onToggle={togglePlay} onSeek={seek} />}
-        {/* Stage 过滤 */}
         <div className="gr-stage-tabs">
           <button className={`gr-stage-tab ${!selectedStage ? 'active' : ''}`} style={!selectedStage ? { borderBottomColor: color, color } : {}} onClick={() => setSelectedStage(null)}>全部</button>
           {stages.map(s => (
@@ -261,7 +370,7 @@ export default function GradedReading({ onBack }) {
             return (
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: color, background: `${color}18` } : {}}
-                onClick={() => playBook(book)}>
+                onClick={() => openBook(book)}>
                 <div className="gr-book-cover" style={{ background: `${color}30` }}>
                   <span className="gr-book-icon">{active && isPlaying ? '🔊' : '📖'}</span>
                 </div>
@@ -289,7 +398,6 @@ export default function GradedReading({ onBack }) {
         </div>
       </div>
 
-      {/* 系列卡片 */}
       <div className="gr-series-grid">
         {SERIES.map(s => (
           <button key={s.id} className="gr-series-card" style={{ borderTopColor: s.color }} onClick={() => changeSeries(s.id)}>
@@ -300,7 +408,6 @@ export default function GradedReading({ onBack }) {
         ))}
       </div>
 
-      {/* RAZ 级别网格 */}
       <div className="gr-section-title">📗 RAZ 级别选择</div>
       <div className="gr-level-grid">
         {razLevels.map(lv => {

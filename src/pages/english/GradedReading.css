@@ -372,3 +372,97 @@
   cursor: pointer;
   color: #555;
 }
+
+/* ── PDF Badge on book card ── */
+.gr-pdf-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: #f59e0b;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin: 3px auto 0;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+/* ── Player compact mode (used in reader header) ── */
+.gr-player.compact {
+  margin: 0;
+  flex: 1;
+  border-width: 1px;
+  padding: 8px 12px;
+}
+.gr-player.compact .gr-play-btn {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+/* ── BookReader ── */
+.gr-reader {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+.gr-reader-header {
+  background: #fff;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.gr-reader-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gr-reader-badge {
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gr-reader-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.gr-reader-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gr-pdf-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+}
+
+.gr-pdf-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #94a3b8;
+}
+.gr-pdf-placeholder-icon { font-size: 48px; }
+.gr-pdf-placeholder-text { font-size: 16px; font-weight: 600; color: #64748b; }
+.gr-pdf-placeholder-sub  { font-size: 13px; color: #94a3b8; }
