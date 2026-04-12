@@ -144,3 +144,224 @@
   .listening-tab { padding: 8px 10px; font-size: 13px; }
   .read-along-text { font-size: 14px; }
 }
+
+/* ── GradedListening ── */
+.gl-level-tab {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.gl-level-count {
+  font-weight: 400;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.gl-search {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.gl-search:focus { border-color: #6366f1; }
+
+.gl-action-btn {
+  padding: 8px 13px;
+  font-size: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+  color: #475569;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.gl-action-btn:hover { background: #f1f5f9; }
+.gl-action-clear { color: #ef4444; border-color: #fecaca; }
+.gl-action-clear:hover { background: #fef2f2; }
+
+/* Book grid */
+.gl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.gl-book-card {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+  user-select: none;
+}
+.gl-book-card:hover { border-color: var(--lc); }
+.gl-book-card.selected {
+  background: color-mix(in srgb, var(--lc) 10%, #fff);
+  border-color: color-mix(in srgb, var(--lc) 50%, #fff);
+}
+.gl-book-card.now-playing {
+  background: color-mix(in srgb, var(--lc) 18%, #fff);
+  border-color: var(--lc);
+}
+
+.gl-check {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--lc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 700;
+}
+.gl-book-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--lc);
+  margin-bottom: 3px;
+}
+.gl-book-title {
+  font-size: 12px;
+  color: #1e293b;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Bottom player */
+.gl-player {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #1e293b;
+  padding: 10px 16px 12px;
+  z-index: 200;
+}
+.gl-player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.gl-ctrl-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+.gl-ctrl-btn:hover:not(:disabled) { color: #fff; }
+.gl-ctrl-btn:disabled { opacity: 0.3; cursor: default; }
+.gl-play-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.gl-play-btn:hover { background: #4f46e5; }
+.gl-player-info {
+  flex: 1;
+  min-width: 0;
+}
+.gl-player-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.gl-player-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gl-player-badge {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+.gl-close-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.gl-close-btn:hover { color: #94a3b8; }
+.gl-progress-bar {
+  height: 4px;
+  background: #334155;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.gl-progress-fill {
+  height: 100%;
+  background: #6366f1;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+/* Start bar */
+.gl-start-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 200;
+}
+.gl-start-info {
+  flex: 1;
+  font-size: 14px;
+  color: #64748b;
+}
+.gl-start-info strong { color: #1e293b; }
+.gl-start-btn {
+  padding: 10px 28px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gl-start-btn:hover { background: #4f46e5; }

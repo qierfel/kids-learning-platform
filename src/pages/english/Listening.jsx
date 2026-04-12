@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { HEINEMANN } from '../../data/heinemann'
 import './Listening.css'
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -88,25 +89,19 @@ const TEXTS = {
   ],
 }
 
-const LEVEL_COLOR = { A1: '#10b981', A2: '#3b82f6', B1: '#f59e0b', B2: '#7c3aed' }
-
-// ─── Word-highlight reader component ─────────────────────────────────────────
+// ─── Word-highlight reader ────────────────────────────────────────────────────
 
 function ReadAlongText({ text, charIndex, playing }) {
   const containerRef = useRef(null)
-
-  // Pre-compute word positions
   const words = useMemo(() => {
     const result = []
     const regex = /\S+/g
     let m
-    while ((m = regex.exec(text)) !== null) {
+    while ((m = regex.exec(text)) !== null)
       result.push({ word: m[0], start: m.index, end: m.index + m[0].length })
-    }
     return result
   }, [text])
 
-  // Find active word index
   const activeIdx = playing && charIndex >= 0
     ? (() => {
         let idx = -1
@@ -118,76 +113,266 @@ function ReadAlongText({ text, charIndex, playing }) {
       })()
     : -1
 
-  // Auto-scroll to highlighted word
   useEffect(() => {
-    if (activeIdx >= 0 && containerRef.current) {
-      const el = containerRef.current.querySelector('.word-active')
-      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
+    if (activeIdx >= 0 && containerRef.current)
+      containerRef.current.querySelector('.word-active')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [activeIdx])
 
-  // Render text with highlights
   const parts = []
   let lastEnd = 0
   words.forEach((w, i) => {
     if (w.start > lastEnd) parts.push(<span key={`g${i}`}>{text.slice(lastEnd, w.start)}</span>)
-    parts.push(
-      <span key={i} className={i === activeIdx ? 'word-active' : 'word-normal'}>
-        {w.word}
-      </span>
-    )
+    parts.push(<span key={i} className={i === activeIdx ? 'word-active' : 'word-normal'}>{w.word}</span>)
     lastEnd = w.end
   })
   if (lastEnd < text.length) parts.push(<span key="tail">{text.slice(lastEnd)}</span>)
 
-  return (
-    <div className="read-along-text" ref={containerRef}>
-      {parts}
-    </div>
-  )
+  return <div className="read-along-text" ref={containerRef}>{parts}</div>
 }
-
-// ─── Text Card ────────────────────────────────────────────────────────────────
 
 function TextCard({ item, badge, playingId, charIndex, onPlay }) {
   const isPlaying = playingId === item.id
   return (
-    <div className={`listen-card${isPlaying ? ' listen-card-active' : ''}`}
-      style={{ '--card-color': item.color }}>
+    <div className={`listen-card${isPlaying ? ' listen-card-active' : ''}`} style={{ '--card-color': item.color }}>
       <div className="listen-card-header">
         <div className="listen-card-meta">
-          <span className="listen-badge" style={{ background: item.color }}>
-            {badge}
-          </span>
+          <span className="listen-badge" style={{ background: item.color }}>{badge}</span>
           <span className="listen-card-title">{item.title}</span>
         </div>
         <button
           className={`listen-play-btn${isPlaying ? ' playing' : ''}`}
-          style={{ borderColor: item.color, color: isPlaying ? '#fff' : item.color,
-            background: isPlaying ? item.color : 'transparent' }}
+          style={{ borderColor: item.color, color: isPlaying ? '#fff' : item.color, background: isPlaying ? item.color : 'transparent' }}
           onClick={() => onPlay(item)}
         >
           {isPlaying ? '⏹ Stop' : '▶ Listen'}
         </button>
       </div>
-      <ReadAlongText
-        text={item.text}
-        charIndex={isPlaying ? charIndex : -1}
-        playing={isPlaying}
-      />
+      <ReadAlongText text={item.text} charIndex={isPlaying ? charIndex : -1} playing={isPlaying} />
     </div>
   )
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Graded Listening (multi-select playlist) ─────────────────────────────────
 
-const TABS = ['课文朗读', '分级故事', '磨耳朵']
-const TAB_KEYS = ['课文朗读', '分级故事', '磨耳朵']
+const LEVEL_COLORS = { gk: '#f59e0b', g1: '#10b981', g2: '#6366f1' }
+const LEVEL_LABELS = { gk: 'GK', g1: 'G1', g2: 'G2' }
+
+function fmt(s) {
+  if (!s || isNaN(s)) return '0:00'
+  const m = Math.floor(s / 60)
+  const sec = Math.floor(s % 60)
+  return `${m}:${sec.toString().padStart(2, '0')}`
+}
+
+function GradedListening() {
+  const [levelId, setLevelId]     = useState('gk')
+  const [selected, setSelected]   = useState(new Set())   // "gk-1", "g1-5" …
+  const [search, setSearch]       = useState('')
+  const [playlist, setPlaylist]   = useState([])
+  const [playIdx, setPlayIdx]     = useState(0)
+  const [playing, setPlaying]     = useState(false)
+  const [isPaused, setIsPaused]   = useState(false)
+  const [progress, setProgress]   = useState(0)
+  const [duration, setDuration]   = useState(0)
+  const audioRef = useRef(null)
+
+  const currentLevel = HEINEMANN.levels.find(l => l.id === levelId)
+  const books = currentLevel?.books || []
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase()
+    return q ? books.filter(b => b.title.toLowerCase().includes(q) || String(b.num).includes(q)) : books
+  }, [books, search])
+
+  // Load + play when playIdx changes
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !playing || playlist.length === 0) return
+    const book = playlist[playIdx]
+    if (!book) return
+    audio.src = book.audio
+    audio.play().catch(() => {})
+  }, [playIdx, playing]) // eslint-disable-line
+
+  // Audio events
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onTime   = () => setProgress(audio.currentTime)
+    const onDur    = () => setDuration(audio.duration || 0)
+    const onPlay   = () => setIsPaused(false)
+    const onPause  = () => setIsPaused(true)
+    const onEnded  = () => {
+      if (playIdx < playlist.length - 1) setPlayIdx(i => i + 1)
+      else { setPlaying(false); setProgress(0) }
+    }
+    audio.addEventListener('timeupdate', onTime)
+    audio.addEventListener('durationchange', onDur)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('ended', onEnded)
+    return () => {
+      audio.removeEventListener('timeupdate', onTime)
+      audio.removeEventListener('durationchange', onDur)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('ended', onEnded)
+    }
+  }, [playIdx, playlist])
+
+  function toggleBook(book) {
+    const key = `${levelId}-${book.num}`
+    setSelected(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n })
+  }
+
+  function selectAll()  { setSelected(new Set(filtered.map(b => `${levelId}-${b.num}`))) }
+  function clearSel()   { setSelected(new Set()) }
+
+  function startPlay() {
+    const levelOrder = ['gk', 'g1', 'g2']
+    const pl = []
+    HEINEMANN.levels.forEach(lv => {
+      lv.books.forEach(b => {
+        if (selected.has(`${lv.id}-${b.num}`)) pl.push({ ...b, levelId: lv.id })
+      })
+    })
+    pl.sort((a, b) => levelOrder.indexOf(a.levelId) - levelOrder.indexOf(b.levelId) || a.num - b.num)
+    if (!pl.length) return
+    setPlaylist(pl)
+    setPlayIdx(0)
+    setProgress(0)
+    setPlaying(true)
+  }
+
+  function stopPlay() {
+    audioRef.current?.pause()
+    setPlaying(false)
+    setProgress(0)
+  }
+
+  function togglePause() {
+    const audio = audioRef.current
+    if (!audio) return
+    if (audio.paused) audio.play().catch(() => {})
+    else audio.pause()
+  }
+
+  function seekTo(e) {
+    const audio = audioRef.current
+    if (!audio || !duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * duration
+  }
+
+  function jumpTo(idx) {
+    if (idx < 0 || idx >= playlist.length) return
+    setPlayIdx(idx)
+    setProgress(0)
+  }
+
+  const currentBook = playlist[playIdx]
+  const color = LEVEL_COLORS[levelId]
+  const pct = duration > 0 ? (progress / duration) * 100 : 0
+
+  return (
+    <div style={{ paddingBottom: playing || selected.size > 0 ? 88 : 0 }}>
+      {/* Level tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+        {HEINEMANN.levels.map(lv => (
+          <button key={lv.id} onClick={() => { setLevelId(lv.id); setSearch('') }}
+            className="gl-level-tab"
+            style={{
+              background: levelId === lv.id ? LEVEL_COLORS[lv.id] : '#f1f5f9',
+              color: levelId === lv.id ? '#fff' : '#64748b',
+            }}>
+            {lv.label}
+            <span className="gl-level-count">{lv.books.length}本</span>
+          </button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 12, color: '#94a3b8', alignSelf: 'center' }}>
+          已选 {selected.size} 本
+        </span>
+      </div>
+
+      {/* Search + actions */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <input
+          value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="搜书名或编号…"
+          className="gl-search"
+        />
+        <button onClick={selectAll} className="gl-action-btn">全选</button>
+        {selected.size > 0 && <button onClick={clearSel} className="gl-action-btn gl-action-clear">清除</button>}
+      </div>
+
+      {/* Book grid */}
+      <div className="gl-grid">
+        {filtered.map(book => {
+          const key = `${levelId}-${book.num}`
+          const isSel = selected.has(key)
+          const isNowPlaying = playing && currentBook?.levelId === levelId && currentBook?.num === book.num
+          return (
+            <div key={key} onClick={() => toggleBook(book)}
+              className={`gl-book-card ${isSel ? 'selected' : ''} ${isNowPlaying ? 'now-playing' : ''}`}
+              style={{ '--lc': color }}>
+              {isSel && (
+                <div className="gl-check">
+                  {isNowPlaying ? '♪' : '✓'}
+                </div>
+              )}
+              <div className="gl-book-num">
+                Book {book.num}{book.level ? ` · ${book.level}` : ''}
+              </div>
+              <div className="gl-book-title">{book.title}</div>
+            </div>
+          )
+        })}
+      </div>
+
+      <audio ref={audioRef} />
+
+      {/* Sticky bottom: player or start bar */}
+      {playing ? (
+        <div className="gl-player">
+          <div className="gl-player-row">
+            <button onClick={() => jumpTo(playIdx - 1)} disabled={playIdx === 0} className="gl-ctrl-btn">⏮</button>
+            <button onClick={togglePause} className="gl-play-btn">
+              {isPaused ? '▶' : '⏸'}
+            </button>
+            <button onClick={() => jumpTo(playIdx + 1)} disabled={playIdx >= playlist.length - 1} className="gl-ctrl-btn">⏭</button>
+            <div className="gl-player-info">
+              <div className="gl-player-title">{currentBook?.title}</div>
+              <div className="gl-player-sub">
+                <span className="gl-player-badge" style={{ background: LEVEL_COLORS[currentBook?.levelId] }}>
+                  {LEVEL_LABELS[currentBook?.levelId]} {currentBook?.level ? `Lv.${currentBook.level}` : ''}
+                </span>
+                第 {playIdx + 1} / {playlist.length} 首 · {fmt(progress)} / {fmt(duration)}
+              </div>
+            </div>
+            <button onClick={stopPlay} className="gl-close-btn">✕</button>
+          </div>
+          <div className="gl-progress-bar" onClick={seekTo}>
+            <div className="gl-progress-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      ) : selected.size > 0 ? (
+        <div className="gl-start-bar">
+          <span className="gl-start-info">已选 <strong>{selected.size}</strong> 本</span>
+          <button onClick={startPlay} className="gl-start-btn">▶ 播放</button>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+// ─── Main Listening Component ─────────────────────────────────────────────────
+
+const TABS = ['课文朗读', '分级故事', '磨耳朵', '分级读物']
 
 export default function Listening({ onBack }) {
-  const [activeTab, setActiveTab] = useState(0)
-  const [playingId, setPlayingId] = useState(null)
-  const [charIndex, setCharIndex] = useState(-1)
+  const [activeTab, setActiveTab]   = useState(0)
+  const [playingId, setPlayingId]   = useState(null)
+  const [charIndex, setCharIndex]   = useState(-1)
   const utteranceRef = useRef(null)
 
   function stopAll() {
@@ -202,11 +387,8 @@ export default function Listening({ onBack }) {
     const utter = new window.SpeechSynthesisUtterance(item.text)
     utter.lang = 'en-US'
     utter.rate = 0.82
-    utter.pitch = 1
-    utter.onboundary = (e) => {
-      if (e.name === 'word') setCharIndex(e.charIndex)
-    }
-    utter.onend = () => { setPlayingId(null); setCharIndex(-1) }
+    utter.onboundary = (e) => { if (e.name === 'word') setCharIndex(e.charIndex) }
+    utter.onend  = () => { setPlayingId(null); setCharIndex(-1) }
     utter.onerror = () => { setPlayingId(null); setCharIndex(-1) }
     utteranceRef.current = utter
     setPlayingId(item.id)
@@ -214,52 +396,44 @@ export default function Listening({ onBack }) {
     window.speechSynthesis.speak(utter)
   }, [playingId])
 
-  function switchTab(i) {
-    stopAll()
-    setActiveTab(i)
-  }
+  function switchTab(i) { stopAll(); setActiveTab(i) }
 
-  const items = TEXTS[TAB_KEYS[activeTab]] || []
+  const items = TEXTS[TABS[activeTab]] || []
 
   return (
     <div className="listening-page">
       <div className="listening-header">
         {onBack && (
-          <button className="listening-back-btn" onClick={() => { stopAll(); onBack() }}>
-            ← 返回
-          </button>
+          <button className="listening-back-btn" onClick={() => { stopAll(); onBack() }}>← 返回</button>
         )}
         <div className="listening-title-row">
           <span className="listening-icon">🎧</span>
           <h2 className="listening-title">Listening Practice</h2>
         </div>
-        <p className="listening-subtitle">点击 ▶ Listen，文字随朗读自动高亮滚动</p>
+        <p className="listening-subtitle">
+          {activeTab === 3 ? '勾选书目，一键连续播放外教音频' : '点击 ▶ Listen，文字随朗读自动高亮滚动'}
+        </p>
       </div>
 
       <div className="listening-tabs">
         {TABS.map((tab, i) => (
-          <button
-            key={tab}
-            className={`listening-tab${activeTab === i ? ' active' : ''}`}
-            onClick={() => switchTab(i)}
-          >
+          <button key={tab} className={`listening-tab${activeTab === i ? ' active' : ''}`}
+            onClick={() => switchTab(i)}>
             {tab}
           </button>
         ))}
       </div>
 
-      <div className="listening-list">
-        {items.map(item => (
-          <TextCard
-            key={item.id}
-            item={item}
-            badge={item.grade || item.level}
-            playingId={playingId}
-            charIndex={charIndex}
-            onPlay={handlePlay}
-          />
-        ))}
-      </div>
+      {activeTab === 3 ? (
+        <GradedListening />
+      ) : (
+        <div className="listening-list">
+          {items.map(item => (
+            <TextCard key={item.id} item={item} badge={item.grade || item.level}
+              playingId={playingId} charIndex={charIndex} onPlay={handlePlay} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
