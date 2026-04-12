@@ -7,6 +7,7 @@ import Writing from './english/Writing'
 import Listening from './english/Listening'
 import Dictionary from './english/Dictionary'
 import HumanHistory from './english/HumanHistory'
+import Phonics from './english/Phonics'
 import ReadingHub from './english/ReadingHub'
 import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
@@ -21,6 +22,7 @@ const CATEGORIES = [
     tools: [
       { id: 'listening', icon: '🎧', label: '听力练习', desc: 'TTS朗读 · 分级故事', ready: true },
       { id: 'history',   icon: '🌍', label: '人类大历史', desc: '中英双语 · 98讲 · TTS朗读', ready: true },
+      { id: 'phonics',   icon: '🔤', label: '自然拼读',   desc: '尼尔森体系 · 148集视频', ready: true },
     ],
   },
   {
@@ -97,6 +99,7 @@ export default function English({ user }) {
   if (activeTool === 'grammar')     return <Grammar user={user} onBack={() => setActiveTool(null)} />
   if (activeTool === 'reading_hub') return <ReadingHub user={user} onBack={() => setActiveTool(null)} />
   if (activeTool === 'history')     return <HumanHistory onBack={() => setActiveTool(null)} />
+  if (activeTool === 'phonics')    return <Phonics onBack={() => setActiveTool(null)} />
   if (activeTool === 'listening')   return <Listening onBack={() => setActiveTool(null)} />
   if (activeTool === 'speaking')    return <Speaking user={user} onBack={() => setActiveTool(null)} />
   if (activeTool === 'writing')     return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
