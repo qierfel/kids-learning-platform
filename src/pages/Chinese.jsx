@@ -3,6 +3,7 @@ import Confusables from './chinese/Confusables'
 import Poems from './chinese/Poems'
 import ChineseJunior from './chinese/ChineseJunior'
 import ChineseDictionary from './chinese/ChineseDictionary'
+import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
 const PRIMARY_TOOLS = [
@@ -69,6 +70,8 @@ export default function Chinese() {
           初中（7-9年级）
         </button>
       </div>
+
+      <TextbookLink subject="语文" edition={stage === 'primary' ? '人教版小学语文' : '人教版初中语文'} />
 
       <div className="tool-grid">
         {tools.map(t => (

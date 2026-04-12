@@ -9,6 +9,7 @@ import Reading from './english/Reading'
 import GradedReading from './english/GradedReading'
 import Dictionary from './english/Dictionary'
 import HumanHistory from './english/HumanHistory'
+import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
 const TOOLS = [
@@ -49,6 +50,7 @@ export default function English({ user }) {
   return (
     <div className="subject-page">
       <h2 className="subject-title">英语 <span className="edition">听说读写 · 词汇 · 语法 · 查词</span></h2>
+      <TextbookLink subject="英语" edition="译林版/人教版小学英语" />
       <div className="tool-grid">
         {TOOLS.map(t => (
           <div

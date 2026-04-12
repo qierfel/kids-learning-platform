@@ -4,6 +4,7 @@ import MathTable from './math/MathTable'
 import Formulas from './math/Formulas'
 import JuniorMath from './math/JuniorMath'
 import Curriculum from './math/Curriculum'
+import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
 const TOOLS = [
@@ -26,6 +27,7 @@ export default function MathPage({ user }) {
   return (
     <div className="subject-page">
       <h2 className="subject-title">数学 <span className="edition">小学 · 初中</span></h2>
+      <TextbookLink subject="数学" edition="苏教版小学数学" />
       <div className="tool-grid">
         {TOOLS.map(t => (
           <div

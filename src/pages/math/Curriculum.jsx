@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import mathCurriculum from '../../data/mathCurriculum'
+import TextbookLink from '../../components/TextbookLink'
 import './Curriculum.css'
 
 const DIFFICULTY_LABELS = ['', '入门', '基础', '中等', '较难', '挑战']
@@ -60,19 +61,7 @@ export default function Curriculum({ onBack }) {
             <span>{stats.topics} 个知识点</span>
           </div>
 
-          <a
-            className="textbook-link"
-            href="https://basic.smartedu.cn/tchMaterial"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span className="textbook-icon">📖</span>
-            <div className="textbook-text">
-              <div className="textbook-title">查看官方电子教材</div>
-              <div className="textbook-desc">国家中小学智慧教育平台（免费 · 苏教版 · 数学）</div>
-            </div>
-            <span className="textbook-arrow">→</span>
-          </a>
+          <TextbookLink subject="数学" edition={`苏教版${current.grade}年级${current.semester}册`} />
 
           <div className="units">
             {current.units.map(unit => {

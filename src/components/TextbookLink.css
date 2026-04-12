@@ -1,0 +1,37 @@
+.textbook-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s;
+}
+
+.textbook-link:hover {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+}
+
+.textbook-link-icon { font-size: 22px; }
+
+.textbook-link-text { flex: 1; }
+
+.textbook-link-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 2px;
+}
+
+.textbook-link-desc { font-size: 12px; color: #3b82f6; }
+
+.textbook-link-arrow {
+  font-size: 18px;
+  color: #2563eb;
+  font-weight: 700;
+}
