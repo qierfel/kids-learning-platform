@@ -16,7 +16,7 @@ const TOOLS = [
   { id: 'words',      icon: '📖', label: '单词速练',  desc: '沪教版 · KET · PET · FCE 闪卡', ready: true },
   { id: 'dictionary', icon: '🔎', label: '查词 · 生词本', desc: '即查即存 · 闪卡复习', ready: true },
   { id: 'grammar',    icon: '📐', label: '语法讲解',  desc: '14章65个知识点 · AI练习题', ready: true },
-  { id: 'graded',     icon: '📚', label: '分级读物',  desc: 'RAZ aa–T · 974本 · 朗读音频', ready: true },
+  { id: 'graded',     icon: '📚', label: '分级读物',  desc: 'RAZ aa–T · 海尼曼GK/G1 · 牛津树 · 音频', ready: true },
   { id: 'history',    icon: '🌍', label: '人类大历史', desc: '中英双语 · 98讲 · TTS朗读', ready: true },
   { id: 'listening',  icon: '🎧', label: '听力练习',  desc: 'TTS朗读 · 分级故事 · B站资源', ready: true },
   { id: 'speaking',   icon: '🗣️', label: '口语对话',  desc: 'AI外教 Emma · 实时纠错', ready: true },
