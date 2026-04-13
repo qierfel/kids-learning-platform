@@ -10,6 +10,7 @@ import HumanHistory from './english/HumanHistory'
 import Phonics from './english/Phonics'
 import ReadingHub from './english/ReadingHub'
 import TextbookLink from '../components/TextbookLink'
+import TextbookVocab from './english/TextbookVocab'
 import './Subject.css'
 import './English.css'
 
@@ -67,8 +68,9 @@ const CATEGORIES = [
     color: '#ef4444',
     bg: '#fef2f2',
     tools: [
-      { id: 'srs',   icon: '📅', label: '词汇记忆', desc: '记忆曲线 · 每日任务 · KET/PET/FCE', ready: true },
-      { id: 'words', icon: '📖', label: '单词速练', desc: '沪教版 · KET · PET · FCE 闪卡', ready: true },
+      { id: 'srs',           icon: '📅', label: '词汇记忆',   desc: '记忆曲线 · 每日任务 · KET/PET/FCE', ready: true },
+      { id: 'words',         icon: '📖', label: '单词速练',   desc: '沪教版 · KET · PET · FCE 闪卡',       ready: true },
+      { id: 'textbook_vocab',icon: '📚', label: '教材词汇',   desc: '译林版3-6年级 · 单词句型 · 听写练习', ready: true },
     ],
   },
   {
@@ -102,7 +104,8 @@ export default function English({ user }) {
   if (activeTool === 'phonics')    return <Phonics onBack={() => setActiveTool(null)} />
   if (activeTool === 'listening')   return <Listening onBack={() => setActiveTool(null)} />
   if (activeTool === 'speaking')    return <Speaking user={user} onBack={() => setActiveTool(null)} />
-  if (activeTool === 'writing')     return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
+  if (activeTool === 'writing')      return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
+  if (activeTool === 'textbook_vocab') return <TextbookVocab onBack={() => setActiveTool(null)} />
 
   return (
     <div className="subject-page en-page">

@@ -1,0 +1,540 @@
+/* TextbookVocab.css — 英语教材词汇与句子 */
+
+.tv-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Top bar ── */
+.tv-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tv-top-icon { font-size: 24px; }
+.tv-top-name { font-size: 17px; font-weight: 700; color: #1e293b; }
+.tv-top-sub  { font-size: 12px; color: #94a3b8; }
+
+.tv-back-link {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tv-back-link:hover { background: #e2e8f0; }
+
+/* ── Grade selector ── */
+.tv-selector {
+  padding: 24px 20px;
+}
+.tv-selector-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 12px;
+}
+.tv-grade-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.tv-grade-btn {
+  padding: 18px 0;
+  border: 2px solid;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tv-grade-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+.tv-semester-row {
+  display: flex;
+  gap: 12px;
+}
+.tv-sem-btn {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.tv-sem-btn:hover { opacity: 0.85; transform: translateY(-2px); }
+
+/* ── Unit list ── */
+.tv-unit-list-page { padding-bottom: 40px; }
+
+.tv-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tv-page-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.tv-page-sub { font-size: 12px; color: #94a3b8; font-weight: 400; }
+
+.tv-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px 20px;
+}
+.tv-unit-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.tv-unit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+.tv-unit-card-num {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.tv-unit-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.tv-unit-card-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.tv-empty { padding: 40px 20px; text-align: center; color: #94a3b8; font-size: 14px; }
+
+/* ── Unit view ── */
+.tv-unit-view { padding-bottom: 100px; }
+
+.tv-unit-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 3px solid;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tv-unit-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tv-unit-num {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.tv-unit-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* ── Tabs ── */
+.tv-tabs {
+  display: flex;
+  border-bottom: 2px solid #e8edf2;
+  background: #fff;
+}
+.tv-tab {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #94a3b8;
+  cursor: pointer;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tv-tab.active { font-weight: 700; }
+
+/* ── Word list ── */
+.tv-word-list {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tv-word-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+.tv-word-play {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tv-word-play:hover { background: #e2e8f0; }
+.tv-word-en {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  min-width: 100px;
+  font-family: 'Georgia', serif;
+}
+.tv-word-cn {
+  font-size: 13px;
+  color: #64748b;
+  flex: 1;
+}
+.tv-error-badge {
+  font-size: 10px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Sentence list ── */
+.tv-sentence-list {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tv-sentence-item {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 14px;
+}
+.tv-sentence-en {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: 'Georgia', serif;
+  line-height: 1.5;
+}
+.tv-sent-play {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.tv-sent-play:hover { background: #e2e8f0; }
+.tv-sentence-cn {
+  font-size: 13px;
+  color: #64748b;
+  padding-left: 36px;
+}
+
+/* ── Dictate bar ── */
+.tv-dictate-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  background: rgba(248, 250, 252, 0.95);
+  border-top: 1px solid #e2e8f0;
+  backdrop-filter: blur(8px);
+}
+.tv-dictate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tv-dictate-btn:hover { opacity: 0.88; }
+
+/* ── Dictation mode ── */
+.tv-dictation { padding: 0 0 40px; }
+
+.tv-dictation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tv-dictation-progress {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.tv-progress-track {
+  height: 4px;
+  background: #e2e8f0;
+  position: relative;
+}
+.tv-progress-fill {
+  height: 100%;
+  background: #6366f1;
+  transition: width 0.3s ease;
+}
+
+.tv-dictation-card {
+  margin: 20px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px 24px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  text-align: center;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.tv-dictation-cn {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.5;
+}
+.tv-dictation-hint {
+  font-size: 13px;
+  color: #94a3b8;
+}
+.tv-dictation-answer {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6366f1;
+  font-family: 'Georgia', serif;
+  line-height: 1.5;
+  background: #eef2ff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.tv-dictation-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.tv-play-big-btn {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+.tv-play-big-btn:hover { background: #e2e8f0; }
+
+.tv-reveal-btn {
+  background: #6366f1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+}
+.tv-reveal-btn:hover { opacity: 0.88; }
+
+.tv-mark-btns {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.tv-mark-correct, .tv-mark-wrong {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tv-mark-correct { background: #dcfce7; color: #16a34a; }
+.tv-mark-correct:hover { background: #bbf7d0; }
+.tv-mark-wrong { background: #fef2f2; color: #dc2626; }
+.tv-mark-wrong:hover { background: #fee2e2; }
+
+.tv-mini-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 20px;
+  justify-content: center;
+}
+.tv-mini-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.tv-mini-dot.correct { background: #22c55e; }
+.tv-mini-dot.wrong   { background: #ef4444; }
+
+/* ── Dictation result ── */
+.tv-dictation-result {
+  padding: 24px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.tv-result-score {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+}
+.tv-result-label {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.tv-result-items {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tv-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+.tv-result-item.correct { border-left: 3px solid #22c55e; }
+.tv-result-item.wrong   { border-left: 3px solid #ef4444; }
+.tv-result-mark {
+  font-size: 16px;
+  font-weight: 700;
+  width: 20px;
+  text-align: center;
+}
+.tv-result-item.correct .tv-result-mark { color: #22c55e; }
+.tv-result-item.wrong   .tv-result-mark { color: #ef4444; }
+.tv-result-en {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: 'Georgia', serif;
+  flex: 1;
+}
+.tv-result-cn {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.tv-result-btns {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+.tv-btn-primary {
+  flex: 1;
+  padding: 14px;
+  background: #6366f1;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tv-btn-primary:hover { opacity: 0.88; }
+.tv-btn-ghost {
+  padding: 14px 20px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tv-btn-ghost:hover { background: #e2e8f0; }
