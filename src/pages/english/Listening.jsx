@@ -368,15 +368,67 @@ function GradedListening() {
 
 // ─── Main Listening Component ─────────────────────────────────────────────────
 
+// ─── TTS engine ───────────────────────────────────────────────────────────────
+
+// Pick the best available English voice (prefer premium system voices)
+const VOICE_PRIORITY = [
+  'Samantha',       // macOS default, very natural
+  'Karen',          // macOS Australian
+  'Moira',          // macOS Irish
+  'Daniel',         // macOS British
+  'Alex',           // macOS (older)
+  'Google US English',
+  'Microsoft Zira',
+  'Microsoft David',
+]
+function getBestVoice() {
+  const voices = window.speechSynthesis.getVoices()
+  for (const name of VOICE_PRIORITY) {
+    const v = voices.find(v => v.name.startsWith(name))
+    if (v) return v
+  }
+  return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null
+}
+
+// Split full text into sentence segments, tracking their offset in the original string
+function splitSegments(text) {
+  const segs = []
+  // Match sentences ending in . ! ? (possibly followed by quotes)
+  const re = /[^.!?]+[.!?]["']?/g
+  let m, last = 0
+  while ((m = re.exec(text)) !== null) {
+    segs.push({ text: m[0].trim(), offset: m.index })
+    last = m.index + m[0].length
+  }
+  // Remainder (if text doesn't end with punctuation)
+  if (last < text.length) {
+    const rest = text.slice(last).trim()
+    if (rest) segs.push({ text: rest, offset: last })
+  }
+  return segs.length ? segs : [{ text, offset: 0 }]
+}
+
+// Pause after sentence (ms): longer for ! and ?, shorter for plain .
+function sentencePause(seg) {
+  const t = seg.text
+  if (t.endsWith('?') || t.endsWith('?"') || t.endsWith("?'")) return 550
+  if (t.endsWith('!') || t.endsWith('!"') || t.endsWith("!'")) return 480
+  return 380
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
 const TABS = ['课文朗读', '分级故事', '磨耳朵', '分级读物']
 
 export default function Listening({ onBack }) {
   const [activeTab, setActiveTab]   = useState(0)
   const [playingId, setPlayingId]   = useState(null)
   const [charIndex, setCharIndex]   = useState(-1)
-  const utteranceRef = useRef(null)
+  const ttsRef = useRef({ cancelled: false, timer: null })
 
   function stopAll() {
+    ttsRef.current.cancelled = true
+    clearTimeout(ttsRef.current.timer)
     window.speechSynthesis?.cancel()
     setPlayingId(null)
     setCharIndex(-1)
@@ -385,16 +437,57 @@ export default function Listening({ onBack }) {
   const handlePlay = useCallback((item) => {
     if (playingId === item.id) { stopAll(); return }
     stopAll()
-    const utter = new window.SpeechSynthesisUtterance(item.text)
-    utter.lang = 'en-US'
-    utter.rate = 0.82
-    utter.onboundary = (e) => { if (e.name === 'word') setCharIndex(e.charIndex) }
-    utter.onend  = () => { setPlayingId(null); setCharIndex(-1) }
-    utter.onerror = () => { setPlayingId(null); setCharIndex(-1) }
-    utteranceRef.current = utter
-    setPlayingId(item.id)
-    setCharIndex(0)
-    window.speechSynthesis.speak(utter)
+
+    const segs = splitSegments(item.text)
+    const state = { cancelled: false, timer: null }
+    ttsRef.current = state
+
+    // Load voices (may be async on first call)
+    const startTTS = () => {
+      const voice = getBestVoice()
+      let segIdx = 0
+
+      const speakNext = () => {
+        if (state.cancelled || segIdx >= segs.length) {
+          if (!state.cancelled) { setPlayingId(null); setCharIndex(-1) }
+          return
+        }
+        const seg = segs[segIdx]
+        const isQuestion   = /\?["']?$/.test(seg.text)
+        const isExclamation = /!["']?$/.test(seg.text)
+
+        const utter = new SpeechSynthesisUtterance(seg.text)
+        utter.lang  = 'en-US'
+        utter.rate  = isQuestion ? 0.78 : isExclamation ? 0.88 : 0.82
+        utter.pitch = isQuestion ? 1.15 : isExclamation ? 1.05 : 1.0
+        if (voice) utter.voice = voice
+
+        utter.onboundary = (e) => {
+          if (state.cancelled) return
+          if (e.name === 'word') setCharIndex(seg.offset + e.charIndex)
+        }
+        utter.onend = () => {
+          if (state.cancelled) return
+          segIdx++
+          state.timer = setTimeout(speakNext, sentencePause(seg))
+        }
+        utter.onerror = () => {
+          if (!state.cancelled) { setPlayingId(null); setCharIndex(-1) }
+        }
+        window.speechSynthesis.speak(utter)
+      }
+
+      setPlayingId(item.id)
+      setCharIndex(0)
+      speakNext()
+    }
+
+    // Voices might not be loaded yet on first page load
+    if (window.speechSynthesis.getVoices().length > 0) {
+      startTTS()
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; startTTS() }
+    }
   }, [playingId])
 
   function switchTab(i) { stopAll(); setActiveTab(i) }
