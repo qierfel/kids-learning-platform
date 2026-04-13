@@ -15,112 +15,79 @@ import './English.css'
 const CARDS = [
   {
     id: 'listening',
-    category: '听力',
-    icon: '🎧',
+    img: '/icons/card_listening.png',
     label: '听力练习',
     desc: 'TTS朗读 · 分级故事',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f4ff 100%)',
-    color: '#0891b2',
     ready: true,
   },
   {
     id: 'history',
-    category: '历史文化',
-    icon: '🌍',
+    img: '/icons/card_history.png',
     label: '人类大历史',
     desc: '中英双语 · 98讲 · TTS朗读',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #f5ede0 100%)',
-    color: '#b45309',
     ready: true,
   },
   {
     id: 'phonics',
-    category: '拼读',
-    icon: '🔤',
+    img: '/icons/card_phonics.png',
     label: '自然拼读',
     desc: '尼尔森体系 · 148集视频',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fef9d7 100%)',
-    color: '#d97706',
     ready: true,
   },
   {
     id: 'speaking',
-    category: '口语',
-    icon: '🗣️',
+    img: '/icons/card_speaking.png',
     label: '口语对话',
     desc: 'AI外教 Emma · 实时纠错',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e0 100%)',
-    color: '#ea580c',
     ready: true,
   },
   {
     id: 'reading_hub',
-    category: '阅读',
-    icon: '📖',
+    img: '/icons/card_reading.png',
     label: '阅读中心',
     desc: '分级 · 绘本 · 章节书 · 考试阅读',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)',
-    color: '#059669',
     ready: true,
   },
   {
     id: 'writing',
-    category: '写作',
-    icon: '✏️',
+    img: '/icons/card_writing.png',
     label: '写作练习',
     desc: 'AI批改 · 自动录入错题本',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #f3e8ff 100%)',
-    color: '#7c3aed',
     ready: true,
   },
   {
     id: 'grammar',
-    category: '语法',
-    icon: '📐',
+    img: '/icons/card_grammar.png',
     label: '语法讲解',
     desc: '14章65个知识点 · AI练习题',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)',
-    color: '#2563eb',
     ready: true,
   },
   {
     id: 'srs',
-    category: '词汇',
-    icon: '📅',
+    img: '/icons/card_vocab.png',
     label: '词汇记忆',
     desc: '记忆曲线 · 每日任务 · KET/PET/FCE',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #dff0ff 100%)',
-    color: '#3b82f6',
     ready: true,
   },
   {
     id: 'words',
-    category: '单词',
-    icon: '🃏',
+    img: '/icons/card_flashcard.png',
     label: '单词速练',
     desc: '沪教版 · KET · PET · FCE 闪卡',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0eeff 100%)',
-    color: '#4f46e5',
     ready: true,
   },
   {
     id: 'textbook_vocab',
-    category: '教材',
-    icon: '📚',
+    img: '/icons/card_textbook.png',
     label: '教材词汇',
     desc: '译林版3-6年级 · 单词句型 · 听写练习',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e8 100%)',
-    color: '#c2410c',
     ready: true,
   },
   {
     id: 'dictionary',
-    category: '查词',
-    icon: '🔎',
+    img: '/icons/card_lookup.png',
     label: '查词 · 生词本',
     desc: '即查即存 · 闪音 · 例句 · 闪卡复习',
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #d9feff 100%)',
-    color: '#0891b2',
     ready: true,
   },
 ]
@@ -151,7 +118,6 @@ export default function English({ user }) {
   return (
     <div className="en-page">
       <div className="en-hero">
-        <div className="en-hero-icon">🌟</div>
         <h1 className="en-hero-title">趣味英语</h1>
         <p className="en-hero-sub">听说读写 · 词汇 · 查词 · 全方位英语学习</p>
       </div>
@@ -161,14 +127,10 @@ export default function English({ user }) {
           <div
             key={card.id}
             className={`en-card${card.ready ? '' : ' en-card--coming'}`}
-            style={{ '--card-gradient': card.gradient, '--card-color': card.color }}
             onClick={() => card.ready && setActiveTool(card.id)}
           >
-            <div className="en-card-icon-wrap">
-              <span className="en-card-icon">{card.icon}</span>
-            </div>
-            <div className="en-card-bottom">
-              <span className="en-card-badge">{card.category}</span>
+            <img className="en-card-img" src={card.img} alt={card.label} draggable="false" />
+            <div className="en-card-info">
               <div className="en-card-label">{card.label}</div>
               <div className="en-card-desc">{card.desc}</div>
             </div>

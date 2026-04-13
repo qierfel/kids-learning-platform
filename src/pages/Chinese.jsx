@@ -9,27 +9,18 @@ import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
 const PRIMARY_TOOLS = [
-  { id: 'confusables',    icon: '🔄', label: '同音/形近字', desc: '对比 · 组词 · 练习',        ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)', color: '#4f46e5' },
-  { id: 'poems',          icon: '📜', label: '古诗词',      desc: '朗读 · 背诵打卡 · 1-6年级', ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e0 100%)', color: '#ea580c' },
-  { id: 'dictionary',     icon: '🔎', label: '查词 · 生词本', desc: '汉字词语 · 拼音 · 例句',  ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)', color: '#059669' },
-  { id: 'character_list', icon: '🈶', label: '生字表',       desc: '一类字·二类字·点击发音',  ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f4ff 100%)', color: '#0891b2' },
-  { id: 'dictation',      icon: '✍️', label: '听写练习',     desc: '听写·错字本·历史记录',     ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #f3e8ff 100%)', color: '#7c3aed' },
-  { id: 'idioms',         icon: '🐉', label: '成语故事',     desc: '图文解释 · 例句 · 小测验',  ready: false,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fef9d7 100%)', color: '#d97706' },
+  { id: 'confusables',    img: '/icons/cn_card_shape.png',     label: '同音/形近字', desc: '对比 · 组词 · 练习',        ready: true },
+  { id: 'poems',          img: '/icons/cn_card_poetry.png',    label: '古诗词',      desc: '朗读 · 背诵打卡 · 1-6年级', ready: true },
+  { id: 'dictionary',     img: '/icons/cn_card_lookup.png',    label: '查词 · 生词本', desc: '汉字词语 · 拼音 · 例句',  ready: true },
+  { id: 'character_list', img: '/icons/cn_card_chars.png',     label: '生字表',       desc: '一类字·二类字·点击发音',  ready: true },
+  { id: 'dictation',      img: '/icons/cn_card_dictation.png', label: '听写练习',     desc: '听写·错字本·历史记录',     ready: true },
+  { id: 'idioms',         img: '/icons/cn_card_idiom.png',     label: '成语故事',     desc: '图文解释 · 例句 · 小测验',  ready: false },
 ]
 
 const JUNIOR_TOOLS = [
-  { id: 'junior_poems',     icon: '📜', label: '古诗文',     desc: '7-9年级必背篇目 · 文言文', ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e0 100%)', color: '#ea580c' },
-  { id: 'junior_knowledge', icon: '💡', label: '语文知识点', desc: '修辞 · 文体 · 语法 · 考点', ready: true,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)', color: '#4f46e5' },
-  { id: 'junior_reading',   icon: '📰', label: '阅读理解',   desc: '现代文 · AI分析',           ready: false,
-    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)', color: '#059669' },
+  { id: 'junior_poems',     img: '/icons/cn_card_poetry.png',  label: '古诗文',     desc: '7-9年级必背篇目 · 文言文', ready: true },
+  { id: 'junior_knowledge', img: '/icons/cn_card_shape.png',   label: '语文知识点', desc: '修辞 · 文体 · 语法 · 考点', ready: true },
+  { id: 'junior_reading',   img: '/icons/cn_card_lookup.png',  label: '阅读理解',   desc: '现代文 · AI分析',           ready: false },
 ]
 
 export default function Chinese() {
@@ -104,18 +95,15 @@ export default function Chinese() {
 
       {stage === 'primary' && <TextbookLink subject="语文" />}
 
-      <div className="tool-grid cn-card-grid">
+      <div className="cn-card-grid">
         {tools.map(t => (
           <div
             key={t.id}
-            className={`tool-card cn-card ${t.ready ? '' : 'coming-soon'}`}
-            style={{ '--card-gradient': t.gradient, '--card-color': t.color }}
+            className={`cn-card ${t.ready ? '' : 'coming-soon'}`}
             onClick={() => t.ready && setActiveTool(t.id)}
           >
-            <div className="cn-card-top">
-              <div className="cn-card-icon">{t.icon}</div>
-            </div>
-            <div className="cn-card-bottom">
+            <img className="cn-card-img" src={t.img} alt={t.label} draggable="false" />
+            <div className="cn-card-info">
               <div className="tool-label">{t.label}</div>
               <div className="tool-desc">{t.desc}</div>
             </div>
