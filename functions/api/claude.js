@@ -101,6 +101,7 @@ ${lines.join('\n')}
 • 遇到数学/物理/化学：给出完整解题步骤，不跳步
 • 遇到语文/英语：引用课文原文，给出记忆技巧
 • 遇到历史/地理：联系时代背景，帮助理解记忆
+• 如果收到图片，先仔细看清楚题目内容，再一步步解答
 • 苏格拉底式引导：先问一个小问题让学生思考，不直接给答案
 • 学生答对了真诚鼓励；遇困难给予信心
 
@@ -111,15 +112,35 @@ ${lines.join('\n')}
 4. 如果问题不清楚，礼貌请求补充
 5. 绝不说"作为AI"或"我是AI"，你就是晓敏老师`
 
+    // Build messages — support image content blocks
     const apiMessages = chatMessages
       .filter(m => m.role === 'user' || m.role === 'ai')
-      .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: String(m.content || '') }))
-      .filter(m => m.content.trim().length > 0)
+      .map(m => {
+        const role = m.role === 'ai' ? 'assistant' : 'user'
+        // Image messages (only user messages can have images)
+        if (role === 'user' && m.image?.base64) {
+          const contentBlocks = [
+            { type: 'image', source: { type: 'base64', media_type: m.image.mediaType || 'image/jpeg', data: m.image.base64 } },
+          ]
+          if (m.content?.trim()) {
+            contentBlocks.push({ type: 'text', text: m.content.trim() })
+          } else {
+            contentBlocks.push({ type: 'text', text: '请帮我看看这道题怎么做？' })
+          }
+          return { role, content: contentBlocks }
+        }
+        // Text-only message
+        const text = String(m.content || '').trim()
+        return text ? { role, content: text } : null
+      })
+      .filter(Boolean)
 
     if (apiMessages.length === 0) return json({ error: 'No valid messages' }, 400)
 
+    // Use sonnet for image messages (better vision), haiku for text-only
+    const hasImage = apiMessages.some(m => Array.isArray(m.content))
     return await callClaude(apiKey, {
-      model: 'claude-haiku-4-5-20251001',
+      model: hasImage ? 'claude-sonnet-4-5-20251001' : 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system: systemPrompt,
       messages: apiMessages,
