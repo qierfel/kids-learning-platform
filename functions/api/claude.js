@@ -140,7 +140,7 @@ ${lines.join('\n')}
     // Use sonnet for image messages (better vision), haiku for text-only
     const hasImage = apiMessages.some(m => Array.isArray(m.content))
     return await callClaude(apiKey, {
-      model: hasImage ? 'claude-sonnet-4-5-20251001' : 'claude-haiku-4-5-20251001',
+      model: hasImage ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system: systemPrompt,
       messages: apiMessages,
@@ -229,7 +229,7 @@ ${lines.join('\n')}
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20251001',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1024,
           messages: [{
             role: 'user',
@@ -305,27 +305,38 @@ Grade this writing and respond in Chinese with this exact format:
     // Normalize media type to Anthropic-supported values
     const supported = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     const mediaType = supported.includes(rawMediaType) ? rawMediaType : 'image/jpeg'
+    console.log(`[claude] essay_ocr mediaType=${mediaType} base64len=${cleanBase64.length}`)
     try {
+      const reqBody = {
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2048,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: cleanBase64 } },
+            { type: 'text', text: '请仔细识别这张作文/写作照片中的文字内容，完整准确地转录出来。只输出识别到的作文正文，不要加任何说明或标题。保留原文的段落结构。' }
+          ]
+        }],
+      }
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20251001',
-          max_tokens: 2048,
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'base64', media_type: mediaType, data: cleanBase64 } },
-              { type: 'text', text: '请仔细识别这张作文/写作照片中的文字内容，完整准确地转录出来。只输出识别到的作文正文，不要加任何说明或标题。保留原文的段落结构。' }
-            ]
-          }],
-        }),
+        body: JSON.stringify(reqBody),
       })
-      if (!response.ok) { const err = await response.text(); return json({ error: 'Upstream API error', detail: err }, 502) }
+      if (!response.ok) {
+        const errText = await response.text()
+        console.error(`[claude] essay_ocr upstream error ${response.status}:`, errText)
+        let errMsg = 'OCR 服务暂时不可用'
+        try { const errJson = JSON.parse(errText); errMsg = errJson?.error?.message || errMsg } catch { /* */ }
+        return json({ error: errMsg, detail: errText }, 502)
+      }
       const data = await response.json()
       const text = data.content?.[0]?.text?.trim() || ''
       return json({ text })
-    } catch (e) { return json({ error: e.message }, 500) }
+    } catch (e) {
+      console.error(`[claude] essay_ocr exception:`, e.message)
+      return json({ error: e.message }, 500)
+    }
 
   } else if (type === 'essay_correct') {
     const { essayText, level = 'KET' } = payload
