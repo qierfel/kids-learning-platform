@@ -67,6 +67,7 @@ export default function PictureBooks({ onBack }) {
   const [selectedSeries, setSelectedSeries] = useState(null)
   const [playingBook, setPlayingBook]       = useState(null)
   const [pdfBook, setPdfBook]               = useState(null)
+  const [pdfSeriesId, setPdfSeriesId]       = useState(null)
   const [isPlaying, setIsPlaying]           = useState(false)
   const [progress, setProgress]             = useState(0)
   const [duration, setDuration]             = useState(0)
@@ -120,8 +121,8 @@ export default function PictureBooks({ onBack }) {
 
   // PDF 阅读器视图
   if (pdfBook) {
-    const series = PICTURE_BOOKS.find(s => s.id === 'frog')
-    return <PdfReader book={pdfBook} color={series.color} onClose={() => setPdfBook(null)} />
+    const pdfSeries = PICTURE_BOOKS.find(s => s.id === pdfSeriesId)
+    return <PdfReader book={pdfBook} color={pdfSeries?.color || '#10b981'} onClose={() => { setPdfBook(null); setPdfSeriesId(null) }} />
   }
 
   const series = selectedSeries ? PICTURE_BOOKS.find(s => s.id === selectedSeries) : null
@@ -162,6 +163,7 @@ export default function PictureBooks({ onBack }) {
                     playBook(book)
                   } else {
                     setPdfBook(book)
+                    setPdfSeriesId(series.id)
                   }
                 }}
               >
