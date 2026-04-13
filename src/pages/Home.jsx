@@ -1,98 +1,184 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
-const SUBJECTS = [
+const PRIMARY_SUBJECTS = [
   {
     path: '/chinese',
+    tag: '趣味语文',
     label: '语文',
-    icon: '语',
-    desc: '古诗词 · 成语 · 同音字',
-    color: '#ff6b6b',
-    bg: '#fff5f5',
+    icon: '📖',
+    desc: '古诗词 · 成语 · 同音字 · 听写',
+    tagColor: '#059669',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)',
   },
   {
     path: '/math',
+    tag: '趣味数学',
     label: '数学',
-    icon: '数',
-    desc: '口算 · 乘法表 · 图形',
-    color: '#4ecdc4',
-    bg: '#f0fffe',
+    icon: '🔢',
+    desc: '口算 · 乘法表 · 公式 · 图形',
+    tagColor: '#d97706',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #fef3d0 100%)',
   },
   {
     path: '/english',
+    tag: '趣味英语',
     label: '英语',
-    icon: 'E',
-    desc: '单词 · KET · PET · 雅思',
-    color: '#a78bfa',
-    bg: '#f5f3ff',
-  },
-  {
-    path: '/physics',
-    label: '物理',
-    icon: '⚡',
-    desc: '声光热力电 · 中考考点',
-    color: '#f59e0b',
-    bg: '#fffbeb',
-  },
-  {
-    path: '/chemistry',
-    label: '化学',
-    icon: '⚗️',
-    desc: '方程式 · 酸碱盐 · 元素',
-    color: '#10b981',
-    bg: '#f0fdf4',
-  },
-  {
-    path: '/history',
-    label: '历史',
-    icon: '🏯',
-    desc: '古代史 · 近代史 · 世界史',
-    color: '#b45309',
-    bg: '#fef3c7',
-  },
-  {
-    path: '/geography',
-    label: '地理',
-    icon: '🌏',
-    desc: '中国地理 · 山西特色 · 世界',
-    color: '#0ea5e9',
-    bg: '#f0f9ff',
-  },
-  {
-    path: '/mistakes',
-    label: '错题本',
-    icon: '📝',
-    desc: '错题归纳 · AI解析 · 同类练习',
-    color: '#e53e3e',
-    bg: '#fff5f5',
-  },
-  {
-    path: '/notebook',
-    label: '问题讨论',
-    icon: '💬',
-    desc: '提问 · AI引导 · 线上讨论',
-    color: '#6366f1',
-    bg: '#eef2ff',
+    icon: '🌟',
+    desc: '单词 · KET · PET · 听说读写',
+    tagColor: '#2563eb',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)',
   },
 ]
 
-export default function Home({ user }) {
+const JUNIOR_SUBJECTS = [
+  {
+    path: '/physics',
+    tag: '趣味物理',
+    label: '物理',
+    icon: '⚡',
+    desc: '声光热力电 · 中考考点',
+    tagColor: '#7c3aed',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #f0e8ff 100%)',
+  },
+  {
+    path: '/chemistry',
+    tag: '趣味化学',
+    label: '化学',
+    icon: '⚗️',
+    desc: '方程式 · 酸碱盐 · 元素',
+    tagColor: '#059669',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)',
+  },
+  {
+    path: '/history',
+    tag: '趣味历史',
+    label: '历史',
+    icon: '🏯',
+    desc: '古代史 · 近代史 · 世界史',
+    tagColor: '#b45309',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #f5ede0 100%)',
+  },
+  {
+    path: '/geography',
+    tag: '趣味地理',
+    label: '地理',
+    icon: '🌏',
+    desc: '中国地理 · 山西特色 · 世界',
+    tagColor: '#0ea5e9',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #dff5ff 100%)',
+  },
+]
+
+const TOOL_SUBJECTS = [
+  {
+    path: '/mistakes',
+    tag: '错题本',
+    label: '错题本',
+    icon: '📝',
+    desc: '错题归纳 · AI解析 · 同类练习',
+    tagColor: '#e53e3e',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #ffe0e0 100%)',
+  },
+  {
+    path: '/notebook',
+    tag: '问题讨论',
+    label: '问题讨论',
+    icon: '💬',
+    desc: '提问 · AI引导 · 线上讨论',
+    tagColor: '#6366f1',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #eaecff 100%)',
+  },
+]
+
+export default function Home() {
   const navigate = useNavigate()
+  const [grade, setGrade] = useState('primary') // 'primary' | 'junior'
+
+  const subjects = grade === 'primary' ? PRIMARY_SUBJECTS : JUNIOR_SUBJECTS
+
+  const allTags = [
+    { key: 'primary', label: '小学' },
+    ...PRIMARY_SUBJECTS.map(s => ({ key: s.path, label: s.tag, color: s.tagColor, path: s.path })),
+    { key: 'junior', label: '初中' },
+    ...JUNIOR_SUBJECTS.map(s => ({ key: s.path, label: s.tag, color: s.tagColor, path: s.path })),
+  ]
 
   return (
     <div className="home">
       <div className="home-header">
         <h1 className="home-title">今天学什么？</h1>
-        <p className="home-sub">选择一个科目开始学习</p>
+        <p className="home-sub">选择科目开始学习</p>
       </div>
 
-      <div className="subject-grid">
-        {SUBJECTS.map(s => (
-          <button key={s.path} className="subject-card" onClick={() => navigate(s.path)}
-            style={{ '--card-color': s.color, '--card-bg': s.bg }}>
-            <div className="subject-icon">{s.icon}</div>
-            <div className="subject-label">{s.label}</div>
-            <div className="subject-desc">{s.desc}</div>
+      {/* Tag cloud */}
+      <div className="home-tags">
+        {allTags.map(t => (
+          t.path ? (
+            <button
+              key={t.key}
+              className="home-tag"
+              style={{ '--tag-color': t.color }}
+              onClick={() => navigate(t.path)}
+            >
+              {t.label}
+            </button>
+          ) : (
+            <span key={t.key} className="home-tag-section">{t.label}</span>
+          )
+        ))}
+      </div>
+
+      {/* Grade toggle */}
+      <div className="home-grade-toggle">
+        <button
+          className={`grade-btn${grade === 'primary' ? ' active' : ''}`}
+          onClick={() => setGrade('primary')}
+        >
+          小学（1-6年级）
+        </button>
+        <button
+          className={`grade-btn${grade === 'junior' ? ' active' : ''}`}
+          onClick={() => setGrade('junior')}
+        >
+          初中（7-9年级）
+        </button>
+      </div>
+
+      {/* Subject cards */}
+      <div className="home-subject-grid">
+        {subjects.map(s => (
+          <button
+            key={s.path}
+            className="home-subject-card"
+            style={{ background: s.bg }}
+            onClick={() => navigate(s.path)}
+          >
+            <span className="home-subject-icon">{s.icon}</span>
+            <div className="home-subject-info">
+              <div className="home-subject-label">{s.label}</div>
+              <div className="home-subject-desc">{s.desc}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Tools */}
+      <div className="home-tools-title">学习工具</div>
+      <div className="home-tools-row">
+        {TOOL_SUBJECTS.map(s => (
+          <button
+            key={s.path}
+            className="home-tool-card"
+            style={{ background: s.bg, '--tag-color': s.tagColor }}
+            onClick={() => navigate(s.path)}
+          >
+            <span className="home-tool-icon">{s.icon}</span>
+            <div>
+              <div className="home-tool-label">{s.label}</div>
+              <div className="home-tool-desc">{s.desc}</div>
+            </div>
           </button>
         ))}
       </div>
