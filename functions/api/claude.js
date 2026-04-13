@@ -294,6 +294,73 @@ Grade this writing and respond in Chinese with this exact format:
 【错误列表】(list up to 3 specific grammar/spelling errors in format: "错误: xxx → 正确: yyy")`
     max_tokens = 600
 
+  } else if (type === 'essay_ocr') {
+    const { imageBase64, mediaType = 'image/jpeg' } = payload
+    if (!imageBase64) return json({ error: 'imageBase64 required' }, 400)
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5-20251001',
+          max_tokens: 2048,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+              { type: 'text', text: '请仔细识别这张作文/写作照片中的文字内容，完整准确地转录出来。只输出识别到的作文正文，不要加任何说明或标题。保留原文的段落结构。' }
+            ]
+          }],
+        }),
+      })
+      if (!response.ok) { const err = await response.text(); return json({ error: 'Upstream API error', detail: err }, 502) }
+      const data = await response.json()
+      const text = data.content?.[0]?.text?.trim() || ''
+      return json({ text })
+    } catch (e) { return json({ error: e.message }, 500) }
+
+  } else if (type === 'essay_correct') {
+    const { essayText, level = 'KET' } = payload
+    if (!essayText) return json({ error: 'essayText required' }, 400)
+    const levelDesc = level === 'KET' ? 'A2 (KET)' : level === 'PET' ? 'B1 (PET)' : 'B2 (FCE)'
+    prompt = `你是一位专业的英语写作批改老师，请批改以下英语作文。作文水平参考：${levelDesc}。
+
+作文内容：
+"""
+${essayText}
+"""
+
+请按以下JSON格式返回批改结果（只输出JSON，不要任何其他内容）：
+{
+  "overallScore": "综合评级，如：B+ / 良好",
+  "wordCount": 识别到的单词数（数字）,
+  "summary": "总体评语，2-3句话",
+  "errors": [
+    {
+      "original": "原文中的错误片段",
+      "corrected": "正确写法",
+      "explanation": "错误原因说明（中文，1句话）",
+      "type": "错误类型：grammar/spelling/vocabulary/punctuation之一"
+    }
+  ],
+  "grammar": {
+    "score": "语法评级（A/B/C）",
+    "feedback": "语法点评（1-2句）"
+  },
+  "vocabulary": {
+    "score": "词汇评级（A/B/C）",
+    "feedback": "词汇点评（1-2句）"
+  },
+  "content": {
+    "score": "内容评级（A/B/C）",
+    "feedback": "内容点评（1-2句）"
+  },
+  "suggestions": ["改进建议1", "改进建议2", "改进建议3"]
+}
+
+errors数组最多列出5个最典型的错误。`
+    max_tokens = 1500
+
   } else if (type === 'reading_explain') {
     const { passage, question } = payload
     prompt = `Based on this English reading passage:

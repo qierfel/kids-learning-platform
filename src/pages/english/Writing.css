@@ -316,6 +316,358 @@
   background: #e9ecf0;
 }
 
+/* ── Main tabs (写作练习 / 作文批改) ─────────────────────────── */
+.writing-main-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 14px;
+}
+.writing-main-tab {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.writing-main-tab.active {
+  background: #fff;
+  color: #1a1a2e;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+}
+.writing-main-tab:hover:not(.active) {
+  color: #374151;
+  background: rgba(255,255,255,0.5);
+}
+
+/* ── Essay Correction ─────────────────────────────────────────── */
+.ec-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ec-step-card {
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.ec-step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ec-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ec-step-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.ec-upload-area {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ec-upload-btn {
+  flex: 1;
+  min-width: 130px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px dashed #c4b5fd;
+  background: #f5f3ff;
+  color: #7c3aed;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: center;
+}
+.ec-upload-btn:hover {
+  background: #ede9fe;
+  border-color: #7c3aed;
+}
+.ec-upload-btn--secondary {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.ec-upload-btn--secondary:hover {
+  background: #dbeafe;
+  border-color: #1d4ed8;
+}
+
+.ec-image-preview-wrap {
+  position: relative;
+  display: inline-block;
+}
+.ec-image-preview {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  display: block;
+}
+.ec-remove-image {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ec-action-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid;
+  transition: background 0.15s, opacity 0.15s;
+  text-align: center;
+}
+.ec-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ec-action-btn:not(:disabled):hover {
+  background: #f5f3ff;
+}
+
+.ec-ocr-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+/* Result card */
+.ec-result-card {
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+}
+.ec-result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ec-result-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.ec-result-summary {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+  line-height: 1.5;
+  max-width: 360px;
+}
+.ec-result-score {
+  font-size: 28px;
+  font-weight: 900;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ec-score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.ec-score-item {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.ec-score-item-label {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.ec-score-item-value {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.ec-score-item-text {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.ec-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.ec-errors-section {
+  margin-bottom: 18px;
+}
+.ec-error-item {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.ec-error-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+.ec-error-badge--type {
+  background: #fee2e2;
+  color: #dc2626;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ec-error-orig {
+  font-size: 13px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.ec-error-fix {
+  font-size: 13px;
+  color: #16a34a;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.ec-error-exp {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ec-suggestions-section {
+  margin-bottom: 10px;
+}
+.ec-suggestions-list {
+  padding-left: 18px;
+  margin: 0;
+}
+.ec-suggestions-list li {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+/* History */
+.ec-history-btn {
+  padding: 8px 14px;
+  background: #f3f4f6;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ec-history-btn:hover {
+  background: #e9ecf0;
+}
+.ec-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ec-history-item {
+  background: #fff;
+  border: 1.5px solid #e8edf2;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.ec-history-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.ec-history-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+.ec-history-level {
+  font-size: 12px;
+  font-weight: 700;
+}
+.ec-history-score {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.ec-history-errors {
+  font-size: 12px;
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.ec-history-preview {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.ec-empty {
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+
 /* Mobile responsive */
 @media (max-width: 480px) {
   .writing-page-title {
