@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { GRADE_WORDS, EXAM_WORDS, IELTS_WORDS } from '../../data/englishWords'
 import { sm2Update, newCard, getTodayPlan, estimatePlan, getStats } from '../../utils/srs'
-import { wordAudioMap } from '../../data/wordAudioMap'
 import { ttsSpeak } from '../../utils/tts'
 import './SRSStudy.css'
 
@@ -350,20 +349,10 @@ function Session({ level, todayPlan, progress, onFinish, onBack }) {
   const [learnTimer, setLearnTimer] = useState(3)
   const timerRef = useRef(null)
   const inputRef = useRef(null)
-  const audioRef = useRef(new Audio())
 
   function playWordAudio(word) {
     if (!word) return
-    const path = wordAudioMap[word.toLowerCase()]
-    if (path) {
-      const audio = audioRef.current
-      audio.src = path
-      audio.currentTime = 0
-      audio.play().catch(() => {})
-    } else {
-      // TTS 回退
-      ttsSpeak(word).catch(() => {})
-    }
+    ttsSpeak(word).catch(() => {})
   }
 
   // 进入 LEARN 阶段时自动播放
