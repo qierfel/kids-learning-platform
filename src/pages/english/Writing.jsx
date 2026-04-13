@@ -39,13 +39,19 @@ function saveHistory(history) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 20)))
 }
 
+function normalizeMediaType(mt) {
+  if (!mt || mt === 'image/jpg') return 'image/jpeg'
+  if (['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(mt)) return mt
+  return 'image/jpeg' // fallback for image/heic, image/avif, etc.
+}
+
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       const dataUrl = reader.result
-      const base64 = dataUrl.split(',')[1]
-      resolve({ base64, mediaType: file.type || 'image/jpeg' })
+      const base64 = dataUrl.split(',')[1].replace(/\s/g, '')
+      resolve({ base64, mediaType: normalizeMediaType(file.type) })
     }
     reader.onerror = reject
     reader.readAsDataURL(file)
