@@ -141,6 +141,49 @@ function BookReader({ book, color, onClose }) {
         />
       </div>
 
+      {/* 下载栏 */}
+      {(book.worksheet || book.workbook) && (
+        <div className="gr-download-bar">
+          <span className="gr-download-label">📥 配套资源：</span>
+          {book.worksheet && (
+            <a
+              className="gr-download-btn"
+              href={mediaUrl(book.worksheet)}
+              download
+              target="_blank"
+              rel="noreferrer"
+              style={{ borderColor: color, color }}
+            >
+              📝 同步练习
+            </a>
+          )}
+          {book.workbook && (
+            <a
+              className="gr-download-btn"
+              href={mediaUrl(book.workbook)}
+              download
+              target="_blank"
+              rel="noreferrer"
+              style={{ borderColor: color, color }}
+            >
+              📒 练习册
+            </a>
+          )}
+          {book.pdf && (
+            <a
+              className="gr-download-btn"
+              href={mediaUrl(book.pdf)}
+              download
+              target="_blank"
+              rel="noreferrer"
+              style={{ borderColor: color, color }}
+            >
+              🎨 彩色绘本
+            </a>
+          )}
+        </div>
+      )}
+
       {/* PDF 区域 */}
       <div className="gr-reader-body">
         {pdfError ? (
