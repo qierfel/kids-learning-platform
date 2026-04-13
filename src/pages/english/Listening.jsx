@@ -133,7 +133,7 @@ function ReadAlongText({ text, charIndex, playing }) {
   return <div className="read-along-text" ref={containerRef}>{parts}</div>
 }
 
-function TextCard({ item, badge, playingId, charIndex, onPlay }) {
+function TextCard({ item, badge, playingId, charIndex, onPlay, loading }) {
   const isPlaying = playingId === item.id
   return (
     <div className={`listen-card${isPlaying ? ' listen-card-active' : ''}`} style={{ '--card-color': item.color }}>
@@ -146,8 +146,9 @@ function TextCard({ item, badge, playingId, charIndex, onPlay }) {
           className={`listen-play-btn${isPlaying ? ' playing' : ''}`}
           style={{ borderColor: item.color, color: isPlaying ? '#fff' : item.color, background: isPlaying ? item.color : 'transparent' }}
           onClick={() => onPlay(item)}
+          disabled={loading}
         >
-          {isPlaying ? '⏹ Stop' : '▶ Listen'}
+          {loading ? '⏳ 生成…' : isPlaying ? '⏹ Stop' : '▶ Listen'}
         </button>
       </div>
       <ReadAlongText text={item.text} charIndex={isPlaying ? charIndex : -1} playing={isPlaying} />
@@ -368,52 +369,38 @@ function GradedListening() {
 
 // ─── Main Listening Component ─────────────────────────────────────────────────
 
-// ─── TTS engine ───────────────────────────────────────────────────────────────
+// ─── OpenAI TTS engine ────────────────────────────────────────────────────────
 
-// Pick the best available English voice (prefer premium system voices)
-const VOICE_PRIORITY = [
-  'Samantha',       // macOS default, very natural
-  'Karen',          // macOS Australian
-  'Moira',          // macOS Irish
-  'Daniel',         // macOS British
-  'Alex',           // macOS (older)
-  'Google US English',
-  'Microsoft Zira',
-  'Microsoft David',
-]
-function getBestVoice() {
-  const voices = window.speechSynthesis.getVoices()
-  for (const name of VOICE_PRIORITY) {
-    const v = voices.find(v => v.name.startsWith(name))
-    if (v) return v
-  }
-  return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null
+// In-memory cache: text → object URL (freed on unload)
+const ttsAudioCache = new Map()
+
+async function fetchTTSAudio(text, voice = 'nova') {
+  const key = `${voice}||${text}`
+  if (ttsAudioCache.has(key)) return ttsAudioCache.get(key)
+  const url = `/api/tts?voice=${encodeURIComponent(voice)}&text=${encodeURIComponent(text)}`
+  const resp = await fetch(url)
+  if (!resp.ok) throw new Error(`TTS ${resp.status}: ${await resp.text()}`)
+  const blob = await resp.blob()
+  const objUrl = URL.createObjectURL(blob)
+  ttsAudioCache.set(key, objUrl)
+  return objUrl
 }
 
-// Split full text into sentence segments, tracking their offset in the original string
-function splitSegments(text) {
-  const segs = []
-  // Match sentences ending in . ! ? (possibly followed by quotes)
-  const re = /[^.!?]+[.!?]["']?/g
-  let m, last = 0
-  while ((m = re.exec(text)) !== null) {
-    segs.push({ text: m[0].trim(), offset: m.index })
-    last = m.index + m[0].length
-  }
-  // Remainder (if text doesn't end with punctuation)
-  if (last < text.length) {
-    const rest = text.slice(last).trim()
-    if (rest) segs.push({ text: rest, offset: last })
-  }
-  return segs.length ? segs : [{ text, offset: 0 }]
-}
-
-// Pause after sentence (ms): longer for ! and ?, shorter for plain .
-function sentencePause(seg) {
-  const t = seg.text
-  if (t.endsWith('?') || t.endsWith('?"') || t.endsWith("?'")) return 550
-  if (t.endsWith('!') || t.endsWith('!"') || t.endsWith("!'")) return 480
-  return 380
+// Build word-timing estimates from the full text + audio duration.
+// Returns array of { charStart, charEnd, estTime } for each word.
+function buildWordTimings(text, duration) {
+  const words = []
+  const re = /\S+/g
+  let m
+  while ((m = re.exec(text)) !== null)
+    words.push({ charStart: m.index, charEnd: m.index + m[0].length, word: m[0] })
+  if (!words.length) return []
+  // Assign proportion: each char takes (duration / totalChars) seconds
+  const totalChars = text.length
+  words.forEach(w => {
+    w.estTime = (w.charStart / totalChars) * duration
+  })
+  return words
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -424,70 +411,63 @@ export default function Listening({ onBack }) {
   const [activeTab, setActiveTab]   = useState(0)
   const [playingId, setPlayingId]   = useState(null)
   const [charIndex, setCharIndex]   = useState(-1)
-  const ttsRef = useRef({ cancelled: false, timer: null })
+  const [loading, setLoading]       = useState(false)
+  const audioRef  = useRef(null)
+  const wordTimingsRef = useRef([])
+  const rafRef    = useRef(null)
 
   function stopAll() {
-    ttsRef.current.cancelled = true
-    clearTimeout(ttsRef.current.timer)
-    window.speechSynthesis?.cancel()
+    cancelAnimationFrame(rafRef.current)
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = '' }
     setPlayingId(null)
     setCharIndex(-1)
+    setLoading(false)
   }
 
-  const handlePlay = useCallback((item) => {
+  // Update charIndex by scanning word timings on each animation frame
+  function startHighlightLoop(audio, text) {
+    const tick = () => {
+      const t = audio.currentTime
+      const words = wordTimingsRef.current
+      let idx = -1
+      for (let i = words.length - 1; i >= 0; i--) {
+        if (words[i].estTime <= t) { idx = words[i].charStart; break }
+      }
+      setCharIndex(idx)
+      if (!audio.paused && !audio.ended) rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  const handlePlay = useCallback(async (item) => {
     if (playingId === item.id) { stopAll(); return }
     stopAll()
+    setLoading(true)
+    setPlayingId(item.id)
 
-    const segs = splitSegments(item.text)
-    const state = { cancelled: false, timer: null }
-    ttsRef.current = state
+    let audioUrl
+    try {
+      audioUrl = await fetchTTSAudio(item.text, 'nova')
+    } catch (e) {
+      console.error('TTS failed:', e)
+      setLoading(false)
+      setPlayingId(null)
+      return
+    }
 
-    // Load voices (may be async on first call)
-    const startTTS = () => {
-      const voice = getBestVoice()
-      let segIdx = 0
-
-      const speakNext = () => {
-        if (state.cancelled || segIdx >= segs.length) {
-          if (!state.cancelled) { setPlayingId(null); setCharIndex(-1) }
-          return
-        }
-        const seg = segs[segIdx]
-        const isQuestion   = /\?["']?$/.test(seg.text)
-        const isExclamation = /!["']?$/.test(seg.text)
-
-        const utter = new SpeechSynthesisUtterance(seg.text)
-        utter.lang  = 'en-US'
-        utter.rate  = isQuestion ? 0.78 : isExclamation ? 0.88 : 0.82
-        utter.pitch = isQuestion ? 1.15 : isExclamation ? 1.05 : 1.0
-        if (voice) utter.voice = voice
-
-        utter.onboundary = (e) => {
-          if (state.cancelled) return
-          if (e.name === 'word') setCharIndex(seg.offset + e.charIndex)
-        }
-        utter.onend = () => {
-          if (state.cancelled) return
-          segIdx++
-          state.timer = setTimeout(speakNext, sentencePause(seg))
-        }
-        utter.onerror = () => {
-          if (!state.cancelled) { setPlayingId(null); setCharIndex(-1) }
-        }
-        window.speechSynthesis.speak(utter)
-      }
-
-      setPlayingId(item.id)
+    if (!audioRef.current) return // unmounted
+    const audio = audioRef.current
+    audio.src = audioUrl
+    audio.onloadedmetadata = () => {
+      wordTimingsRef.current = buildWordTimings(item.text, audio.duration)
+      setLoading(false)
       setCharIndex(0)
-      speakNext()
+      audio.play().catch(() => {})
+      startHighlightLoop(audio, item.text)
     }
-
-    // Voices might not be loaded yet on first page load
-    if (window.speechSynthesis.getVoices().length > 0) {
-      startTTS()
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; startTTS() }
-    }
+    audio.onended = () => { setPlayingId(null); setCharIndex(-1); cancelAnimationFrame(rafRef.current) }
+    audio.onerror = () => { setPlayingId(null); setCharIndex(-1); setLoading(false) }
+    audio.load()
   }, [playingId])
 
   function switchTab(i) { stopAll(); setActiveTab(i) }
@@ -518,13 +498,17 @@ export default function Listening({ onBack }) {
         ))}
       </div>
 
+      {/* Hidden audio element for OpenAI TTS playback */}
+      <audio ref={audioRef} style={{ display: 'none' }} />
+
       {activeTab === 3 ? (
         <GradedListening />
       ) : (
         <div className="listening-list">
           {items.map(item => (
             <TextCard key={item.id} item={item} badge={item.grade || item.level}
-              playingId={playingId} charIndex={charIndex} onPlay={handlePlay} />
+              playingId={playingId} charIndex={charIndex} onPlay={handlePlay}
+              loading={loading && playingId === item.id} />
           ))}
         </div>
       )}

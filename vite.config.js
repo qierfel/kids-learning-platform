@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
+import https from 'https'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,6 +15,44 @@ export default defineConfig({
       name: 'local-media-server',
       configureServer(server) {
         const MEDIA_DIR = process.env.MEDIA_DIR || '/Volumes/D/kids-learning-media'
+        // ── /api/tts 本地代理 ──────────────────────────────────────────
+        server.middlewares.use('/api/tts', async (req, res) => {
+          const apiKey = process.env.OPENAI_API_KEY
+          if (!apiKey) {
+            res.writeHead(500, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ error: 'OPENAI_API_KEY not set in environment' }))
+            return
+          }
+          const qs     = new URLSearchParams(req.url.replace(/^\?/, '').replace(/^\/\?/, ''))
+          const text   = (qs.get('text') || '').slice(0, 4096)
+          const voice  = ['alloy','echo','fable','onyx','nova','shimmer'].includes(qs.get('voice')) ? qs.get('voice') : 'nova'
+          const model  = ['tts-1','tts-1-hd'].includes(qs.get('model')) ? qs.get('model') : 'tts-1-hd'
+          if (!text.trim()) { res.writeHead(400); res.end('text required'); return }
+
+          const body = JSON.stringify({ model, input: text, voice, response_format: 'mp3', speed: 0.9 })
+          const options = {
+            hostname: 'api.openai.com',
+            path: '/v1/audio/speech',
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(body),
+            }
+          }
+          const proxyReq = https.request(options, (proxyRes) => {
+            res.writeHead(proxyRes.statusCode, {
+              'Content-Type': 'audio/mpeg',
+              'Cache-Control': 'public, max-age=604800',
+            })
+            proxyRes.pipe(res)
+          })
+          proxyReq.on('error', (e) => { res.writeHead(500); res.end(e.message) })
+          proxyReq.write(body)
+          proxyReq.end()
+        })
+
+        // ── /media 本地媒体文件 ─────────────────────────────────────────
         server.middlewares.use('/media', (req, res, next) => {
           const filePath = path.join(MEDIA_DIR, decodeURIComponent(req.url))
           if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return next()
