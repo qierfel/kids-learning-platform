@@ -164,10 +164,14 @@ export default function English({ user }) {
             style={{ '--card-gradient': card.gradient, '--card-color': card.color }}
             onClick={() => card.ready && setActiveTool(card.id)}
           >
-            <span className="en-card-badge">{card.category}</span>
-            <div className="en-card-icon">{card.icon}</div>
-            <div className="en-card-label">{card.label}</div>
-            <div className="en-card-desc">{card.desc}</div>
+            <div className="en-card-top">
+              <span className="en-card-badge">{card.category}</span>
+              <div className="en-card-icon">{card.icon}</div>
+            </div>
+            <div className="en-card-bottom">
+              <div className="en-card-label">{card.label}</div>
+              <div className="en-card-desc">{card.desc}</div>
+            </div>
             {!card.ready && <span className="en-card-soon">即将上线</span>}
           </div>
         ))}

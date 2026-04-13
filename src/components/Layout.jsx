@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import './Layout.css'
 
@@ -21,11 +22,23 @@ const TOOL_NAV = [
 
 export default function Layout({ user, profile, onLogout }) {
   const navigate = useNavigate()
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef(null)
 
   function handleLogout() {
     onLogout()
     navigate('/login')
   }
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (moreRef.current && !moreRef.current.contains(e.target)) {
+        setMoreOpen(false)
+      }
+    }
+    if (moreOpen) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [moreOpen])
 
   return (
     <div className="layout">
@@ -54,10 +67,25 @@ export default function Layout({ user, profile, onLogout }) {
         </div>
         <div className="nav-user">
           <span className="user-email">{profile?.nickname || user?.email}</span>
-          {profile?.role === 'admin' && (
-            <NavLink to="/admin" className="admin-nav-btn">管理</NavLink>
-          )}
-          {user && <button onClick={handleLogout} className="logout-btn">退出</button>}
+          <span className="nav-user-desktop">
+            {profile?.role === 'admin' && (
+              <NavLink to="/admin" className="admin-nav-btn">管理</NavLink>
+            )}
+            {user && <button onClick={handleLogout} className="logout-btn">退出</button>}
+          </span>
+          <div className="nav-more-wrap" ref={moreRef}>
+            <button className="nav-more-btn" onClick={() => setMoreOpen(v => !v)} aria-label="更多">···</button>
+            {moreOpen && (
+              <div className="nav-more-menu">
+                {profile?.role === 'admin' && (
+                  <NavLink to="/admin" className="nav-more-item" onClick={() => setMoreOpen(false)}>管理</NavLink>
+                )}
+                {user && (
+                  <button className="nav-more-item nav-more-logout" onClick={() => { setMoreOpen(false); handleLogout() }}>退出登录</button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </nav>
       <main className="main-content">
