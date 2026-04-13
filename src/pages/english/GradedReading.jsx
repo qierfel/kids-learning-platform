@@ -4,13 +4,14 @@ import { HEINEMANN } from '../../data/heinemann'
 import { OXFORD_TREE } from '../../data/oxfordTree'
 import { LRFOS } from '../../data/lrfos'
 import PdfCover, { PlaceholderCover } from '../../components/PdfCover'
+import { mediaUrl } from '../../utils/media'
 
 // 统一书卡封面组件
 function BookCover({ book, color, isPlaying }) {
   return (
     <div className="gr-book-cover">
       {book?.pdf
-        ? <PdfCover pdfUrl={book.pdf} color={color} title={book.title} />
+        ? <PdfCover pdfUrl={mediaUrl(book.pdf)} color={color} title={book.title} />
         : <PlaceholderCover color={color} title={book?.title || ''} />
       }
       {isPlaying && (
@@ -97,7 +98,7 @@ function BookReader({ book, color, onClose }) {
     audio.addEventListener('ended', onEnd)
     audio.addEventListener('error', onErr)
     // auto-play
-    audio.src = book.audio
+    audio.src = mediaUrl(book.audio)
     audio.load()
     audio.play().then(() => setIsPlaying(true)).catch(() => {})
     return () => {
@@ -152,7 +153,7 @@ function BookReader({ book, color, onClose }) {
           <iframe
             key={book.pdf}
             className="gr-pdf-frame"
-            src={book.pdf}
+            src={mediaUrl(book.pdf)}
             title={book.title}
             onError={() => setPdfError(true)}
           />
@@ -202,7 +203,7 @@ export default function GradedReading({ onBack }) {
     setProgress(0); setDuration(0)
     const audio = audioRef.current
     if (!audio) return
-    audio.src = book.audio
+    audio.src = mediaUrl(book.audio)
     audio.load()
     audio.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true))
   }

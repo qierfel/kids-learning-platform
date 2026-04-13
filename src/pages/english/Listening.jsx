@@ -4,6 +4,7 @@ import { OXFORD } from '../../data/oxford'
 import razLevels from '../../data/razLevels'
 import PdfCover, { PlaceholderCover } from '../../components/PdfCover'
 import './Listening.css'
+import { mediaUrl } from '../../utils/media'
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -203,7 +204,7 @@ function GradedListening() {
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !playing || playlist.length === 0) return
-    audio.src = playlist[playIdx]?.audio || ''
+    audio.src = mediaUrl(playlist[playIdx]?.audio || '')
     audio.play().catch(() => {})
   }, [playIdx, playing]) // eslint-disable-line
 
@@ -319,7 +320,7 @@ function GradedListening() {
               {/* 封面 */}
               <div className="gl-book-cover">
                 {book.pdf
-                  ? <PdfCover pdfUrl={book.pdf} color={lc} title={book.title} />
+                  ? <PdfCover pdfUrl={mediaUrl(book.pdf)} color={lc} title={book.title} />
                   : <PlaceholderCover color={lc} title={book.title} />
                 }
                 {isNow && (

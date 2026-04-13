@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { PICTURE_BOOKS } from '../../data/pictureBooks'
+import { mediaUrl } from '../../utils/media'
 import './GradedReading.css'
 
 // ── 音频播放器（复用 GradedReading 样式）────────────────────────
@@ -52,7 +53,7 @@ function PdfReader({ book, color, onClose }) {
           <iframe
             key={book.pdf}
             className="gr-pdf-frame"
-            src={book.pdf}
+            src={mediaUrl(book.pdf)}
             title={book.title}
             onError={() => setPdfError(true)}
           />
@@ -97,7 +98,7 @@ export default function PictureBooks({ onBack }) {
     setProgress(0); setDuration(0)
     const audio = audioRef.current
     if (!audio) return
-    audio.src = book.audio
+    audio.src = mediaUrl(book.audio)
     audio.load()
     audio.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true))
   }
