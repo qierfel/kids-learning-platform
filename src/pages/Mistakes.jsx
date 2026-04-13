@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './Mistakes.css'
 
 function getToken() { return localStorage.getItem('session_token') }
@@ -201,10 +201,12 @@ function AddMistake({ user, onClose, onAdded }) {
   const [mode, setMode] = useState('photo') // 'photo' | 'manual'
   const [photoFile, setPhotoFile] = useState(null)
   const [photoPreview, setPhotoPreview] = useState('')
+  const [showCrop, setShowCrop] = useState(false)
   const [ocrLoading, setOcrLoading] = useState(false)
   const [ocrDone, setOcrDone] = useState(false)
   const [ocrResult, setOcrResult] = useState(null)
-  const fileInputRef = useRef(null)
+  const cameraInputRef = useRef(null)
+  const galleryInputRef = useRef(null)
 
   const [subject, setSubject] = useState('语文')
   const [topic, setTopic] = useState('')
@@ -219,13 +221,21 @@ function AddMistake({ user, onClose, onAdded }) {
     setTopic('')
   }
 
-  async function handlePhoto(e) {
+  function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
     setPhotoFile(file)
     setPhotoPreview(URL.createObjectURL(file))
+    setShowCrop(true)
     setOcrDone(false)
     setOcrResult(null)
+    e.target.value = ''
+  }
+
+  function handleCropDone(croppedFile, croppedUrl) {
+    setPhotoFile(croppedFile)
+    setPhotoPreview(croppedUrl)
+    setShowCrop(false)
   }
 
   async function recognizePhoto() {
@@ -295,25 +305,34 @@ function AddMistake({ user, onClose, onAdded }) {
       {mode === 'photo' && (
         <div className="photo-section">
           {!photoPreview ? (
-            <div className="photo-upload-area" onClick={() => fileInputRef.current?.click()}>
+            <div className="photo-upload-area" onClick={() => galleryInputRef.current?.click()}>
               <div className="photo-upload-icon">📸</div>
               <div className="photo-upload-text">点击选择试卷照片</div>
               <div className="photo-upload-hint">支持拍照或从相册选取</div>
               <div className="photo-buttons">
-                <button className="photo-btn camera-btn" onClick={e => { e.stopPropagation(); fileInputRef.current?.click() }}>
+                <button className="photo-btn camera-btn" onClick={e => { e.stopPropagation(); cameraInputRef.current?.click() }}>
                   📷 拍照
                 </button>
-                <button className="photo-btn gallery-btn" onClick={e => { e.stopPropagation(); fileInputRef.current?.click() }}>
+                <button className="photo-btn gallery-btn" onClick={e => { e.stopPropagation(); galleryInputRef.current?.click() }}>
                   🖼️ 相册
                 </button>
               </div>
             </div>
+          ) : showCrop ? (
+            <ImageCropper
+              src={photoPreview}
+              onCrop={handleCropDone}
+              onCancel={() => setShowCrop(false)}
+            />
           ) : (
             <div className="photo-preview-container">
               <img src={photoPreview} alt="试卷照片" className="photo-preview" />
               <div className="photo-actions">
-                <button className="photo-btn gallery-btn" onClick={() => fileInputRef.current?.click()}>
+                <button className="photo-btn gallery-btn" onClick={() => galleryInputRef.current?.click()}>
                   重新选择
+                </button>
+                <button className="photo-btn crop-btn" onClick={() => setShowCrop(true)}>
+                  ✂️ 裁剪
                 </button>
                 {!ocrLoading && (
                   <button className="photo-btn recognize-btn" onClick={recognizePhoto}>
@@ -329,11 +348,20 @@ function AddMistake({ user, onClose, onAdded }) {
               </div>
             </div>
           )}
+          {/* Camera input — forces camera on mobile */}
           <input
-            ref={fileInputRef}
+            ref={cameraInputRef}
             type="file"
             accept="image/*"
             capture="environment"
+            style={{ display: 'none' }}
+            onChange={handlePhoto}
+          />
+          {/* Gallery input — shows full file picker / photo library */}
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
             style={{ display: 'none' }}
             onChange={handlePhoto}
           />
@@ -560,6 +588,155 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
             ))}
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function ImageCropper({ src, onCrop, onCancel }) {
+  const canvasRef = useRef(null)
+  const imgRef = useRef(null)
+  const draggingRef = useRef(false)
+  const startPosRef = useRef(null)
+  const cropRectRef = useRef(null)
+  const [cropRect, setCropRect] = useState(null)
+
+  const drawCanvas = useCallback((rect) => {
+    const canvas = canvasRef.current
+    const img = imgRef.current
+    if (!canvas || !img) return
+    const ctx = canvas.getContext('2d')
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+    if (rect && Math.abs(rect.w) > 4 && Math.abs(rect.h) > 4) {
+      const x = Math.min(rect.x, rect.x + rect.w)
+      const y = Math.min(rect.y, rect.y + rect.h)
+      const w = Math.abs(rect.w)
+      const h = Math.abs(rect.h)
+      // Dark overlay outside selection
+      ctx.fillStyle = 'rgba(0,0,0,0.45)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // Re-draw selected region at full brightness
+      ctx.drawImage(
+        img,
+        (x / canvas.width) * img.naturalWidth,
+        (y / canvas.height) * img.naturalHeight,
+        (w / canvas.width) * img.naturalWidth,
+        (h / canvas.height) * img.naturalHeight,
+        x, y, w, h
+      )
+      // Selection border
+      ctx.strokeStyle = '#fff'
+      ctx.lineWidth = 2
+      ctx.strokeRect(x, y, w, h)
+      // Corner handles
+      const hs = 10
+      ctx.fillStyle = '#e53e3e'
+      ;[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([hx, hy]) => {
+        ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs)
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => {
+      imgRef.current = img
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const maxW = Math.min(600, img.naturalWidth)
+      canvas.width = maxW
+      canvas.height = Math.round(maxW * (img.naturalHeight / img.naturalWidth))
+      drawCanvas(null)
+    }
+    img.src = src
+  }, [src, drawCanvas])
+
+  function getPos(e) {
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const t = e.touches?.[0] || e
+    return {
+      x: ((t.clientX - rect.left) / rect.width) * canvas.width,
+      y: ((t.clientY - rect.top) / rect.height) * canvas.height,
+    }
+  }
+
+  function handleStart(e) {
+    e.preventDefault()
+    const pos = getPos(e)
+    startPosRef.current = pos
+    draggingRef.current = true
+    cropRectRef.current = { x: pos.x, y: pos.y, w: 0, h: 0 }
+    drawCanvas(cropRectRef.current)
+  }
+
+  function handleMove(e) {
+    if (!draggingRef.current) return
+    e.preventDefault()
+    const pos = getPos(e)
+    const s = startPosRef.current
+    cropRectRef.current = { x: s.x, y: s.y, w: pos.x - s.x, h: pos.y - s.y }
+    drawCanvas(cropRectRef.current)
+  }
+
+  function handleEnd() {
+    draggingRef.current = false
+    setCropRect(cropRectRef.current ? { ...cropRectRef.current } : null)
+  }
+
+  function applyCrop() {
+    const rect = cropRectRef.current
+    if (!rect || Math.abs(rect.w) < 10 || Math.abs(rect.h) < 10) return
+    const canvas = canvasRef.current
+    const img = imgRef.current
+    const x = Math.max(0, Math.min(rect.x, rect.x + rect.w))
+    const y = Math.max(0, Math.min(rect.y, rect.y + rect.h))
+    const w = Math.min(Math.abs(rect.w), canvas.width - x)
+    const h = Math.min(Math.abs(rect.h), canvas.height - y)
+    const scaleX = img.naturalWidth / canvas.width
+    const scaleY = img.naturalHeight / canvas.height
+    const out = document.createElement('canvas')
+    out.width = Math.round(w * scaleX)
+    out.height = Math.round(h * scaleY)
+    out.getContext('2d').drawImage(
+      img,
+      x * scaleX, y * scaleY, w * scaleX, h * scaleY,
+      0, 0, out.width, out.height
+    )
+    out.toBlob(blob => {
+      if (blob) onCrop(new File([blob], 'cropped.jpg', { type: 'image/jpeg' }), URL.createObjectURL(blob))
+    }, 'image/jpeg', 0.92)
+  }
+
+  const hasValidCrop = cropRect && Math.abs(cropRect.w) >= 10 && Math.abs(cropRect.h) >= 10
+
+  return (
+    <div className="crop-container">
+      <div className="crop-hint">用手指拖动选择要识别的区域</div>
+      <canvas
+        ref={canvasRef}
+        className="crop-canvas"
+        onMouseDown={handleStart}
+        onMouseMove={handleMove}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={handleStart}
+        onTouchMove={handleMove}
+        onTouchEnd={handleEnd}
+        style={{ touchAction: 'none', width: '100%', borderRadius: 8, cursor: 'crosshair', display: 'block' }}
+      />
+      <div className="crop-actions">
+        <button className="photo-btn gallery-btn" onClick={onCancel}>跳过裁剪</button>
+        <button
+          className="photo-btn recognize-btn"
+          onClick={applyCrop}
+          disabled={!hasValidCrop}
+          style={{ opacity: hasValidCrop ? 1 : 0.45 }}
+        >
+          ✂️ 确认裁剪
+        </button>
       </div>
     </div>
   )
