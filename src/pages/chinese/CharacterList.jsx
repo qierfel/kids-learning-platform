@@ -2,34 +2,12 @@
 import { useState, useMemo } from 'react'
 import { CHARACTER_LISTS } from '../../data/characterLists'
 import characters from '../../data/characters'
+import { vocabList } from '../../data/vocabList'
 import { ttsSpeak } from '../../utils/tts'
 
 // Get pinyin for a multi-character word by joining each character's pinyin
 function getWordPinyin(word) {
   return [...word].map(ch => characters[ch]?.pinyin || '').filter(Boolean).join(' ')
-}
-
-// Collect vocabulary words from a list of characters (type1 + type2 of a lesson)
-function getWordsForChars(charList, maxPerChar = 4) {
-  const seen = new Set()
-  const result = []
-  charList.forEach(char => {
-    const charData = characters[char]
-    if (!charData?.words) return
-    let count = 0
-    for (const word of charData.words) {
-      if (count >= maxPerChar) break
-      if (word.length >= 2 && word.length <= 4 && !seen.has(word)) {
-        // Require all characters in the word to have pinyin data
-        if ([...word].every(c => characters[c]?.pinyin)) {
-          seen.add(word)
-          result.push(word)
-          count++
-        }
-      }
-    }
-  })
-  return result
 }
 
 export default function CharacterList({ onBack }) {
@@ -45,15 +23,11 @@ export default function CharacterList({ onBack }) {
     typeFilter === 'type2' ? data.type2 :
     [...data.type1, ...data.type2]
 
-  // Build lesson vocabulary: for each lesson, derive words from its characters
+  // Build lesson vocabulary from standard 部编版 vocab list
+  const vocabKey = `${grade}-${semester === '上' ? '1' : '2'}`
   const lessonWords = useMemo(() => {
-    if (!data?.lessons) return []
-    return data.lessons.map(lesson => {
-      const allChars = [...(lesson.type1 || []), ...(lesson.type2 || [])]
-      const words = getWordsForChars(allChars)
-      return { lesson: lesson.lesson, title: lesson.title, words }
-    }).filter(l => l.words.length > 0)
-  }, [data])
+    return (vocabList[vocabKey] || []).filter(l => l.words.length > 0)
+  }, [vocabKey])
 
   const totalWords = lessonWords.reduce((sum, l) => sum + l.words.length, 0)
 
