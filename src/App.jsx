@@ -22,6 +22,11 @@ export default function App() {
 
   // On mount: check if we have a valid session
   useEffect(() => {
+    // 本地开发模式：跳过登录，直接以管理员身份进入
+    if (import.meta.env.DEV) {
+      setUser({ uid: 'dev', email: 'dev@local', nickname: '本地开发', status: 'approved', role: 'admin' })
+      return
+    }
     const token = getToken()
     if (!token) { setUser(null); return }
     fetch('/api/auth', {
