@@ -4,9 +4,10 @@
  * 用法：node media-server.js
  * 默认端口：3001，媒体目录：/Volumes/D/kids-learning-media
  */
-const http = require('http')
-const fs   = require('fs')
-const path = require('path')
+import http from 'http'
+import fs   from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 const PORT      = process.env.PORT      || 3001
 const MEDIA_DIR = process.env.MEDIA_DIR || '/Volumes/D/kids-learning-media'
