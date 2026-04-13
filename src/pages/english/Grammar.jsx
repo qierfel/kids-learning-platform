@@ -43,27 +43,40 @@ export default function Grammar({ user, onBack }) {
     setQuizItems(null)
   }
 
+  async function callAPI(body) {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const text = await res.text()
+    let data
+    try { data = JSON.parse(text) }
+    catch { throw new Error(`服务器错误 (HTTP ${res.status})`) }
+    if (!res.ok || data.error) {
+      throw new Error(data.error || data.detail || `HTTP ${res.status}`)
+    }
+    return data
+  }
+
   async function askAI(type) {
     if (!activePoint) return
     setAiLoading(true)
     setAiResult('')
     try {
-      const res = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          type: 'grammar_explain',
-          payload: {
-            grammarPoint: activePoint.title,
-            level: activePoint.level,
-            queryType: type,
-            summary: activePoint.summary,
-          },
-        }),
+      const data = await callAPI({
+        type: 'grammar_explain',
+        payload: {
+          grammarPoint: activePoint.title,
+          level: activePoint.level,
+          queryType: type,
+          summary: activePoint.summary,
+        },
       })
-      const json = await res.json()
-      setAiResult(json.text || '')
-    } catch { setAiResult('请求失败，请检查网络。') }
+      setAiResult(data.text || '（AI 未返回内容）')
+    } catch (e) {
+      setAiResult(`⚠️ 请求失败：${e.message}`)
+    }
     setAiLoading(false)
   }
 
@@ -75,28 +88,25 @@ export default function Grammar({ user, onBack }) {
     setShowAns(false)
     setAiResult('')
     try {
-      const res = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          type: 'grammar_practice',
-          payload: {
-            grammarPoint: activePoint.title,
-            level: activePoint.level,
-          },
-        }),
+      const data = await callAPI({
+        type: 'grammar_practice',
+        payload: {
+          grammarPoint: activePoint.title,
+          level: activePoint.level,
+        },
       })
-      const json = await res.json()
       try {
         // Claude 可能返回 ```json ... ``` 包裹的文本，先剥离
-        let raw = (json.text || '').replace(/^```json?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+        let raw = (data.text || '').replace(/^```json?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
         // 兜底：用正则提取 JSON 数组
         const match = raw.match(/\[[\s\S]*\]/)
         const parsed = JSON.parse(match ? match[0] : raw)
         if (Array.isArray(parsed)) setQuizItems(parsed)
-        else setAiResult(json.text || '')
-      } catch { setAiResult(json.text || '') }
-    } catch { setAiResult('请求失败，请检查网络。') }
+        else setAiResult(data.text || '')
+      } catch { setAiResult(data.text || '') }
+    } catch (e) {
+      setAiResult(`⚠️ 请求失败：${e.message}`)
+    }
     setAiLoading(false)
   }
 
