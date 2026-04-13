@@ -30,7 +30,7 @@ export default function Layout({ user, profile, onLogout }) {
   return (
     <div className="layout">
       <nav className="navbar">
-        <NavLink to="/" className="nav-logo">学习平台</NavLink>
+        <NavLink to="/" className="nav-logo">🏠 快乐学习屋</NavLink>
         <div className="nav-all">
           <div className="nav-links">
             {PRIMARY_NAV.map(({ to, label }) => (
