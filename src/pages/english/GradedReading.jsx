@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import razLevels from '../../data/razLevels'
 import { HEINEMANN } from '../../data/heinemann'
 import { OXFORD_TREE } from '../../data/oxfordTree'
+import { LRFOS } from '../../data/lrfos'
 import './GradedReading.css'
 
 const LEVEL_COLORS = {
@@ -25,6 +26,7 @@ const SERIES = [
   { id: 'raz',       label: 'RAZ',    labelFull: 'Reading A-Z',        color: '#6366f1', total: razLevels.reduce((s,l)=>s+l.count,0) },
   { id: 'heinemann', label: '海尼曼', labelFull: 'Heinemann GK·G1·G2', color: '#f59e0b', total: totalHeinemann },
   { id: 'oxford',    label: '牛津树', labelFull: 'Oxford Reading Tree', color: '#10b981', total: OXFORD_TREE.books.length },
+  { id: 'lrfos',    label: 'LRFOS',  labelFull: "Let's Read and Find Out Science", color: '#0ea5e9', total: LRFOS.books.length },
 ]
 
 // ── 通用音频播放器 ─────────────────────────────────────────────
@@ -147,6 +149,7 @@ export default function GradedReading({ onBack }) {
   const [selectedLevel, setSelectedLevel] = useState(null)
   const [selectedStage, setSelectedStage] = useState(null)
   const [heinLevel, setHeinLevel]         = useState('gk')
+  const [lrfosLevel, setLrfosLevel]       = useState('l1')
   const [readingBook, setReadingBook]     = useState(null)   // 阅读器打开的书（有PDF）
   const [playingBook, setPlayingBook]     = useState(null)   // 卡片内联播放的书（无PDF）
   const [isPlaying, setIsPlaying]         = useState(false)
@@ -334,6 +337,67 @@ export default function GradedReading({ onBack }) {
     )
   }
 
+  // ── 书单页（LRFOS）─────────────────────────────────────────────
+  if (series === 'lrfos') {
+    const currentLevel = LRFOS.levels.find(l => l.id === lrfosLevel)
+    const q = searchQuery.toLowerCase()
+    const books = q
+      ? currentLevel.books.filter(b => b.title.toLowerCase().includes(q) || String(b.num).includes(q))
+      : currentLevel.books
+    return (
+      <div className="gr-page">
+        <audio ref={audioRef} />
+        <div className="gr-header">
+          <button className="gr-back-btn" onClick={() => changeSeries('raz')}>← 返回</button>
+          <div className="gr-header-info">
+            <span className="gr-level-badge" style={{ background: color }}>LRFOS</span>
+            <span className="gr-header-grade">{currentLevel.label} · {currentLevel.desc}</span>
+            <span className="gr-header-count">{books.length} 本</span>
+          </div>
+        </div>
+        {playingBook && <AudioPlayer book={playingBook} color={color} audioRef={audioRef} isPlaying={isPlaying} progress={progress} duration={duration} audioError={audioError} onToggle={togglePlay} onSeek={seek} />}
+
+        {/* 级别 tabs */}
+        <div className="gr-stage-tabs">
+          {LRFOS.levels.map(lv => (
+            <button
+              key={lv.id}
+              className={`gr-stage-tab ${lrfosLevel === lv.id ? 'active' : ''}`}
+              style={lrfosLevel === lv.id ? { borderBottomColor: color, color } : {}}
+              onClick={() => { setLrfosLevel(lv.id); setSearchQuery(''); setPlayingBook(null) }}
+            >
+              {lv.label}
+              <span className="gr-stage-tab-sub">{lv.books.length}本{lv.hasPdf ? ' · PDF' : ''}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="gr-search-row">
+          <input className="gr-search-input" placeholder="🔍 搜索书名或编号" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+          {searchQuery && <button className="gr-search-clear" onClick={() => setSearchQuery('')}>✕</button>}
+        </div>
+        <div className="gr-book-grid">
+          {books.map((book, i) => {
+            const active = playingBook?.title === book.title
+            return (
+              <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
+                style={active ? { borderColor: color, background: `${color}18` } : {}}
+                onClick={() => openBook(book)}>
+                <div className="gr-book-cover" style={{ background: `${color}30` }}>
+                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : book.pdf ? '📚' : '📖'}</span>
+                </div>
+                <div className="gr-book-num" style={{ color }}>Book {book.num}</div>
+                <div className="gr-book-title">{book.title}</div>
+                {book.pdf && <div className="gr-pdf-badge">PDF</div>}
+                {active && isPlaying && <div className="gr-playing-dot" style={{ background: color }} />}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
   // ── 书单页（牛津树）────────────────────────────────────────────
   if (series === 'oxford') {
     const stages = OXFORD_TREE.stages
@@ -396,7 +460,7 @@ export default function GradedReading({ onBack }) {
         <div className="gr-title-group">
           <span className="gr-icon">📚</span>
           <h2 className="gr-title">分级读物</h2>
-          <span className="gr-subtitle">三大系列 · 音频朗读</span>
+          <span className="gr-subtitle">四大系列 · 音频朗读</span>
         </div>
       </div>
 
