@@ -328,3 +328,88 @@
 
 .level-up-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
 .level-up-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── Grade grid (3 columns × 2 rows) ── */
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.grade-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 14px;
+  border: 2px solid #e8edf2;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.grade-btn:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.grade-btn.active {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.grade-btn-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+}
+
+.grade-btn.active .grade-btn-num {
+  color: #fff;
+}
+
+.grade-btn-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.grade-btn.active .grade-btn-label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Semester row ── */
+.semester-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.semester-btn {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 2px solid #e8edf2;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.semester-btn:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.semester-btn.active {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}

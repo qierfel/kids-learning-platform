@@ -44,7 +44,14 @@ export const TEXTBOOK_LINKS = {
   },
   '英语': {
     publisher: '译林版（三年级起点）',
+    note: '上教版1-2年级教材在上海地方平台，国家平台译林版从三年级起',
     books: [
+      // 上教版1-2年级：国家平台暂无，链接至上海教育资源库
+      { grade: 1, semester: '上', url: 'https://www.sjer.cn/', label: '上教版一年级上（上海教育资源库）', external: true },
+      { grade: 1, semester: '下', url: 'https://www.sjer.cn/', label: '上教版一年级下（上海教育资源库）', external: true },
+      { grade: 2, semester: '上', url: 'https://www.sjer.cn/', label: '上教版二年级上（上海教育资源库）', external: true },
+      { grade: 2, semester: '下', url: 'https://www.sjer.cn/', label: '上教版二年级下（上海教育资源库）', external: true },
+      // 译林版3-6年级（国家智慧教育平台）
       { grade: 3, semester: '上', url: url('1206a3aa-1969-9e64-b354-e6eae4325ed4') },
       { grade: 3, semester: '下', url: url('d87e8865-615a-4b3b-8d34-179b9fb33013') },
       { grade: 4, semester: '上', url: url('a9ce6662-f5a5-4561-944a-c3dbcc5a8192') },

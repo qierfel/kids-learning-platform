@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ttsSpeak } from '../../utils/tts'
+import StrokeAnimation from '../../components/StrokeAnimation'
 import './ChineseDictionary.css'
 
 const STORAGE_KEY = 'zh_vocab_book'
@@ -181,6 +182,13 @@ export default function ChineseDictionary() {
             {result.tips && (
               <div className="zhdict-tips">
                 <span className="zhdict-tips-icon">💡</span> {result.tips}
+              </div>
+            )}
+
+            {result && result.word.length === 1 && (
+              <div style={{ marginTop: 16, borderTop: '1px solid #f1f5f9', paddingTop: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8 }}>✍ 笔顺演示</div>
+                <StrokeAnimation char={result.word} />
               </div>
             )}
           </div>

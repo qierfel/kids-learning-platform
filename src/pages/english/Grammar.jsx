@@ -4,6 +4,25 @@ import './Grammar.css'
 
 const LEVEL_COLOR = { KET: '#10b981', PET: '#f59e0b', FCE: '#7c3aed' }
 
+function getGrammarResources(point) {
+  const base = [
+    { icon: '🇬🇧', label: 'British Council - Grammar', url: `https://learnenglish.britishcouncil.org/grammar` },
+    { icon: '📖', label: 'BBC Learning English - Grammar', url: 'https://www.bbc.co.uk/learningenglish/english/course/upper-intermediate/unit-1/tab/grammar' },
+  ]
+  if (point.level === 'KET') return [
+    { icon: '🎯', label: 'Cambridge A2 Grammar Practice', url: 'https://www.cambridgeenglish.org/learning-english/activities-for-learners/?level=a2&skill=grammar' },
+    ...base,
+  ]
+  if (point.level === 'PET') return [
+    { icon: '🎯', label: 'Cambridge B1 Grammar Practice', url: 'https://www.cambridgeenglish.org/learning-english/activities-for-learners/?level=b1&skill=grammar' },
+    ...base,
+  ]
+  return [
+    { icon: '🎯', label: 'Cambridge B2 Grammar Practice', url: 'https://www.cambridgeenglish.org/learning-english/activities-for-learners/?level=b2&skill=grammar' },
+    ...base,
+  ]
+}
+
 export default function Grammar({ user, onBack }) {
   const [activeChapter, setActiveChapter] = useState(0)
   const [activePoint, setActivePoint] = useState(null)
@@ -155,6 +174,20 @@ export default function Grammar({ user, onBack }) {
               </button>
             </div>
             {aiResult && <div className="grammar-ai-result">{aiResult}</div>}
+
+            {/* 资源链接 */}
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8 }}>📚 在线资源</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {getGrammarResources(activePoint).map((r, i) => (
+                  <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: 13, color: '#3b82f6', textDecoration: 'none', padding: '6px 10px',
+                      background: '#eff6ff', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>{r.icon}</span> {r.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

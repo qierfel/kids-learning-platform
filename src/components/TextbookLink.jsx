@@ -26,15 +26,17 @@ export default function TextbookLink({ subject, grade, semester }) {
       {open && (
         <div className="textbook-dropdown-menu">
           <div className="textbook-dropdown-note">国家智慧教育平台 · 首次需免费注册</div>
+          {data.note && <div className="textbook-dropdown-note" style={{ color: '#f59e0b' }}>⚠ {data.note}</div>}
           {data.books.map(b => (
             <a
               key={`${b.grade}-${b.semester}`}
-              className={`textbook-dropdown-item ${highlighted && b.grade === grade && b.semester === semester ? 'active' : ''}`}
+              className={`textbook-dropdown-item ${highlighted && b.grade === grade && b.semester === semester ? 'active' : ''} ${b.external ? 'external' : ''}`}
               href={b.url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {b.grade}年级{b.semester}册
+              {b.label || `${b.grade}年级${b.semester}册`}
+              {b.external && <span style={{ fontSize: 10, color: '#94a3b8', marginLeft: 4 }}>↗ 外部</span>}
             </a>
           ))}
         </div>

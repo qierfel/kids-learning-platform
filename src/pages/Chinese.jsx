@@ -3,6 +3,8 @@ import Confusables from './chinese/Confusables'
 import Poems from './chinese/Poems'
 import ChineseJunior from './chinese/ChineseJunior'
 import ChineseDictionary from './chinese/ChineseDictionary'
+import Dictation from './chinese/Dictation'
+import CharacterList from './chinese/CharacterList'
 import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
@@ -10,6 +12,8 @@ const PRIMARY_TOOLS = [
   { id: 'confusables', icon: '字', label: '同音/形近字', desc: '对比 · 组词 · 练习', ready: true },
   { id: 'poems',       icon: '诗', label: '古诗词',      desc: '朗读 · 背诵打卡 · 1-6年级', ready: true },
   { id: 'dictionary',  icon: '🔎', label: '查词 · 生词本', desc: '汉字词语 · 拼音 · 例句', ready: true },
+  { id: 'character_list', icon: '字', label: '生字表',      desc: '一类字·二类字·点击发音', ready: true },
+  { id: 'dictation',     icon: '✍', label: '听写练习',     desc: '听写·错字本·历史记录',  ready: true },
   { id: 'idioms',      icon: '成', label: '成语故事',    desc: '图文解释 · 例句 · 小测验', ready: false },
 ]
 
@@ -44,6 +48,22 @@ export default function Chinese() {
       <div className="subject-page">
         <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
         <ChineseDictionary />
+      </div>
+    )
+  }
+  if (activeTool === 'character_list') {
+    return (
+      <div className="subject-page">
+        <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
+        <CharacterList />
+      </div>
+    )
+  }
+  if (activeTool === 'dictation') {
+    return (
+      <div className="subject-page">
+        <button className="subject-back" onClick={() => setActiveTool(null)}>← 语文</button>
+        <Dictation onBack={() => setActiveTool(null)} />
       </div>
     )
   }

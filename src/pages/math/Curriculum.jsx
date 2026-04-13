@@ -6,9 +6,21 @@ import './Curriculum.css'
 const DIFFICULTY_LABELS = ['', '入门', '基础', '中等', '较难', '挑战']
 const DIFFICULTY_COLORS = ['', '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
 
+const GRADE_NAMES = ['', '一年级', '二年级', '三年级', '四年级', '五年级', '六年级']
+
 export default function Curriculum({ onBack }) {
   const grades = mathCurriculum.grades
-  const [selected, setSelected] = useState(`${grades[0].grade}-${grades[0].semester}`)
+
+  // Derive available grade numbers (1–6)
+  const gradeNumbers = useMemo(() => {
+    const seen = new Set()
+    grades.forEach(g => seen.add(g.grade))
+    return [...seen].sort((a, b) => a - b)
+  }, [grades])
+
+  const [selectedGrade, setSelectedGrade] = useState(null)   // 1..6 | null
+  const [selectedSemester, setSelectedSemester] = useState(null) // '上' | '下' | null
+
   const [openUnit, setOpenUnit] = useState(null)
   const [openTopic, setOpenTopic] = useState(null)
   // AI 功能状态
@@ -20,10 +32,19 @@ export default function Curriculum({ onBack }) {
   const [showAns, setShowAns] = useState(false)
   const [practiceDiff, setPracticeDiff] = useState(0) // 0 = 用知识点默认难度
 
-  const current = useMemo(
-    () => grades.find(g => `${g.grade}-${g.semester}` === selected),
-    [grades, selected]
-  )
+  // Semesters available for the selected grade
+  const availableSemesters = useMemo(() => {
+    if (!selectedGrade) return []
+    return grades
+      .filter(g => g.grade === selectedGrade)
+      .map(g => g.semester)
+      .sort() // '上' before '下' alphabetically works (上 < 下)
+  }, [grades, selectedGrade])
+
+  const current = useMemo(() => {
+    if (!selectedGrade || !selectedSemester) return null
+    return grades.find(g => g.grade === selectedGrade && g.semester === selectedSemester) || null
+  }, [grades, selectedGrade, selectedSemester])
 
   const stats = useMemo(() => {
     if (!current) return { units: 0, topics: 0 }
@@ -41,6 +62,19 @@ export default function Curriculum({ onBack }) {
     setUserAnswers({})
     setShowAns(false)
     setPracticeDiff(0)
+  }
+
+  function handleGradeSelect(grade) {
+    setSelectedGrade(grade)
+    setSelectedSemester(null)
+    setOpenUnit(null)
+    selectTopic(null)
+  }
+
+  function handleSemesterSelect(semester) {
+    setSelectedSemester(semester)
+    setOpenUnit(null)
+    selectTopic(null)
   }
 
   async function fetchExplain(topic) {
@@ -114,25 +148,36 @@ export default function Curriculum({ onBack }) {
         课程体系 <span className="edition">{mathCurriculum.edition}</span>
       </h2>
 
-      <div className="grade-tabs">
-        {grades.map(g => {
-          const key = `${g.grade}-${g.semester}`
-          return (
-            <button
-              key={key}
-              className={selected === key ? 'grade-tab active' : 'grade-tab'}
-              onClick={() => {
-                setSelected(key)
-                setOpenUnit(null)
-                selectTopic(null)
-              }}
-            >
-              {g.grade}年级{g.semester}册
-            </button>
-          )
-        })}
+      {/* ── Step 1: Grade grid ── */}
+      <div className="grade-grid">
+        {gradeNumbers.map(grade => (
+          <button
+            key={grade}
+            className={`grade-btn${selectedGrade === grade ? ' active' : ''}`}
+            onClick={() => handleGradeSelect(grade)}
+          >
+            <span className="grade-btn-num">{grade}</span>
+            <span className="grade-btn-label">{GRADE_NAMES[grade]}</span>
+          </button>
+        ))}
       </div>
 
+      {/* ── Step 2: Semester row ── */}
+      {selectedGrade && (
+        <div className="semester-row">
+          {availableSemesters.map(sem => (
+            <button
+              key={sem}
+              className={`semester-btn${selectedSemester === sem ? ' active' : ''}`}
+              onClick={() => handleSemesterSelect(sem)}
+            >
+              {sem}册
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Step 3: Content ── */}
       {current && (
         <>
           <div className="stats">
