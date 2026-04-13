@@ -451,3 +451,31 @@
   font-size: 12px;
   color: #16a34a;
 }
+
+/* Crop UI */
+.crop-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crop-hint {
+  font-size: 13px;
+  color: #888;
+  text-align: center;
+}
+
+.crop-canvas {
+  border-radius: 10px;
+  border: 1.5px solid #e8edf2;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.crop-btn {
+  background: #f3f4f6;
+  color: #555;
+}
