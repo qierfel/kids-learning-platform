@@ -39,6 +39,14 @@
 .tv-selector {
   padding: 24px 20px;
 }
+.tv-selector-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
 .tv-selector-title {
   font-size: 14px;
   font-weight: 700;
@@ -142,6 +150,53 @@
 }
 
 .tv-empty { padding: 40px 20px; text-align: center; color: #94a3b8; font-size: 14px; }
+
+/* ── Module blocks ── */
+.tv-module-block {
+  margin: 12px 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+.tv-module-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  background: #fff;
+  border: none;
+  border-left: 4px solid;
+  cursor: pointer;
+  text-align: left;
+}
+.tv-module-header:hover { background: #f8fafc; }
+.tv-module-tag {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.tv-module-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  flex: 1;
+}
+.tv-module-arrow {
+  font-size: 16px;
+  color: #94a3b8;
+}
+.tv-unit-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px 10px 12px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
 
 /* ── Unit view ── */
 .tv-unit-view { padding-bottom: 100px; }

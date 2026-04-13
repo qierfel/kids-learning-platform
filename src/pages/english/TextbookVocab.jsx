@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { ttsSpeak, ttsStop } from '../../utils/tts'
-import { TEXTBOOK_VOCAB, getUnits, AVAILABLE_GRADES, AVAILABLE_SEMESTERS } from '../../data/englishTextbook'
+import { getModules, AVAILABLE_GRADES, AVAILABLE_SEMESTERS } from '../../data/englishTextbook'
 import './TextbookVocab.css'
 
 const STORAGE_KEY = 'en_textbook_vocab_history'
@@ -14,15 +14,16 @@ function saveHistory(h) {
 
 // ── Dictation mode — 听英文写英文 ────────────────────────────────────────────
 function DictationMode({ items, type, onBack }) {
-  const [idx, setIdx]           = useState(0)
-  const [played, setPlayed]     = useState(false)   // 是否已听过一次
-  const [revealed, setRevealed] = useState(false)   // 是否显示答案
-  const [hintShown, setHintShown] = useState(false) // 是否显示中文提示
-  const [scores, setScores]     = useState([])
-  const [done, setDone]         = useState(false)
-  const [playing, setPlaying]   = useState(false)
+  const [idx, setIdx]             = useState(0)
+  const [played, setPlayed]       = useState(false)
+  const [revealed, setRevealed]   = useState(false)
+  const [hintShown, setHintShown] = useState(false)
+  const [scores, setScores]       = useState([])
+  const [done, setDone]           = useState(false)
+  const [playing, setPlaying]     = useState(false)
 
   const history = useRef(loadHistory())
+  const autoPlayedRef = useRef(false)
 
   function recordResult(key, correct) {
     const h = history.current
@@ -32,26 +33,24 @@ function DictationMode({ items, type, onBack }) {
     saveHistory(h)
   }
 
-  async function playItem() {
+  async function playItem(text) {
     if (playing) return
     setPlaying(true)
-    await ttsSpeak(items[idx].en, { voice: 'nova' })
+    await ttsSpeak(text || items[idx].en, { voice: 'nova' })
     setPlayed(true)
     setPlaying(false)
   }
 
-  // 切题时自动播放
-  function goTo(newIdx, scoreList) {
+  function goNext(newIdx) {
     setIdx(newIdx)
     setPlayed(false)
     setRevealed(false)
     setHintShown(false)
     setPlaying(false)
-    // 自动播放下一题
     setTimeout(() => {
       ttsSpeak(items[newIdx].en, { voice: 'nova' })
       setPlayed(true)
-    }, 300)
+    }, 350)
   }
 
   function mark(correct) {
@@ -61,31 +60,20 @@ function DictationMode({ items, type, onBack }) {
     if (idx + 1 >= items.length) {
       setDone(true)
     } else {
-      goTo(idx + 1, newScores)
+      goNext(idx + 1)
     }
   }
 
   function restart() {
-    setIdx(0)
-    setScores([])
-    setPlayed(false)
-    setRevealed(false)
-    setHintShown(false)
-    setDone(false)
-    setTimeout(() => {
-      ttsSpeak(items[0].en, { voice: 'nova' })
-      setPlayed(true)
-    }, 300)
+    setIdx(0); setScores([]); setPlayed(false)
+    setRevealed(false); setHintShown(false); setDone(false)
+    setTimeout(() => { ttsSpeak(items[0].en, { voice: 'nova' }); setPlayed(true) }, 350)
   }
 
-  // 第一题自动播放（仅一次）
-  const autoPlayedRef = useRef(false)
+  // 首题自动播放
   if (!autoPlayedRef.current) {
     autoPlayedRef.current = true
-    setTimeout(() => {
-      ttsSpeak(items[0].en, { voice: 'nova' })
-      setPlayed(true)
-    }, 400)
+    setTimeout(() => { ttsSpeak(items[0].en, { voice: 'nova' }); setPlayed(true) }, 450)
   }
 
   if (done) {
@@ -126,39 +114,32 @@ function DictationMode({ items, type, onBack }) {
         <button className="tv-back-link" onClick={() => { ttsStop(); onBack() }}>← 退出听写</button>
         <span className="tv-dictation-progress">{idx + 1} / {items.length}</span>
       </div>
-
       <div className="tv-progress-track">
         <div className="tv-progress-fill" style={{ width: `${(idx / items.length) * 100}%` }} />
       </div>
 
       <div className="tv-dictation-card">
-        {/* 主播放按钮 */}
         <button
           className={`tv-listen-btn ${playing ? 'playing' : ''}`}
-          onClick={playItem}
+          onClick={() => playItem()}
           disabled={playing}
         >
           <span className="tv-listen-icon">{playing ? '🔉' : '🔊'}</span>
           <span className="tv-listen-label">{playing ? '播放中…' : played ? '再听一次' : '点击听音频'}</span>
         </button>
 
-        {/* 慢速播放 */}
         {played && !revealed && (
           <button className="tv-slow-btn" onClick={async () => {
+            if (playing) return
             setPlaying(true)
-            // 慢速：重复每个词，加停顿
-            const words = item.en.split(' ')
-            for (const w of words) {
+            for (const w of item.en.split(' ')) {
               await ttsSpeak(w, { voice: 'nova' })
-              await new Promise(r => setTimeout(r, 400))
+              await new Promise(r => setTimeout(r, 500))
             }
             setPlaying(false)
-          }}>
-            🐢 慢读
-          </button>
+          }}>🐢 慢读</button>
         )}
 
-        {/* 中文提示（可选显示） */}
         {played && !hintShown && !revealed && (
           <button className="tv-hint-btn" onClick={() => setHintShown(true)}>
             💡 显示中文提示
@@ -168,7 +149,6 @@ function DictationMode({ items, type, onBack }) {
           <div className="tv-dictation-hint-text">{item.cn}</div>
         )}
 
-        {/* 答案区域 */}
         {revealed ? (
           <div className="tv-answer-block">
             <div className="tv-dictation-answer">{item.en}</div>
@@ -188,28 +168,23 @@ function DictationMode({ items, type, onBack }) {
 
         {!played && (
           <div className="tv-dictation-prompt">
-            {type === 'words' ? '听音频，写出这个单词的拼写' : '听音频，写出这个句子'}
+            {type === 'words' ? '听音频，写出单词拼写' : '听音频，写出完整句子'}
           </div>
         )}
       </div>
 
       <div className="tv-mini-scores">
-        {scores.map((s, i) => (
-          <span key={i} className={`tv-mini-dot ${s}`} />
-        ))}
+        {scores.map((s, i) => <span key={i} className={`tv-mini-dot ${s}`} />)}
       </div>
     </div>
   )
 }
 
-// ── Word / Sentence list view ────────────────────────────────────────────────
-function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
+// ── Unit view: words + sentences ─────────────────────────────────────────────
+function UnitView({ unit, moduleTitle, color, onDictateWords, onDictateSentences, onBack }) {
   const [activeTab, setActiveTab] = useState('words')
   const history = loadHistory()
-
-  function getWrongCount(en) {
-    return history[en]?.wrong || 0
-  }
+  const getWrongs = en => history[en]?.wrong || 0
 
   return (
     <div className="tv-unit-view">
@@ -222,36 +197,29 @@ function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
       </div>
 
       <div className="tv-tabs">
-        <button
-          className={`tv-tab ${activeTab === 'words' ? 'active' : ''}`}
-          onClick={() => setActiveTab('words')}
-          style={activeTab === 'words' ? { color, borderColor: color } : {}}
-        >
-          📝 单词 ({unit.words.length})
-        </button>
-        <button
-          className={`tv-tab ${activeTab === 'sentences' ? 'active' : ''}`}
-          onClick={() => setActiveTab('sentences')}
-          style={activeTab === 'sentences' ? { color, borderColor: color } : {}}
-        >
-          💬 句子 ({unit.sentences.length})
-        </button>
+        {['words', 'sentences'].map(tab => (
+          <button
+            key={tab}
+            className={`tv-tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+            style={activeTab === tab ? { color, borderColor: color } : {}}
+          >
+            {tab === 'words' ? `📝 单词 (${unit.words.length})` : `💬 句子 (${unit.sentences.length})`}
+          </button>
+        ))}
       </div>
 
       {activeTab === 'words' && (
         <>
           <div className="tv-word-list">
-            {unit.words.map((w, i) => {
-              const wrongs = getWrongCount(w.en)
-              return (
-                <div key={i} className="tv-word-item">
-                  <button className="tv-word-play" onClick={() => ttsSpeak(w.en, { voice: 'nova' })}>🔊</button>
-                  <div className="tv-word-en">{w.en}</div>
-                  <div className="tv-word-cn">{w.cn}</div>
-                  {wrongs >= 2 && <span className="tv-error-badge">错{wrongs}</span>}
-                </div>
-              )
-            })}
+            {unit.words.map((w, i) => (
+              <div key={i} className="tv-word-item">
+                <button className="tv-word-play" onClick={() => ttsSpeak(w.en, { voice: 'nova' })}>🔊</button>
+                <div className="tv-word-en">{w.en}</div>
+                <div className="tv-word-cn">{w.cn}</div>
+                {getWrongs(w.en) >= 2 && <span className="tv-error-badge">错{getWrongs(w.en)}</span>}
+              </div>
+            ))}
           </div>
           <div className="tv-dictate-bar">
             <button className="tv-dictate-btn" style={{ background: color }} onClick={onDictateWords}>
@@ -264,19 +232,16 @@ function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
       {activeTab === 'sentences' && (
         <>
           <div className="tv-sentence-list">
-            {unit.sentences.map((s, i) => {
-              const wrongs = getWrongCount(s.en)
-              return (
-                <div key={i} className="tv-sentence-item">
-                  <div className="tv-sentence-en">
-                    <button className="tv-sent-play" onClick={() => ttsSpeak(s.en, { voice: 'nova' })}>🔊</button>
-                    {s.en}
-                    {wrongs >= 2 && <span className="tv-error-badge">错{wrongs}</span>}
-                  </div>
-                  <div className="tv-sentence-cn">{s.cn}</div>
+            {unit.sentences.map((s, i) => (
+              <div key={i} className="tv-sentence-item">
+                <div className="tv-sentence-en">
+                  <button className="tv-sent-play" onClick={() => ttsSpeak(s.en, { voice: 'nova' })}>🔊</button>
+                  {s.en}
+                  {getWrongs(s.en) >= 2 && <span className="tv-error-badge">错{getWrongs(s.en)}</span>}
                 </div>
-              )
-            })}
+                <div className="tv-sentence-cn">{s.cn}</div>
+              </div>
+            ))}
           </div>
           <div className="tv-dictate-bar">
             <button className="tv-dictate-btn" style={{ background: color }} onClick={onDictateSentences}>
@@ -289,9 +254,10 @@ function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
   )
 }
 
-// ── Unit List (grade/semester selected) ─────────────────────────────────────
-function UnitList({ grade, semester, color, onSelectUnit, onBack }) {
-  const units = getUnits(grade, semester)
+// ── Module + Unit list ────────────────────────────────────────────────────────
+function ModuleUnitList({ grade, semester, color, onSelectUnit, onBack }) {
+  const modules = getModules(grade, semester)
+  const [openModule, setOpenModule] = useState(modules[0]?.module || 1)
 
   return (
     <div className="tv-unit-list-page">
@@ -299,52 +265,64 @@ function UnitList({ grade, semester, color, onSelectUnit, onBack }) {
         <button className="tv-back-link" onClick={onBack}>← 返回</button>
         <div className="tv-page-title">
           <span>{grade}年级{semester}册</span>
-          <span className="tv-page-sub">共 {units.length} 个单元</span>
+          <span className="tv-page-sub">牛津英语（上海版）</span>
         </div>
       </div>
-      <div className="tv-unit-grid">
-        {units.map(unit => (
+
+      {modules.map(mod => (
+        <div key={mod.module} className="tv-module-block">
           <button
-            key={unit.unit}
-            className="tv-unit-card"
-            style={{ borderTopColor: color }}
-            onClick={() => onSelectUnit(unit)}
+            className="tv-module-header"
+            style={{ borderLeftColor: color }}
+            onClick={() => setOpenModule(openModule === mod.module ? null : mod.module)}
           >
-            <div className="tv-unit-card-num" style={{ color }}>Unit {unit.unit}</div>
-            <div className="tv-unit-card-title">{unit.title}</div>
-            <div className="tv-unit-card-meta">
-              <span>📝 {unit.words.length}词</span>
-              <span>💬 {unit.sentences.length}句</span>
-            </div>
+            <span className="tv-module-tag" style={{ background: color }}>M{mod.module}</span>
+            <span className="tv-module-title">{mod.title}</span>
+            <span className="tv-module-arrow">{openModule === mod.module ? '▾' : '›'}</span>
           </button>
-        ))}
-        {units.length === 0 && (
-          <div className="tv-empty">暂无数据</div>
-        )}
-      </div>
+
+          {openModule === mod.module && (
+            <div className="tv-unit-cards">
+              {mod.units.map(unit => (
+                <button
+                  key={unit.unit}
+                  className="tv-unit-card"
+                  style={{ borderTopColor: color }}
+                  onClick={() => onSelectUnit(unit, mod.title)}
+                >
+                  <div className="tv-unit-card-num" style={{ color }}>Unit {unit.unit}</div>
+                  <div className="tv-unit-card-title">{unit.title}</div>
+                  <div className="tv-unit-card-meta">
+                    <span>📝 {unit.words.length}词</span>
+                    <span>💬 {unit.sentences.length}句</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   )
 }
 
-// ── Grade/Semester selector ──────────────────────────────────────────────────
-const GRADE_COLORS = {
-  3: '#10b981',
-  4: '#3b82f6',
-  5: '#8b5cf6',
-  6: '#f59e0b',
-}
+// ── Grade / Semester selector ─────────────────────────────────────────────────
+const GRADE_COLORS = { 1: '#10b981', 2: '#3b82f6', 3: '#8b5cf6', 4: '#f59e0b', 5: '#ef4444' }
 
 function GradeSelector({ onSelect }) {
   const [selectedGrade, setSelectedGrade] = useState(null)
 
   return (
     <div className="tv-selector">
+      <div className="tv-selector-desc">
+        牛津英语（上海版）· 1–5年级 · Module / Unit 结构
+      </div>
       <div className="tv-selector-title">选择年级</div>
       <div className="tv-grade-grid">
         {AVAILABLE_GRADES.map(g => (
           <button
             key={g}
-            className={`tv-grade-btn ${selectedGrade === g ? 'active' : ''}`}
+            className="tv-grade-btn"
             style={{
               borderColor: GRADE_COLORS[g],
               background: selectedGrade === g ? GRADE_COLORS[g] : '#fff',
@@ -378,55 +356,32 @@ function GradeSelector({ onSelect }) {
   )
 }
 
-// ── Main Export ──────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function TextbookVocab({ onBack }) {
-  const [view, setView] = useState('select') // 'select' | 'units' | 'unit' | 'dictate-words' | 'dictate-sentences'
-  const [selectedGrade, setSelectedGrade] = useState(null)
-  const [selectedSemester, setSelectedSemester] = useState(null)
-  const [selectedColor, setSelectedColor] = useState('#10b981')
-  const [selectedUnit, setSelectedUnit] = useState(null)
+  const [view, setView]                     = useState('select')
+  const [selectedGrade, setSelectedGrade]   = useState(null)
+  const [selectedSem, setSelectedSem]       = useState(null)
+  const [selectedColor, setSelectedColor]   = useState('#10b981')
+  const [selectedUnit, setSelectedUnit]     = useState(null)
+  const [selectedModTitle, setSelectedModTitle] = useState('')
 
   function handleSelectGrade(grade, semester, color) {
-    setSelectedGrade(grade)
-    setSelectedSemester(semester)
-    setSelectedColor(color)
+    setSelectedGrade(grade); setSelectedSem(semester); setSelectedColor(color)
     setView('units')
   }
 
-  function handleSelectUnit(unit) {
-    setSelectedUnit(unit)
-    setView('unit')
-  }
-
   if (view === 'dictate-words') {
-    return (
-      <div className="tv-page">
-        <DictationMode
-          items={selectedUnit.words}
-          type="words"
-          onBack={() => setView('unit')}
-        />
-      </div>
-    )
+    return <div className="tv-page"><DictationMode items={selectedUnit.words} type="words" onBack={() => setView('unit')} /></div>
   }
-
   if (view === 'dictate-sentences') {
-    return (
-      <div className="tv-page">
-        <DictationMode
-          items={selectedUnit.sentences}
-          type="sentences"
-          onBack={() => setView('unit')}
-        />
-      </div>
-    )
+    return <div className="tv-page"><DictationMode items={selectedUnit.sentences} type="sentences" onBack={() => setView('unit')} /></div>
   }
-
   if (view === 'unit') {
     return (
       <div className="tv-page">
         <UnitView
           unit={selectedUnit}
+          moduleTitle={selectedModTitle}
           color={selectedColor}
           onDictateWords={() => setView('dictate-words')}
           onDictateSentences={() => setView('dictate-sentences')}
@@ -435,15 +390,14 @@ export default function TextbookVocab({ onBack }) {
       </div>
     )
   }
-
   if (view === 'units') {
     return (
       <div className="tv-page">
-        <UnitList
+        <ModuleUnitList
           grade={selectedGrade}
-          semester={selectedSemester}
+          semester={selectedSem}
           color={selectedColor}
-          onSelectUnit={handleSelectUnit}
+          onSelectUnit={(unit, modTitle) => { setSelectedUnit(unit); setSelectedModTitle(modTitle); setView('unit') }}
           onBack={() => setView('select')}
         />
       </div>
@@ -458,7 +412,7 @@ export default function TextbookVocab({ onBack }) {
           <span className="tv-top-icon">📚</span>
           <div>
             <div className="tv-top-name">教材词汇</div>
-            <div className="tv-top-sub">译林版 3-6年级 · 单词 · 句型 · 听写</div>
+            <div className="tv-top-sub">牛津英语（上海版）· 单词 · 句型 · 听写</div>
           </div>
         </div>
       </div>
