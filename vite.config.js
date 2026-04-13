@@ -5,7 +5,7 @@ import fs from 'fs'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: (process.env.NETLIFY || process.env.VERCEL || process.env.CF_PAGES) ? '/' : '/kids-learning-platform/',
+  base: '/',
   plugins: [
     react(),
     // 本地媒体文件服务插件（仅开发模式）
