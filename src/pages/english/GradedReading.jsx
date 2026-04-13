@@ -3,6 +3,24 @@ import razLevels from '../../data/razLevels'
 import { HEINEMANN } from '../../data/heinemann'
 import { OXFORD_TREE } from '../../data/oxfordTree'
 import { LRFOS } from '../../data/lrfos'
+import PdfCover, { PlaceholderCover } from '../../components/PdfCover'
+
+// 统一书卡封面组件
+function BookCover({ book, color, isPlaying }) {
+  return (
+    <div className="gr-book-cover">
+      {book?.pdf
+        ? <PdfCover pdfUrl={book.pdf} color={color} title={book.title} />
+        : <PlaceholderCover color={color} title={book?.title || ''} />
+      }
+      {isPlaying && (
+        <div className="gr-cover-playing-overlay">
+          <span>🔊</span>
+        </div>
+      )}
+    </div>
+  )
+}
 import './GradedReading.css'
 
 const LEVEL_COLORS = {
@@ -261,9 +279,7 @@ export default function GradedReading({ onBack }) {
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: lcolor, background: `${lcolor}18` } : {}}
                 onClick={() => openBook(book)}>
-                <div className="gr-book-cover" style={{ background: `${lcolor}30` }}>
-                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : '📖'}</span>
-                </div>
+                <BookCover book={book} color={lcolor} isPlaying={active && isPlaying} />
                 <div className="gr-book-title">{book.title}</div>
                 {active && isPlaying && <div className="gr-playing-dot" style={{ background: lcolor }} />}
               </button>
@@ -320,9 +336,7 @@ export default function GradedReading({ onBack }) {
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: color, background: `${color}18` } : {}}
                 onClick={() => openBook(book)}>
-                <div className="gr-book-cover" style={{ background: `${color}30` }}>
-                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : book.pdf ? '📚' : '📖'}</span>
-                </div>
+                <BookCover book={book} color={color} isPlaying={active && isPlaying} />
                 <div className="gr-book-num" style={{ color }}>
                   Book {book.num}{book.level ? ` · Lv.${book.level}` : ''}
                 </div>
@@ -383,9 +397,7 @@ export default function GradedReading({ onBack }) {
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: color, background: `${color}18` } : {}}
                 onClick={() => openBook(book)}>
-                <div className="gr-book-cover" style={{ background: `${color}30` }}>
-                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : book.pdf ? '📚' : '📖'}</span>
-                </div>
+                <BookCover book={book} color={color} isPlaying={active && isPlaying} />
                 <div className="gr-book-num" style={{ color }}>Book {book.num}</div>
                 <div className="gr-book-title">{book.title}</div>
                 {book.pdf && <div className="gr-pdf-badge">PDF</div>}
@@ -437,9 +449,7 @@ export default function GradedReading({ onBack }) {
               <button key={i} className={`gr-book-card ${active ? 'active' : ''}`}
                 style={active ? { borderColor: color, background: `${color}18` } : {}}
                 onClick={() => openBook(book)}>
-                <div className="gr-book-cover" style={{ background: `${color}30` }}>
-                  <span className="gr-book-icon">{active && isPlaying ? '🔊' : '📖'}</span>
-                </div>
+                <BookCover book={book} color={color} isPlaying={active && isPlaying} />
                 <div className="gr-book-num" style={{ color }}>Stage {book.stage}-{String(book.num).padStart(2,'0')}</div>
                 <div className="gr-book-title">{book.title}</div>
                 {active && isPlaying && <div className="gr-playing-dot" style={{ background: color }} />}
