@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { ttsSpeak } from '../utils/tts'
 import './Notebook.css'
 
 const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
@@ -83,11 +84,8 @@ export default function Notebook({ user }) {
         })
       }
 
-      if (ttsEnabled && fullText && window.speechSynthesis) {
-        const utter = new window.SpeechSynthesisUtterance(fullText)
-        utter.lang = 'zh-CN'
-        utter.rate = 0.9
-        window.speechSynthesis.speak(utter)
+      if (ttsEnabled && fullText) {
+        ttsSpeak(fullText, { voice: 'shimmer' }).catch(() => {})
       }
     } catch (e) {
       const detail = e.message || '未知错误'

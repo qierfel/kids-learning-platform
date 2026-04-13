@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { ttsSpeak } from '../../utils/tts'
 import './Dictionary.css'
 
 const STORAGE_KEY = 'en_vocab_book'
@@ -78,10 +79,7 @@ export default function Dictionary({ onBack }) {
     if (audioUrl) {
       new Audio(audioUrl).play().catch(() => {})
     } else {
-      window.speechSynthesis.cancel()
-      const u = new SpeechSynthesisUtterance(entry.word)
-      u.lang = 'en-US'
-      window.speechSynthesis.speak(u)
+      ttsSpeak(entry.word).catch(() => {})
     }
   }
 

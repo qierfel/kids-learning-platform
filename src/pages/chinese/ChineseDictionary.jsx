@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ttsSpeak } from '../../utils/tts'
 import './ChineseDictionary.css'
 
 const STORAGE_KEY = 'zh_vocab_book'
@@ -61,11 +62,7 @@ export default function ChineseDictionary() {
   }
 
   function speak(text) {
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'zh-CN'
-    u.rate = 0.9
-    window.speechSynthesis.speak(u)
+    ttsSpeak(text, { voice: 'shimmer' }).catch(() => {})
   }
 
   function addToBook() {

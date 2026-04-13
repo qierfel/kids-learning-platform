@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { ttsSpeak, ttsStop } from '../../utils/tts'
 import '../Notebook.css'
 import './Speaking.css'
 
@@ -63,11 +64,8 @@ export default function Speaking({ user, onBack }) {
       setMessages([...newMessages, aiMsg])
       setStreamingText('')
 
-      if (ttsEnabled && fullText && window.speechSynthesis) {
-        const utter = new window.SpeechSynthesisUtterance(fullText)
-        utter.lang = 'en-US'
-        utter.rate = 0.9
-        window.speechSynthesis.speak(utter)
+      if (ttsEnabled && fullText) {
+        ttsSpeak(fullText).catch(() => {})
       }
     } catch (e) {
       const detail = e.message || 'Unknown error'
@@ -142,7 +140,7 @@ export default function Speaking({ user, onBack }) {
           <button
             className={`topbar-icon-btn tts-btn ${ttsEnabled ? 'active' : ''}`}
             onClick={() => {
-              if (ttsEnabled) window.speechSynthesis?.cancel()
+              if (ttsEnabled) ttsStop()
               setTtsEnabled(v => !v)
             }}
             title={ttsEnabled ? 'Mute Emma' : 'Unmute Emma'}

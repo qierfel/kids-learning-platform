@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { GRADE_WORDS, EXAM_WORDS, IELTS_WORDS } from '../../data/englishWords'
 import { sm2Update, newCard, getTodayPlan, estimatePlan, getStats } from '../../utils/srs'
+import { wordAudioMap } from '../../data/wordAudioMap'
+import { ttsSpeak } from '../../utils/tts'
 import './SRSStudy.css'
 
 const LEVEL_LABELS = {
@@ -348,6 +350,28 @@ function Session({ level, todayPlan, progress, onFinish, onBack }) {
   const [learnTimer, setLearnTimer] = useState(3)
   const timerRef = useRef(null)
   const inputRef = useRef(null)
+  const audioRef = useRef(new Audio())
+
+  function playWordAudio(word) {
+    if (!word) return
+    const path = wordAudioMap[word.toLowerCase()]
+    if (path) {
+      const audio = audioRef.current
+      audio.src = path
+      audio.currentTime = 0
+      audio.play().catch(() => {})
+    } else {
+      // TTS 回退
+      ttsSpeak(word).catch(() => {})
+    }
+  }
+
+  // 进入 LEARN 阶段时自动播放
+  useEffect(() => {
+    if (stage === PHASE_LEARN && queue[idx]) {
+      playWordAudio(queue[idx].word.word)
+    }
+  }, [idx, stage])
 
   const current = queue[idx]
   const done = idx >= queue.length
@@ -435,7 +459,10 @@ function Session({ level, todayPlan, progress, onFinish, onBack }) {
 
       {stage === PHASE_LEARN && (
         <div className="learn-card">
-          <div className="learn-word">{current.word.word}</div>
+          <div className="learn-word-row">
+            <span className="learn-word">{current.word.word}</span>
+            <button className="word-audio-btn" onClick={() => playWordAudio(current.word.word)} title="播放发音">🔊</button>
+          </div>
           <div className="learn-meaning">{current.word.meaning}</div>
           <div className="learn-example">{current.word.example}</div>
           <div className="learn-timer">{learnTimer > 0 ? `${learnTimer}秒后开始测试` : ''}</div>
@@ -448,7 +475,10 @@ function Session({ level, todayPlan, progress, onFinish, onBack }) {
       {stage === PHASE_QUIZ && (
         <div className="quiz-card">
           <div className="quiz-prompt">这个单词的中文意思是？</div>
-          <div className="quiz-word">{current.word.word}</div>
+          <div className="quiz-word-row">
+            <span className="quiz-word">{current.word.word}</span>
+            <button className="word-audio-btn" onClick={() => playWordAudio(current.word.word)} title="播放发音">🔊</button>
+          </div>
           <div className="quiz-options">
             {options.map((opt, i) => {
               let cls = 'quiz-opt'
