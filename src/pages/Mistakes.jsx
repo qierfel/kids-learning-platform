@@ -207,7 +207,7 @@ function AddMistake({ user, onClose, onAdded }) {
   const fileInputRef = useRef(null)
 
   const [subject, setSubject] = useState('语文')
-  const [topic, setTopic] = useState(TOPICS['语文'][0])
+  const [topic, setTopic] = useState('')
   const [grade, setGrade] = useState(3)
   const [question, setQuestion] = useState('')
   const [myAnswer, setMyAnswer] = useState('')
@@ -216,7 +216,7 @@ function AddMistake({ user, onClose, onAdded }) {
 
   function handleSubjectChange(s) {
     setSubject(s)
-    setTopic(TOPICS[s][0])
+    setTopic('')
   }
 
   async function handlePhoto(e) {
@@ -242,7 +242,7 @@ function AddMistake({ user, onClose, onAdded }) {
       const json = await res.json()
       if (json.parsed) {
         const p = json.parsed
-        if (p.subject && TOPICS[p.subject]) { setSubject(p.subject); setTopic(TOPICS[p.subject][0]) }
+        if (p.subject && TOPICS[p.subject]) setSubject(p.subject)
         if (p.topic) setTopic(p.topic)
         if (p.question) setQuestion(p.question)
         if (p.myAnswer) setMyAnswer(p.myAnswer)
@@ -374,9 +374,16 @@ function AddMistake({ user, onClose, onAdded }) {
 
           <div className="form-row">
             <label>知识点</label>
-            <select className="form-select" value={topic} onChange={e => setTopic(e.target.value)}>
-              {TOPICS[subject].map(t => <option key={t}>{t}</option>)}
-            </select>
+            <input
+              className="form-input"
+              list={`topics-${subject}`}
+              placeholder="AI识别后自动填写，或手动输入"
+              value={topic}
+              onChange={e => setTopic(e.target.value)}
+            />
+            <datalist id={`topics-${subject}`}>
+              {(TOPICS[subject] || []).map(t => <option key={t} value={t} />)}
+            </datalist>
           </div>
 
           <div className="form-row">
