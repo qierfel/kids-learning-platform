@@ -479,7 +479,6 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
   }
 
   async function loadSimilar() {
-    if (data.similarQuestions) return
     setLoadingSimilar(true)
     try {
       const res = await fetch('/api/claude', {
@@ -493,7 +492,12 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
       const json = await res.json()
       if (json.text) {
         let parsed = null
-        try { parsed = JSON.parse(json.text) } catch { /* ignore parse error */ }
+        try { parsed = JSON.parse(json.text) } catch { /* ignore */ }
+        // Handle markdown code fences (```json ... ```)
+        if (!Array.isArray(parsed)) {
+          const match = json.text.match(/\[[\s\S]*\]/)
+          if (match) try { parsed = JSON.parse(match[0]) } catch { /* ignore */ }
+        }
         if (Array.isArray(parsed)) {
           await apiMistakes({ action: 'update', id: data.id, similarQuestions: parsed })
           const updated = { ...data, similarQuestions: parsed }
@@ -558,13 +562,13 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
           {!data.similarQuestions && !loadingSimilar && (
             <button className="load-similar-btn" onClick={loadSimilar}>生成练习题</button>
           )}
-          {data.similarQuestions && (
+          {data.similarQuestions && !loadingSimilar && (
             <button className="load-similar-btn" onClick={async () => {
               await apiMistakes({ action: 'update', id: data.id, similarQuestions: null })
-              const updated = { ...data, similarQuestions: null }
-              setData(updated)
-              onUpdate(updated)
-              setTimeout(loadSimilar, 100)
+              const cleared = { ...data, similarQuestions: null }
+              setData(cleared)
+              onUpdate(cleared)
+              loadSimilar()
             }}>换一批</button>
           )}
         </div>
