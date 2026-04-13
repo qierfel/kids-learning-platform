@@ -357,61 +357,105 @@
   padding: 28px 24px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
   text-align: center;
-  min-height: 260px;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-.tv-dictation-cn {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.5;
+/* 大播放按钮 */
+.tv-listen-btn {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #6366f1;
+  background: #eef2ff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+  flex-shrink: 0;
 }
-.tv-dictation-hint {
+.tv-listen-btn:hover:not(:disabled) {
+  background: #e0e7ff;
+  transform: scale(1.04);
+}
+.tv-listen-btn.playing {
+  border-color: #22c55e;
+  background: #f0fdf4;
+  animation: pulse-ring 1.2s ease infinite;
+}
+.tv-listen-btn:disabled { cursor: default; }
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.35); }
+  70%  { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+.tv-listen-icon { font-size: 32px; line-height: 1; }
+.tv-listen-label { font-size: 12px; font-weight: 600; color: #6366f1; }
+.tv-listen-btn.playing .tv-listen-label { color: #16a34a; }
+
+.tv-dictation-prompt {
   font-size: 13px;
   color: #94a3b8;
 }
+
+/* 慢速 & 提示按钮 */
+.tv-slow-btn, .tv-hint-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+}
+.tv-slow-btn:hover, .tv-hint-btn:hover { background: #f1f5f9; }
+
+.tv-dictation-hint-text {
+  font-size: 16px;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 10px 16px;
+  width: 100%;
+}
+
+/* 答案块 */
+.tv-answer-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .tv-dictation-answer {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #6366f1;
   font-family: 'Georgia', serif;
   line-height: 1.5;
   background: #eef2ff;
-  padding: 12px 20px;
-  border-radius: 10px;
-  width: 100%;
-}
-
-.tv-dictation-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.tv-play-big-btn {
-  background: #f1f5f9;
-  border: 1.5px solid #e2e8f0;
+  padding: 14px 20px;
   border-radius: 12px;
-  padding: 10px 24px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
-.tv-play-big-btn:hover { background: #e2e8f0; }
+.tv-dictation-answer-cn {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
 
 .tv-reveal-btn {
   background: #6366f1;
   border: none;
   border-radius: 12px;
-  padding: 12px 32px;
+  padding: 13px 32px;
   font-size: 15px;
   font-weight: 700;
   color: #fff;
@@ -427,7 +471,7 @@
 }
 .tv-mark-correct, .tv-mark-wrong {
   flex: 1;
-  padding: 12px;
+  padding: 13px;
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -460,10 +504,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
+.tv-result-emoji { font-size: 48px; line-height: 1; }
 .tv-result-score {
-  font-size: 64px;
+  font-size: 60px;
   font-weight: 800;
   line-height: 1;
 }
@@ -481,8 +526,8 @@
 .tv-result-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 8px;
+  padding: 10px 12px;
   border-radius: 10px;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
@@ -490,23 +535,38 @@
 .tv-result-item.correct { border-left: 3px solid #22c55e; }
 .tv-result-item.wrong   { border-left: 3px solid #ef4444; }
 .tv-result-mark {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  width: 20px;
+  width: 18px;
   text-align: center;
+  flex-shrink: 0;
 }
 .tv-result-item.correct .tv-result-mark { color: #22c55e; }
 .tv-result-item.wrong   .tv-result-mark { color: #ef4444; }
+.tv-result-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
 .tv-result-en {
   font-size: 15px;
   font-weight: 600;
   color: #1e293b;
   font-family: 'Georgia', serif;
-  flex: 1;
 }
 .tv-result-cn {
-  font-size: 12px;
+  font-size: 11px;
   color: #94a3b8;
+}
+.tv-result-play {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px;
 }
 
 .tv-result-btns {

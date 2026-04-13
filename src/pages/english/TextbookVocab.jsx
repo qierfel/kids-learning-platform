@@ -12,13 +12,15 @@ function saveHistory(h) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(h))
 }
 
-// ── Dictation mode (words or sentences) ─────────────────────────────────────
+// ── Dictation mode — 听英文写英文 ────────────────────────────────────────────
 function DictationMode({ items, type, onBack }) {
-  // items: [{en, cn}]
-  const [idx, setIdx] = useState(0)
-  const [revealed, setRevealed] = useState(false)
-  const [scores, setScores] = useState([]) // 'correct' | 'wrong'
-  const [done, setDone] = useState(false)
+  const [idx, setIdx]           = useState(0)
+  const [played, setPlayed]     = useState(false)   // 是否已听过一次
+  const [revealed, setRevealed] = useState(false)   // 是否显示答案
+  const [hintShown, setHintShown] = useState(false) // 是否显示中文提示
+  const [scores, setScores]     = useState([])
+  const [done, setDone]         = useState(false)
+  const [playing, setPlaying]   = useState(false)
 
   const history = useRef(loadHistory())
 
@@ -31,29 +33,59 @@ function DictationMode({ items, type, onBack }) {
   }
 
   async function playItem() {
-    const item = items[idx]
-    const text = type === 'words' ? item.en : item.en
-    await ttsSpeak(text, { voice: 'nova' })
+    if (playing) return
+    setPlaying(true)
+    await ttsSpeak(items[idx].en, { voice: 'nova' })
+    setPlayed(true)
+    setPlaying(false)
+  }
+
+  // 切题时自动播放
+  function goTo(newIdx, scoreList) {
+    setIdx(newIdx)
+    setPlayed(false)
+    setRevealed(false)
+    setHintShown(false)
+    setPlaying(false)
+    // 自动播放下一题
+    setTimeout(() => {
+      ttsSpeak(items[newIdx].en, { voice: 'nova' })
+      setPlayed(true)
+    }, 300)
   }
 
   function mark(correct) {
-    const key = items[idx].en
-    recordResult(key, correct)
+    recordResult(items[idx].en, correct)
     const newScores = [...scores, correct ? 'correct' : 'wrong']
     setScores(newScores)
     if (idx + 1 >= items.length) {
       setDone(true)
     } else {
-      setIdx(idx + 1)
-      setRevealed(false)
+      goTo(idx + 1, newScores)
     }
   }
 
   function restart() {
     setIdx(0)
     setScores([])
+    setPlayed(false)
     setRevealed(false)
+    setHintShown(false)
     setDone(false)
+    setTimeout(() => {
+      ttsSpeak(items[0].en, { voice: 'nova' })
+      setPlayed(true)
+    }, 300)
+  }
+
+  // 第一题自动播放（仅一次）
+  const autoPlayedRef = useRef(false)
+  if (!autoPlayedRef.current) {
+    autoPlayedRef.current = true
+    setTimeout(() => {
+      ttsSpeak(items[0].en, { voice: 'nova' })
+      setPlayed(true)
+    }, 400)
   }
 
   if (done) {
@@ -61,18 +93,20 @@ function DictationMode({ items, type, onBack }) {
     const pct = Math.round((correctCount / items.length) * 100)
     return (
       <div className="tv-dictation-result">
+        <div className="tv-result-emoji">{pct === 100 ? '🏆' : pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪'}</div>
         <div className="tv-result-score" style={{ color: pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444' }}>
           {pct}%
         </div>
-        <div className="tv-result-label">
-          {items.length} 题，答对 {correctCount} 题
-        </div>
+        <div className="tv-result-label">{items.length} 题，写对 {correctCount} 题</div>
         <div className="tv-result-items">
           {items.map((item, i) => (
             <div key={i} className={`tv-result-item ${scores[i]}`}>
               <span className="tv-result-mark">{scores[i] === 'correct' ? '✓' : '✗'}</span>
-              <span className="tv-result-en">{item.en}</span>
-              <span className="tv-result-cn">{item.cn}</span>
+              <div className="tv-result-text">
+                <span className="tv-result-en">{item.en}</span>
+                <span className="tv-result-cn">{item.cn}</span>
+              </div>
+              <button className="tv-result-play" onClick={() => ttsSpeak(item.en, { voice: 'nova' })}>🔊</button>
             </div>
           ))}
         </div>
@@ -94,37 +128,69 @@ function DictationMode({ items, type, onBack }) {
       </div>
 
       <div className="tv-progress-track">
-        <div className="tv-progress-fill" style={{ width: `${((idx) / items.length) * 100}%` }} />
+        <div className="tv-progress-fill" style={{ width: `${(idx / items.length) * 100}%` }} />
       </div>
 
       <div className="tv-dictation-card">
-        <div className="tv-dictation-cn">{item.cn}</div>
-        {type === 'sentences' && !revealed && (
-          <div className="tv-dictation-hint">请用英语写出上面的句子</div>
-        )}
-        {type === 'words' && !revealed && (
-          <div className="tv-dictation-hint">请写出对应的英文单词</div>
-        )}
+        {/* 主播放按钮 */}
+        <button
+          className={`tv-listen-btn ${playing ? 'playing' : ''}`}
+          onClick={playItem}
+          disabled={playing}
+        >
+          <span className="tv-listen-icon">{playing ? '🔉' : '🔊'}</span>
+          <span className="tv-listen-label">{playing ? '播放中…' : played ? '再听一次' : '点击听音频'}</span>
+        </button>
 
-        {revealed && (
-          <div className="tv-dictation-answer">{item.en}</div>
-        )}
-
-        <div className="tv-dictation-actions">
-          <button className="tv-play-big-btn" onClick={playItem}>
-            🔊 {type === 'words' ? '听单词' : '听句子'}
+        {/* 慢速播放 */}
+        {played && !revealed && (
+          <button className="tv-slow-btn" onClick={async () => {
+            setPlaying(true)
+            // 慢速：重复每个词，加停顿
+            const words = item.en.split(' ')
+            for (const w of words) {
+              await ttsSpeak(w, { voice: 'nova' })
+              await new Promise(r => setTimeout(r, 400))
+            }
+            setPlaying(false)
+          }}>
+            🐢 慢读
           </button>
-          {!revealed ? (
-            <button className="tv-reveal-btn" onClick={() => setRevealed(true)}>
-              查看答案
-            </button>
-          ) : (
+        )}
+
+        {/* 中文提示（可选显示） */}
+        {played && !hintShown && !revealed && (
+          <button className="tv-hint-btn" onClick={() => setHintShown(true)}>
+            💡 显示中文提示
+          </button>
+        )}
+        {hintShown && !revealed && (
+          <div className="tv-dictation-hint-text">{item.cn}</div>
+        )}
+
+        {/* 答案区域 */}
+        {revealed ? (
+          <div className="tv-answer-block">
+            <div className="tv-dictation-answer">{item.en}</div>
+            <div className="tv-dictation-answer-cn">{item.cn}</div>
             <div className="tv-mark-btns">
-              <button className="tv-mark-correct" onClick={() => mark(true)}>✓ 对了</button>
-              <button className="tv-mark-wrong" onClick={() => mark(false)}>✗ 错了</button>
+              <button className="tv-mark-correct" onClick={() => mark(true)}>✓ 写对了</button>
+              <button className="tv-mark-wrong" onClick={() => mark(false)}>✗ 写错了</button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          played && (
+            <button className="tv-reveal-btn" onClick={() => setRevealed(true)}>
+              核对答案
+            </button>
+          )
+        )}
+
+        {!played && (
+          <div className="tv-dictation-prompt">
+            {type === 'words' ? '听音频，写出这个单词的拼写' : '听音频，写出这个句子'}
+          </div>
+        )}
       </div>
 
       <div className="tv-mini-scores">
@@ -189,7 +255,7 @@ function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
           </div>
           <div className="tv-dictate-bar">
             <button className="tv-dictate-btn" style={{ background: color }} onClick={onDictateWords}>
-              🎧 开始单词听写
+              🎧 听写单词 — 听英文写拼写
             </button>
           </div>
         </>
@@ -214,7 +280,7 @@ function UnitView({ unit, color, onDictateWords, onDictateSentences, onBack }) {
           </div>
           <div className="tv-dictate-bar">
             <button className="tv-dictate-btn" style={{ background: color }} onClick={onDictateSentences}>
-              🎧 开始句子听写
+              🎧 听写句子 — 听英文写句子
             </button>
           </div>
         </>
