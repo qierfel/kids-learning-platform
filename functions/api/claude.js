@@ -219,8 +219,11 @@ ${lines.join('\n')}
     max_tokens = 800
 
   } else if (type === 'photo_ocr') {
-    const { imageBase64, mediaType = 'image/jpeg' } = payload
+    const { imageBase64, mediaType: rawMediaType = 'image/jpeg' } = payload
     if (!imageBase64) return json({ error: 'imageBase64 required' }, 400)
+    const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1].replace(/\s/g, '') : imageBase64.replace(/\s/g, '')
+    const supported = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const mediaType = supported.includes(rawMediaType) ? rawMediaType : 'image/jpeg'
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -231,7 +234,7 @@ ${lines.join('\n')}
           messages: [{
             role: 'user',
             content: [
-              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: cleanBase64 } },
               { type: 'text', text: `请仔细识别这张试卷/作业照片中的错题信息，以JSON格式返回（只输出JSON，不要\`\`\`json标记）：\n{\n  "subject": "科目（语文/数学/英语/物理/化学/历史/地理之一）",\n  "topic": "具体知识点（如：一元一次方程/古诗词默写/欧姆定律等）",\n  "question": "完整的题目内容（包括题干和选项）",\n  "myAnswer": "学生的错误答案（若可见）",\n  "correctAnswer": "正确答案（若有红笔批改则提取）",\n  "errorType": "错误类型（概念错误/计算错误/粗心大意/方法错误/未掌握知识点之一）"\n}\n如某项无法识别填空字符串。题目内容要尽量完整准确。` }
             ]
           }],
@@ -295,8 +298,13 @@ Grade this writing and respond in Chinese with this exact format:
     max_tokens = 600
 
   } else if (type === 'essay_ocr') {
-    const { imageBase64, mediaType = 'image/jpeg' } = payload
+    const { imageBase64, mediaType: rawMediaType = 'image/jpeg' } = payload
     if (!imageBase64) return json({ error: 'imageBase64 required' }, 400)
+    // Strip any data URL prefix that may have slipped through, remove whitespace
+    const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1].replace(/\s/g, '') : imageBase64.replace(/\s/g, '')
+    // Normalize media type to Anthropic-supported values
+    const supported = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const mediaType = supported.includes(rawMediaType) ? rawMediaType : 'image/jpeg'
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -307,7 +315,7 @@ Grade this writing and respond in Chinese with this exact format:
           messages: [{
             role: 'user',
             content: [
-              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: cleanBase64 } },
               { type: 'text', text: '请仔细识别这张作文/写作照片中的文字内容，完整准确地转录出来。只输出识别到的作文正文，不要加任何说明或标题。保留原文的段落结构。' }
             ]
           }],
