@@ -1,12 +1,42 @@
-// Browse 生字表 by grade/semester, see 一类字 and 二类字
-import { useState } from 'react'
+// Browse 生字表 by grade/semester, see 一类字 and 二类字; 词语表 tab shows vocabulary words
+import { useState, useMemo } from 'react'
 import { CHARACTER_LISTS } from '../../data/characterLists'
+import characters from '../../data/characters'
 import { ttsSpeak } from '../../utils/tts'
+
+// Get pinyin for a multi-character word by joining each character's pinyin
+function getWordPinyin(word) {
+  return [...word].map(ch => characters[ch]?.pinyin || '').filter(Boolean).join(' ')
+}
+
+// Collect vocabulary words from a list of characters (type1 + type2 of a lesson)
+function getWordsForChars(charList, maxPerChar = 4) {
+  const seen = new Set()
+  const result = []
+  charList.forEach(char => {
+    const charData = characters[char]
+    if (!charData?.words) return
+    let count = 0
+    for (const word of charData.words) {
+      if (count >= maxPerChar) break
+      if (word.length >= 2 && word.length <= 4 && !seen.has(word)) {
+        // Require all characters in the word to have pinyin data
+        if ([...word].every(c => characters[c]?.pinyin)) {
+          seen.add(word)
+          result.push(word)
+          count++
+        }
+      }
+    }
+  })
+  return result
+}
 
 export default function CharacterList({ onBack }) {
   const [grade, setGrade] = useState(1)
   const [semester, setSemester] = useState('上')
   const [typeFilter, setTypeFilter] = useState('all') // 'all'|'type1'|'type2'
+  const [view, setView] = useState('chars') // 'chars'|'words'
 
   const data = CHARACTER_LISTS.find(d => d.grade === grade && d.semester === semester)
 
@@ -14,6 +44,18 @@ export default function CharacterList({ onBack }) {
     typeFilter === 'type1' ? data.type1 :
     typeFilter === 'type2' ? data.type2 :
     [...data.type1, ...data.type2]
+
+  // Build lesson vocabulary: for each lesson, derive words from its characters
+  const lessonWords = useMemo(() => {
+    if (!data?.lessons) return []
+    return data.lessons.map(lesson => {
+      const allChars = [...(lesson.type1 || []), ...(lesson.type2 || [])]
+      const words = getWordsForChars(allChars)
+      return { lesson: lesson.lesson, title: lesson.title, words }
+    }).filter(l => l.words.length > 0)
+  }, [data])
+
+  const totalWords = lessonWords.reduce((sum, l) => sum + l.words.length, 0)
 
   return (
     <div style={{ padding: '0 16px 80px' }}>
@@ -37,37 +79,89 @@ export default function CharacterList({ onBack }) {
           </button>
         ))}
       </div>
-      {/* type filter */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        {[['all','全部字'],['type1','一类字（必写）'],['type2','二类字（认读）']].map(([v,l]) => (
-          <button key={v} onClick={() => setTypeFilter(v)}
-            style={{ padding: '5px 14px', borderRadius: 16, border: `2px solid ${typeFilter===v?'#e85d4a':'#e2e8f0'}`,
-              fontWeight: 600, fontSize: 12, cursor: 'pointer', background: typeFilter===v?'#fff5f5':'#fff', color: typeFilter===v?'#e85d4a':'#64748b' }}>
+      {/* view tabs: 生字 / 词语表 */}
+      <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '2px solid #e2e8f0' }}>
+        {[['chars','生字本'],['words','词语表']].map(([v,l]) => (
+          <button key={v} onClick={() => setView(v)}
+            style={{ padding: '8px 20px', border: 'none', background: 'none', fontWeight: 700, fontSize: 14,
+              cursor: 'pointer', color: view === v ? '#e85d4a' : '#94a3b8',
+              borderBottom: `3px solid ${view === v ? '#e85d4a' : 'transparent'}`,
+              marginBottom: -2 }}>
             {l}
           </button>
         ))}
       </div>
-      {/* stats */}
-      {data && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
-        一类字 {data.type1.length} 个 · 二类字 {data.type2.length} 个
-      </div>}
-      {/* char grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
-        {chars.map((char, i) => {
-          const isType1 = data?.type1.includes(char)
-          return (
-            <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
-              style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
-                background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
-                cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              {char}
-              <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
-                {isType1?'写':'认'}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+
+      {view === 'chars' && (
+        <>
+          {/* type filter */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            {[['all','全部字'],['type1','一类字（必写）'],['type2','二类字（认读）']].map(([v,l]) => (
+              <button key={v} onClick={() => setTypeFilter(v)}
+                style={{ padding: '5px 14px', borderRadius: 16, border: `2px solid ${typeFilter===v?'#e85d4a':'#e2e8f0'}`,
+                  fontWeight: 600, fontSize: 12, cursor: 'pointer', background: typeFilter===v?'#fff5f5':'#fff', color: typeFilter===v?'#e85d4a':'#64748b' }}>
+                {l}
+              </button>
+            ))}
+          </div>
+          {/* stats */}
+          {data && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+            一类字 {data.type1.length} 个 · 二类字 {data.type2.length} 个
+          </div>}
+          {/* char grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
+            {chars.map((char, i) => {
+              const isType1 = data?.type1.includes(char)
+              return (
+                <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
+                  style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
+                    background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  {char}
+                  <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
+                    {isType1?'写':'认'}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+
+      {view === 'words' && (
+        <>
+          {data && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>
+            共 {totalWords} 个词语
+          </div>}
+          {lessonWords.length === 0 && (
+            <div style={{ color: '#94a3b8', textAlign: 'center', marginTop: 40, fontSize: 15 }}>
+              暂无词语数据
+            </div>
+          )}
+          {lessonWords.map(({ lesson, title, words }) => (
+            <div key={lesson} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8,
+                borderLeft: '3px solid #e85d4a', paddingLeft: 8 }}>
+                第{lesson}课 · {title}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 8 }}>
+                {words.map((word, i) => {
+                  const pinyin = getWordPinyin(word)
+                  return (
+                    <button key={i} onClick={() => ttsSpeak(word, { voice: 'shimmer' }).catch(()=>{})}
+                      style={{ padding: '10px 6px', borderRadius: 10, border: '2px solid #fde68a',
+                        background: '#fffbeb', cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                      <span style={{ fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{word}</span>
+                      <span style={{ fontSize: 9, color: '#92400e', lineHeight: 1.2, textAlign: 'center' }}>{pinyin}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }
