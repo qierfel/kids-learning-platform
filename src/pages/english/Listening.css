@@ -193,53 +193,94 @@
 /* Book grid */
 .gl-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
 }
 
 .gl-book-card {
   background: #fff;
   border: 2px solid #e2e8f0;
   border-radius: 10px;
-  padding: 10px 8px;
+  padding: 6px 6px 8px;
   cursor: pointer;
   position: relative;
   transition: all 0.15s;
   user-select: none;
 }
-.gl-book-card:hover { border-color: var(--lc); }
+.gl-book-card:hover {
+  border-color: var(--lc);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
 .gl-book-card.selected {
-  background: color-mix(in srgb, var(--lc) 10%, #fff);
-  border-color: color-mix(in srgb, var(--lc) 50%, #fff);
+  background: color-mix(in srgb, var(--lc) 8%, #fff);
+  border-color: var(--lc);
 }
 .gl-book-card.now-playing {
-  background: color-mix(in srgb, var(--lc) 18%, #fff);
+  background: color-mix(in srgb, var(--lc) 14%, #fff);
   border-color: var(--lc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lc) 25%, transparent);
+}
+
+/* Cover wrapper */
+.gl-book-cover {
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+
+/* Playing overlay on cover */
+.gl-cover-playing {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gl-cover-note {
+  font-size: 26px;
+  color: #fff;
+  animation: coverBounce 0.6s ease-in-out infinite alternate;
+}
+@keyframes coverBounce {
+  from { transform: scale(0.9); opacity: .7; }
+  to   { transform: scale(1.1); opacity: 1; }
+}
+
+/* Spinner for PDF loading */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .gl-check {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 18px;
-  height: 18px;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--lc);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   color: #fff;
   font-weight: 700;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
 }
 .gl-book-num {
   font-size: 10px;
   font-weight: 700;
   color: var(--lc);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 .gl-book-title {
-  font-size: 12px;
+  font-size: 11px;
   color: #1e293b;
   line-height: 1.35;
   font-weight: 500;

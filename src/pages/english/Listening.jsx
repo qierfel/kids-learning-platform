@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { HEINEMANN } from '../../data/heinemann'
 import { OXFORD } from '../../data/oxford'
 import razLevels from '../../data/razLevels'
+import PdfCover, { PlaceholderCover } from '../../components/PdfCover'
 import './Listening.css'
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -314,7 +315,20 @@ function GradedListening() {
               className={`gl-book-card ${isSel ? 'selected' : ''} ${isNow ? 'now-playing' : ''}`}
               style={{ '--lc': lc }}>
               {isSel && <div className="gl-check">{isNow ? '♪' : '✓'}</div>}
-              {book.num && <div className="gl-book-num">#{book.num}{book.level ? ` · ${book.level}` : ''}{book.tag ? ` · ${book.tag}` : ''}</div>}
+              {/* 封面 */}
+              <div className="gl-book-cover">
+                {book.pdf
+                  ? <PdfCover pdfUrl={book.pdf} color={lc} title={book.title} />
+                  : <PlaceholderCover color={lc} title={book.title} />
+                }
+                {isNow && (
+                  <div className="gl-cover-playing">
+                    <span className="gl-cover-note">♪</span>
+                  </div>
+                )}
+              </div>
+              {/* 文字 */}
+              {book.num && <div className="gl-book-num">#{book.num}{book.tag ? ` · ${book.tag}` : ''}</div>}
               <div className="gl-book-title">{book.title}</div>
             </div>
           )
