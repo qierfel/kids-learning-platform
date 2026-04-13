@@ -19,18 +19,18 @@ const CARDS = [
     icon: '🎧',
     label: '听力练习',
     desc: 'TTS朗读 · 分级故事',
-    gradient: 'linear-gradient(135deg, #ddf4ff 0%, #bae8fb 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f4ff 100%)',
     color: '#0891b2',
     ready: true,
   },
   {
     id: 'history',
-    category: '历史',
+    category: '历史文化',
     icon: '🌍',
     label: '人类大历史',
     desc: '中英双语 · 98讲 · TTS朗读',
-    gradient: 'linear-gradient(135deg, #d9f5f0 0%, #a7f3e4 100%)',
-    color: '#0d9488',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #f5ede0 100%)',
+    color: '#b45309',
     ready: true,
   },
   {
@@ -39,7 +39,7 @@ const CARDS = [
     icon: '🔤',
     label: '自然拼读',
     desc: '尼尔森体系 · 148集视频',
-    gradient: 'linear-gradient(135deg, #fffbeb 0%, #fde68a 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #fef9d7 100%)',
     color: '#d97706',
     ready: true,
   },
@@ -49,7 +49,7 @@ const CARDS = [
     icon: '🗣️',
     label: '口语对话',
     desc: 'AI外教 Emma · 实时纠错',
-    gradient: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e0 100%)',
     color: '#ea580c',
     ready: true,
   },
@@ -57,9 +57,9 @@ const CARDS = [
     id: 'reading_hub',
     category: '阅读',
     icon: '📖',
-    label: '阅读',
+    label: '阅读中心',
     desc: '分级 · 绘本 · 章节书 · 考试阅读',
-    gradient: 'linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0f9ec 100%)',
     color: '#059669',
     ready: true,
   },
@@ -69,7 +69,7 @@ const CARDS = [
     icon: '✏️',
     label: '写作练习',
     desc: 'AI批改 · 自动录入错题本',
-    gradient: 'linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #f3e8ff 100%)',
     color: '#7c3aed',
     ready: true,
   },
@@ -79,7 +79,7 @@ const CARDS = [
     icon: '📐',
     label: '语法讲解',
     desc: '14章65个知识点 · AI练习题',
-    gradient: 'linear-gradient(135deg, #eff6ff 0%, #bfdbfe 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)',
     color: '#2563eb',
     ready: true,
   },
@@ -89,8 +89,8 @@ const CARDS = [
     icon: '📅',
     label: '词汇记忆',
     desc: '记忆曲线 · 每日任务 · KET/PET/FCE',
-    gradient: 'linear-gradient(135deg, #fff1f2 0%, #fecdd3 100%)',
-    color: '#e11d48',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #dff0ff 100%)',
+    color: '#3b82f6',
     ready: true,
   },
   {
@@ -99,8 +99,8 @@ const CARDS = [
     icon: '🃏',
     label: '单词速练',
     desc: '沪教版 · KET · PET · FCE 闪卡',
-    gradient: 'linear-gradient(135deg, #fefce8 0%, #fde047 20%, #fef9c3 100%)',
-    color: '#ca8a04',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #e0eeff 100%)',
+    color: '#4f46e5',
     ready: true,
   },
   {
@@ -109,18 +109,18 @@ const CARDS = [
     icon: '📚',
     label: '教材词汇',
     desc: '译林版3-6年级 · 单词句型 · 听写练习',
-    gradient: 'linear-gradient(135deg, #fff8f1 0%, #ffdfb5 100%)',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #fff1e8 100%)',
     color: '#c2410c',
     ready: true,
   },
   {
     id: 'dictionary',
-    category: '字典',
+    category: '查词',
     icon: '🔎',
     label: '查词 · 生词本',
-    desc: '即查即存 · 闪卡复习',
-    gradient: 'linear-gradient(135deg, #eef2ff 0%, #c7d2fe 100%)',
-    color: '#4f46e5',
+    desc: '即查即存 · 闪音 · 例句 · 闪卡复习',
+    gradient: 'linear-gradient(145deg, #ffffff 0%, #d9feff 100%)',
+    color: '#0891b2',
     ready: true,
   },
 ]
@@ -151,9 +151,9 @@ export default function English({ user }) {
   return (
     <div className="en-page">
       <div className="en-hero">
-        <div className="en-hero-icon">📚</div>
+        <div className="en-hero-icon">🌟</div>
         <h1 className="en-hero-title">趣味英语</h1>
-        <p className="en-hero-sub">听说读写 · 词汇 · 字典 · 全方位英语学习</p>
+        <p className="en-hero-sub">听说读写 · 词汇 · 查词 · 全方位英语学习</p>
       </div>
 
       <div className="en-card-grid">
@@ -164,11 +164,11 @@ export default function English({ user }) {
             style={{ '--card-gradient': card.gradient, '--card-color': card.color }}
             onClick={() => card.ready && setActiveTool(card.id)}
           >
-            <div className="en-card-top">
-              <span className="en-card-badge">{card.category}</span>
-              <div className="en-card-icon">{card.icon}</div>
+            <div className="en-card-icon-wrap">
+              <span className="en-card-icon">{card.icon}</span>
             </div>
             <div className="en-card-bottom">
+              <span className="en-card-badge">{card.category}</span>
               <div className="en-card-label">{card.label}</div>
               <div className="en-card-desc">{card.desc}</div>
             </div>
