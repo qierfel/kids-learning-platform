@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { HEINEMANN } from '../../data/heinemann'
+import { OXFORD } from '../../data/oxford'
+import razLevels from '../../data/razLevels'
 import './Listening.css'
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -154,8 +156,15 @@ function TextCard({ item, badge, playingId, charIndex, onPlay }) {
 
 // ─── Graded Listening (multi-select playlist) ─────────────────────────────────
 
-const LEVEL_COLORS = { gk: '#f59e0b', g1: '#10b981', g2: '#6366f1' }
-const LEVEL_LABELS = { gk: 'GK', g1: 'G1', g2: 'G2' }
+// 三个系列的配置
+const SERIES_LIST = [
+  { id: 'heinemann', label: '海尼曼', color: '#f59e0b',
+    levels: HEINEMANN.levels.map(l => ({ ...l, color: { gk:'#f59e0b', g1:'#10b981', g2:'#6366f1' }[l.id] })) },
+  { id: 'oxford',    label: '牛津树', color: '#3b82f6',
+    levels: OXFORD.levels },
+  { id: 'raz',       label: 'RAZ',    color: '#8b5cf6',
+    levels: razLevels.map(l => ({ id: l.level, label: l.level.toUpperCase(), desc: `${l.count}本`, color: '#8b5cf6', books: l.books })) },
+]
 
 function fmt(s) {
   if (!s || isNaN(s)) return '0:00'
@@ -165,8 +174,9 @@ function fmt(s) {
 }
 
 function GradedListening() {
+  const [seriesId, setSeriesId]   = useState('heinemann')
   const [levelId, setLevelId]     = useState('gk')
-  const [selected, setSelected]   = useState(new Set())   // "gk-1", "g1-5" …
+  const [selected, setSelected]   = useState(new Set())  // "seriesId|levelId|bookKey"
   const [search, setSearch]       = useState('')
   const [playlist, setPlaylist]   = useState([])
   const [playIdx, setPlayIdx]     = useState(0)
@@ -176,32 +186,33 @@ function GradedListening() {
   const [duration, setDuration]   = useState(0)
   const audioRef = useRef(null)
 
-  const currentLevel = HEINEMANN.levels.find(l => l.id === levelId)
+  const currentSeries = SERIES_LIST.find(s => s.id === seriesId)
+  const currentLevel  = currentSeries?.levels.find(l => l.id === levelId) || currentSeries?.levels[0]
   const books = currentLevel?.books || []
+  const lc = currentLevel?.color || currentSeries?.color || '#6366f1'
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return q ? books.filter(b => b.title.toLowerCase().includes(q) || String(b.num).includes(q)) : books
+    return q ? books.filter(b => (b.title||'').toLowerCase().includes(q) || String(b.num||'').includes(q)) : books
   }, [books, search])
 
-  // Load + play when playIdx changes
+  function bookKey(b) { return `${seriesId}|${levelId}|${b.num ?? b.title}` }
+
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !playing || playlist.length === 0) return
-    const book = playlist[playIdx]
-    if (!book) return
-    audio.src = book.audio
+    audio.src = playlist[playIdx]?.audio || ''
     audio.play().catch(() => {})
   }, [playIdx, playing]) // eslint-disable-line
 
-  // Audio events
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const onTime   = () => setProgress(audio.currentTime)
-    const onDur    = () => setDuration(audio.duration || 0)
-    const onPlay   = () => setIsPaused(false)
-    const onPause  = () => setIsPaused(true)
-    const onEnded  = () => {
+    const onTime  = () => setProgress(audio.currentTime)
+    const onDur   = () => setDuration(audio.duration || 0)
+    const onPlay  = () => setIsPaused(false)
+    const onPause = () => setIsPaused(true)
+    const onEnded = () => {
       if (playIdx < playlist.length - 1) setPlayIdx(i => i + 1)
       else { setPlaying(false); setProgress(0) }
     }
@@ -219,110 +230,91 @@ function GradedListening() {
     }
   }, [playIdx, playlist])
 
-  function toggleBook(book) {
-    const key = `${levelId}-${book.num}`
-    setSelected(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n })
+  function switchSeries(sid) {
+    const s = SERIES_LIST.find(x => x.id === sid)
+    setSeriesId(sid)
+    setLevelId(s?.levels[0]?.id || '')
+    setSearch('')
   }
 
-  function selectAll()  { setSelected(new Set(filtered.map(b => `${levelId}-${b.num}`))) }
-  function clearSel()   { setSelected(new Set()) }
+  function toggleBook(book) {
+    const k = bookKey(book)
+    setSelected(prev => { const n = new Set(prev); n.has(k) ? n.delete(k) : n.add(k); return n })
+  }
+
+  function selectAll() { setSelected(prev => { const n = new Set(prev); filtered.forEach(b => n.add(bookKey(b))); return n }) }
+  function clearSel()  { setSelected(new Set()) }
 
   function startPlay() {
-    const levelOrder = ['gk', 'g1', 'g2']
     const pl = []
-    HEINEMANN.levels.forEach(lv => {
-      lv.books.forEach(b => {
-        if (selected.has(`${lv.id}-${b.num}`)) pl.push({ ...b, levelId: lv.id })
+    SERIES_LIST.forEach(s => {
+      s.levels.forEach(lv => {
+        lv.books.forEach(b => {
+          const k = `${s.id}|${lv.id}|${b.num ?? b.title}`
+          if (selected.has(k)) pl.push({ ...b, _series: s.label, _level: lv.label })
+        })
       })
     })
-    pl.sort((a, b) => levelOrder.indexOf(a.levelId) - levelOrder.indexOf(b.levelId) || a.num - b.num)
     if (!pl.length) return
-    setPlaylist(pl)
-    setPlayIdx(0)
-    setProgress(0)
-    setPlaying(true)
+    setPlaylist(pl); setPlayIdx(0); setProgress(0); setPlaying(true)
   }
 
-  function stopPlay() {
-    audioRef.current?.pause()
-    setPlaying(false)
-    setProgress(0)
-  }
+  function stopPlay()    { audioRef.current?.pause(); setPlaying(false); setProgress(0) }
+  function togglePause() { const a = audioRef.current; if (!a) return; a.paused ? a.play().catch(()=>{}) : a.pause() }
+  function seekTo(e)     { const a = audioRef.current; if (!a || !duration) return; const r = e.currentTarget.getBoundingClientRect(); a.currentTime = ((e.clientX - r.left) / r.width) * duration }
+  function jumpTo(idx)   { if (idx >= 0 && idx < playlist.length) { setPlayIdx(idx); setProgress(0) } }
 
-  function togglePause() {
-    const audio = audioRef.current
-    if (!audio) return
-    if (audio.paused) audio.play().catch(() => {})
-    else audio.pause()
-  }
-
-  function seekTo(e) {
-    const audio = audioRef.current
-    if (!audio || !duration) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * duration
-  }
-
-  function jumpTo(idx) {
-    if (idx < 0 || idx >= playlist.length) return
-    setPlayIdx(idx)
-    setProgress(0)
-  }
-
-  const currentBook = playlist[playIdx]
-  const color = LEVEL_COLORS[levelId]
+  const cur = playlist[playIdx]
   const pct = duration > 0 ? (progress / duration) * 100 : 0
 
   return (
     <div style={{ paddingBottom: playing || selected.size > 0 ? 88 : 0 }}>
-      {/* Level tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-        {HEINEMANN.levels.map(lv => (
-          <button key={lv.id} onClick={() => { setLevelId(lv.id); setSearch('') }}
-            className="gl-level-tab"
-            style={{
-              background: levelId === lv.id ? LEVEL_COLORS[lv.id] : '#f1f5f9',
-              color: levelId === lv.id ? '#fff' : '#64748b',
-            }}>
-            {lv.label}
-            <span className="gl-level-count">{lv.books.length}本</span>
+
+      {/* 系列选择 */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        {SERIES_LIST.map(s => (
+          <button key={s.id} onClick={() => switchSeries(s.id)}
+            style={{ padding: '7px 16px', borderRadius: 20, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', transition: 'all .15s',
+              background: seriesId === s.id ? s.color : '#f1f5f9',
+              color: seriesId === s.id ? '#fff' : '#64748b' }}>
+            {s.label}
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, color: '#94a3b8', alignSelf: 'center' }}>
-          已选 {selected.size} 本
-        </span>
+        <span style={{ fontSize: 12, color: '#94a3b8', alignSelf: 'center' }}>已选 {selected.size} 本</span>
       </div>
 
-      {/* Search + actions */}
+      {/* 级别 tabs */}
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+        {currentSeries?.levels.map(lv => (
+          <button key={lv.id} onClick={() => { setLevelId(lv.id); setSearch('') }}
+            className="gl-level-tab"
+            style={{ background: levelId === lv.id ? (lv.color || lc) : '#f1f5f9', color: levelId === lv.id ? '#fff' : '#64748b' }}>
+            {lv.label}
+            <span className="gl-level-count">{lv.books.length}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* 搜索 + 操作 */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="搜书名或编号…"
-          className="gl-search"
-        />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="搜书名…" className="gl-search" />
         <button onClick={selectAll} className="gl-action-btn">全选</button>
         {selected.size > 0 && <button onClick={clearSel} className="gl-action-btn gl-action-clear">清除</button>}
       </div>
 
-      {/* Book grid */}
+      {/* 书目网格 */}
       <div className="gl-grid">
         {filtered.map(book => {
-          const key = `${levelId}-${book.num}`
-          const isSel = selected.has(key)
-          const isNowPlaying = playing && currentBook?.levelId === levelId && currentBook?.num === book.num
+          const k = bookKey(book)
+          const isSel = selected.has(k)
+          const isNow = playing && cur?.audio === book.audio
           return (
-            <div key={key} onClick={() => toggleBook(book)}
-              className={`gl-book-card ${isSel ? 'selected' : ''} ${isNowPlaying ? 'now-playing' : ''}`}
-              style={{ '--lc': color }}>
-              {isSel && (
-                <div className="gl-check">
-                  {isNowPlaying ? '♪' : '✓'}
-                </div>
-              )}
-              <div className="gl-book-num">
-                Book {book.num}{book.level ? ` · ${book.level}` : ''}
-              </div>
+            <div key={k} onClick={() => toggleBook(book)}
+              className={`gl-book-card ${isSel ? 'selected' : ''} ${isNow ? 'now-playing' : ''}`}
+              style={{ '--lc': lc }}>
+              {isSel && <div className="gl-check">{isNow ? '♪' : '✓'}</div>}
+              {book.num && <div className="gl-book-num">#{book.num}{book.level ? ` · ${book.level}` : ''}{book.tag ? ` · ${book.tag}` : ''}</div>}
               <div className="gl-book-title">{book.title}</div>
             </div>
           )
@@ -331,21 +323,16 @@ function GradedListening() {
 
       <audio ref={audioRef} />
 
-      {/* Sticky bottom: player or start bar */}
       {playing ? (
         <div className="gl-player">
           <div className="gl-player-row">
             <button onClick={() => jumpTo(playIdx - 1)} disabled={playIdx === 0} className="gl-ctrl-btn">⏮</button>
-            <button onClick={togglePause} className="gl-play-btn">
-              {isPaused ? '▶' : '⏸'}
-            </button>
+            <button onClick={togglePause} className="gl-play-btn">{isPaused ? '▶' : '⏸'}</button>
             <button onClick={() => jumpTo(playIdx + 1)} disabled={playIdx >= playlist.length - 1} className="gl-ctrl-btn">⏭</button>
             <div className="gl-player-info">
-              <div className="gl-player-title">{currentBook?.title}</div>
+              <div className="gl-player-title">{cur?.title}</div>
               <div className="gl-player-sub">
-                <span className="gl-player-badge" style={{ background: LEVEL_COLORS[currentBook?.levelId] }}>
-                  {LEVEL_LABELS[currentBook?.levelId]} {currentBook?.level ? `Lv.${currentBook.level}` : ''}
-                </span>
+                <span className="gl-player-badge" style={{ background: lc }}>{cur?._series} {cur?._level}</span>
                 第 {playIdx + 1} / {playlist.length} 首 · {fmt(progress)} / {fmt(duration)}
               </div>
             </div>
