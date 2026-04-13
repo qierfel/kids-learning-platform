@@ -13,19 +13,23 @@ export async function onRequest({ request, params, env }) {
   const filePath = (params.path || []).join('/')
   const targetUrl = `${base.replace(/\/$/, '')}/${filePath}`
 
-  // 透传 Range、Accept 等请求头（支持音视频 seek）
+  // 视频文件直接重定向到媒体服务器，绕过 Worker 代理
+  // （CF Workers 不适合代理大文件，视频 seek 会失效）
+  const ext = filePath.split('.').pop().toLowerCase()
+  if (ext === 'mp4' || ext === 'webm' || ext === 'mov') {
+    return Response.redirect(targetUrl, 302)
+  }
+
+  // 音频/PDF 走代理透传
   const headers = new Headers()
-  const passHeaders = ['range', 'accept', 'accept-encoding', 'if-range']
-  for (const h of passHeaders) {
+  for (const h of ['range', 'accept', 'accept-encoding', 'if-range']) {
     if (request.headers.has(h)) headers.set(h, request.headers.get(h))
   }
 
   try {
     const upstream = await fetch(targetUrl, { headers, method: 'GET' })
-    // 透传响应头
     const resHeaders = new Headers()
-    const copyHeaders = ['content-type', 'content-length', 'content-range', 'accept-ranges', 'last-modified']
-    for (const h of copyHeaders) {
+    for (const h of ['content-type', 'content-length', 'content-range', 'accept-ranges', 'last-modified']) {
       if (upstream.headers.has(h)) resHeaders.set(h, upstream.headers.get(h))
     }
     resHeaders.set('cache-control', 'public, max-age=86400')
