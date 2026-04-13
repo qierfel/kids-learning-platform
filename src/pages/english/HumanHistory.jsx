@@ -42,19 +42,47 @@ function ReadAlong({ text, charIndex, playing }) {
   )
 }
 
+// ── OpenAI TTS helpers ─────────────────────────────────────
+const ttsCache = new Map()
+
+async function fetchTTSAudio(text) {
+  const cached = ttsCache.get(text)
+  if (cached) return cached
+  const url = `/api/tts?voice=nova&text=${encodeURIComponent(text)}`
+  const resp = await fetch(url)
+  if (!resp.ok) throw new Error(`TTS ${resp.status}`)
+  const blob = await resp.blob()
+  const objUrl = URL.createObjectURL(blob)
+  ttsCache.set(text, objUrl)
+  return objUrl
+}
+
+function buildWordTimings(text, duration) {
+  const words = []
+  const re = /\S+/g
+  let m
+  while ((m = re.exec(text)) !== null)
+    words.push({ charStart: m.index, estTime: (m.index / text.length) * duration })
+  return words
+}
+
 // ── Main Component ──────────────────────────────────────────
 export default function HumanHistory({ onBack }) {
-  const [index, setIndex] = useState(null)          // [{id, vol, lecture, titleEn, titleZh}]
+  const [index, setIndex] = useState(null)
   const [activeVol, setActiveVol] = useState(1)
-  const [volData, setVolData] = useState({})         // vol -> lectures[]
+  const [volData, setVolData] = useState({})
   const [loadingVol, setLoadingVol] = useState(false)
   const [selectedLecture, setSelectedLecture] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   // TTS 状态
   const [playingPara, setPlayingPara] = useState(null)
-  const [charIndex, setCharIndex] = useState(-1)
-  const utterRef = useRef(null)
+  const [charIndex, setCharIndex]     = useState(-1)
+  const [loadingPara, setLoadingPara] = useState(null)
+  const audioRef    = useRef(null)
+  const wordTimings = useRef([])
+  const rafRef      = useRef(null)
+  const queueRef    = useRef([])   // for playAll paragraph queue
 
   // 加载目录
   useEffect(() => {
@@ -64,7 +92,6 @@ export default function HumanHistory({ onBack }) {
       .catch(() => setIndex([]))
   }, [])
 
-  // 加载辑数据
   async function loadVol(vol) {
     if (volData[vol]) return
     setLoadingVol(true)
@@ -81,51 +108,93 @@ export default function HumanHistory({ onBack }) {
   function openLecture(lec) {
     stopTTS()
     setSelectedLecture(lec)
-    setPlayingPara(null)
-    setCharIndex(-1)
   }
 
   // ── TTS ──
   function stopTTS() {
-    window.speechSynthesis.cancel()
+    cancelAnimationFrame(rafRef.current)
+    queueRef.current = []
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = '' }
     setPlayingPara(null)
     setCharIndex(-1)
-    utterRef.current = null
+    setLoadingPara(null)
   }
 
-  function playPara(paraIdx, text) {
+  function startHighlight(audio, text) {
+    cancelAnimationFrame(rafRef.current)
+    const tick = () => {
+      const t = audio.currentTime
+      const ws = wordTimings.current
+      let ci = -1
+      for (let i = ws.length - 1; i >= 0; i--) {
+        if (ws[i].estTime <= t) { ci = ws[i].charStart; break }
+      }
+      setCharIndex(ci)
+      if (!audio.paused && !audio.ended) rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  async function playPara(paraIdx, text) {
     stopTTS()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'en-US'
-    u.rate = 0.85
-    u.onboundary = e => { if (e.name === 'word') setCharIndex(e.charIndex) }
-    u.onend = () => { setPlayingPara(null); setCharIndex(-1) }
-    u.onerror = () => { setPlayingPara(null); setCharIndex(-1) }
-    utterRef.current = u
-    setPlayingPara(paraIdx)
-    setCharIndex(0)
-    window.speechSynthesis.speak(u)
+    setLoadingPara(paraIdx)
+    let audioUrl
+    try { audioUrl = await fetchTTSAudio(text) }
+    catch { setLoadingPara(null); return }
+
+    const audio = audioRef.current
+    if (!audio) return
+    audio.src = audioUrl
+    audio.onloadedmetadata = () => {
+      wordTimings.current = buildWordTimings(text, audio.duration)
+      setLoadingPara(null)
+      setPlayingPara(paraIdx)
+      setCharIndex(0)
+      audio.play().catch(() => {})
+      startHighlight(audio, text)
+    }
+    audio.onended = () => { setPlayingPara(null); setCharIndex(-1); cancelAnimationFrame(rafRef.current) }
+    audio.onerror = () => { setPlayingPara(null); setCharIndex(-1); setLoadingPara(null) }
+    audio.load()
   }
 
   function togglePara(paraIdx, text) {
-    if (playingPara === paraIdx) {
-      stopTTS()
-    } else {
-      playPara(paraIdx, text)
-    }
+    if (playingPara === paraIdx) stopTTS()
+    else playPara(paraIdx, text)
   }
 
-  function playAll() {
+  async function playAll() {
     if (!selectedLecture) return
     stopTTS()
-    const allText = selectedLecture.paragraphs.map(p => p.en).join(' ')
-    const u = new SpeechSynthesisUtterance(allText)
-    u.lang = 'en-US'
-    u.rate = 0.85
-    u.onend = () => { setPlayingPara(null); setCharIndex(-1) }
-    utterRef.current = u
-    setPlayingPara('all')
-    window.speechSynthesis.speak(u)
+    const paras = selectedLecture.paragraphs.map((p, i) => ({ idx: i, text: p.en }))
+    queueRef.current = paras
+
+    async function playNext() {
+      const queue = queueRef.current
+      if (!queue.length) { setPlayingPara(null); setCharIndex(-1); return }
+      const { idx, text } = queue.shift()
+      setLoadingPara('all')
+      let audioUrl
+      try { audioUrl = await fetchTTSAudio(text) }
+      catch { setLoadingPara(null); setPlayingPara(null); return }
+
+      const audio = audioRef.current
+      if (!audio || !queueRef.current) return  // stopped
+      audio.src = audioUrl
+      audio.onloadedmetadata = () => {
+        wordTimings.current = buildWordTimings(text, audio.duration)
+        setLoadingPara(null)
+        setPlayingPara(idx)
+        setCharIndex(0)
+        audio.play().catch(() => {})
+        startHighlight(audio, text)
+      }
+      audio.onended = () => playNext()
+      audio.onerror = () => { setPlayingPara(null); setCharIndex(-1) }
+      audio.load()
+    }
+
+    playNext()
   }
 
   // ── 搜索过滤 ──
@@ -139,8 +208,12 @@ export default function HumanHistory({ onBack }) {
 
   // ── 讲座详情页 ──
   if (selectedLecture) {
+    const isPlayingAll = typeof playingPara === 'number' && queueRef.current !== null && loadingPara === 'all'
+      || (typeof playingPara === 'number' && queueRef.current?.length >= 0 && playingPara !== null && loadingPara !== playingPara)
+
     return (
       <div className="wh-page">
+        <audio ref={audioRef} style={{ display: 'none' }} />
         <div className="wh-detail-header">
           <button className="wh-back" onClick={() => { stopTTS(); setSelectedLecture(null) }}>← 返回目录</button>
           <div className="wh-detail-title-row">
@@ -149,10 +222,11 @@ export default function HumanHistory({ onBack }) {
           </div>
           <div className="wh-detail-actions">
             <button
-              className={`wh-play-all-btn ${playingPara === 'all' ? 'playing' : ''}`}
-              onClick={playingPara === 'all' ? stopTTS : playAll}
+              className={`wh-play-all-btn ${playingPara !== null ? 'playing' : ''}`}
+              onClick={playingPara !== null ? stopTTS : playAll}
+              disabled={loadingPara === 'all'}
             >
-              {playingPara === 'all' ? '⏹ 停止' : '▶ 全文朗读'}
+              {loadingPara === 'all' ? '⏳ 生成…' : playingPara !== null ? '⏹ 停止' : '▶ 全文朗读'}
             </button>
           </div>
         </div>
@@ -165,8 +239,9 @@ export default function HumanHistory({ onBack }) {
                   className="wh-para-play"
                   onClick={() => togglePara(i, para.en)}
                   title={playingPara === i ? '停止' : '朗读'}
+                  disabled={loadingPara === i}
                 >
-                  {playingPara === i ? '⏹' : '🔊'}
+                  {loadingPara === i ? '⏳' : playingPara === i ? '⏹' : '🔊'}
                 </button>
                 <ReadAlong
                   text={para.en}
