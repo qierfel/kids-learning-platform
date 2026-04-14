@@ -307,10 +307,10 @@ export default function Phonics({ onBack }) {
               ref={videoRef}
               key={`${playerPart.id}-${playerLesson.num}`}
               controls
-              autoPlay
+              playsInline
               onEnded={handleVideoEnded}
               style={{ width: '100%', height: '100%', background: '#000', objectFit: 'contain' }}
-              src={`${MEDIA_BASE}/${playerLesson.part}/${playerLesson.filename}`}
+              src={`/media/${encodeURIComponent('35 I陪娃-尼尔森自然拼读【完结】')}/${encodeURIComponent('初级')}/${encodeURIComponent(playerLesson.part)}/${encodeURIComponent(playerLesson.filename)}`}
             />
           </div>
 
