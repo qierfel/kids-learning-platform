@@ -13,83 +13,17 @@ import TextbookVocab from './english/TextbookVocab'
 import './English.css'
 
 const CARDS = [
-  {
-    id: 'listening',
-    image: '/icons/card_listening.png',
-    label: '听力练习',
-    desc: 'TTS朗读 · 分级故事',
-    ready: true,
-  },
-  {
-    id: 'history',
-    image: '/icons/card_history.png',
-    label: '人类大历史',
-    desc: '中英双语 · 98讲 · TTS朗读',
-    ready: true,
-  },
-  {
-    id: 'phonics',
-    image: '/icons/card_phonics.png',
-    label: '自然拼读',
-    desc: '尼尔森体系 · 148集视频',
-    ready: true,
-  },
-  {
-    id: 'speaking',
-    image: '/icons/card_speaking.png',
-    label: '口语对话',
-    desc: 'AI外教 Emma · 实时纠错',
-    ready: true,
-  },
-  {
-    id: 'reading_hub',
-    image: '/icons/card_reading.png',
-    label: '阅读中心',
-    desc: '分级 · 绘本 · 章节书 · 考试阅读',
-    ready: true,
-  },
-  {
-    id: 'writing',
-    image: '/icons/card_writing.png',
-    label: '写作练习',
-    desc: 'AI批改 · 自动录入错题本',
-    ready: true,
-  },
-  {
-    id: 'grammar',
-    image: '/icons/card_grammar.png',
-    label: '语法讲解',
-    desc: '14章65个知识点 · AI练习题',
-    ready: true,
-  },
-  {
-    id: 'srs',
-    image: '/icons/card_vocab.png',
-    label: '词汇记忆',
-    desc: '记忆曲线 · 每日任务 · KET/PET/FCE',
-    ready: true,
-  },
-  {
-    id: 'words',
-    image: '/icons/card_flashcard.png',
-    label: '单词速练',
-    desc: '沪教版 · KET · PET · FCE 闪卡',
-    ready: true,
-  },
-  {
-    id: 'textbook_vocab',
-    image: '/icons/card_textbook.png',
-    label: '教材词汇',
-    desc: '译林版3-6年级 · 单词句型 · 听写练习',
-    ready: true,
-  },
-  {
-    id: 'dictionary',
-    image: '/icons/card_lookup.png',
-    label: '查词 · 生词本',
-    desc: '即查即存 · 闪音 · 例句 · 闪卡复习',
-    ready: true,
-  },
+  { id: 'listening',      img: '/icons/card_listening.png',  label: '听力练习',      desc: 'TTS朗读 · 分级故事',                ready: true  },
+  { id: 'history',        img: '/icons/card_history.png',    label: '人类大历史',    desc: '中英双语 · 98讲 · TTS朗读',          ready: true  },
+  { id: 'phonics',        img: '/icons/card_phonics.png',    label: '自然拼读',      desc: '尼尔森体系 · 148集视频',              ready: true  },
+  { id: 'speaking',       img: '/icons/card_speaking.png',   label: '口语对话',      desc: 'AI外教 Emma · 实时纠错',             ready: true  },
+  { id: 'reading_hub',    img: '/icons/card_reading.png',    label: '阅读中心',      desc: '分级 · 绘本 · 章节书 · 考试阅读',    ready: true  },
+  { id: 'writing',        img: '/icons/card_writing.png',    label: '写作练习',      desc: 'AI批改 · 自动录入错题本',             ready: true  },
+  { id: 'grammar',        img: '/icons/card_grammar.png',    label: '语法讲解',      desc: '14章65个知识点 · AI练习题',           ready: true  },
+  { id: 'srs',            img: '/icons/card_vocab.png',      label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
+  { id: 'words',          img: '/icons/card_flashcard.png',  label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
+  { id: 'textbook_vocab', img: '/icons/card_textbook.png',   label: '教材词汇',      desc: '沪教版 · 单词句型 · 听写练习',        ready: true  },
+  { id: 'dictionary',     img: '/icons/card_lookup.png',     label: '查词 · 生词本', desc: '即查即存 · 闪音 · 例句 · 闪卡复习',  ready: true  },
 ]
 
 export default function English({ user }) {
@@ -103,16 +37,16 @@ export default function English({ user }) {
     alert('已记录到错题本 ✅')
   }
 
-  if (activeTool === 'srs')         return <SRSStudy user={user} onBack={() => setActiveTool(null)} />
-  if (activeTool === 'words')       return <WordQuiz onBack={() => setActiveTool(null)} />
-  if (activeTool === 'dictionary')  return <Dictionary onBack={() => setActiveTool(null)} />
-  if (activeTool === 'grammar')     return <Grammar user={user} onBack={() => setActiveTool(null)} />
-  if (activeTool === 'reading_hub') return <ReadingHub user={user} onBack={() => setActiveTool(null)} />
-  if (activeTool === 'history')     return <HumanHistory onBack={() => setActiveTool(null)} />
-  if (activeTool === 'phonics')     return <Phonics onBack={() => setActiveTool(null)} />
-  if (activeTool === 'listening')   return <Listening onBack={() => setActiveTool(null)} />
-  if (activeTool === 'speaking')    return <Speaking user={user} onBack={() => setActiveTool(null)} />
-  if (activeTool === 'writing')     return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
+  if (activeTool === 'srs')            return <SRSStudy user={user} onBack={() => setActiveTool(null)} />
+  if (activeTool === 'words')          return <WordQuiz onBack={() => setActiveTool(null)} />
+  if (activeTool === 'dictionary')     return <Dictionary onBack={() => setActiveTool(null)} />
+  if (activeTool === 'grammar')        return <Grammar user={user} onBack={() => setActiveTool(null)} />
+  if (activeTool === 'reading_hub')    return <ReadingHub user={user} onBack={() => setActiveTool(null)} />
+  if (activeTool === 'history')        return <HumanHistory onBack={() => setActiveTool(null)} />
+  if (activeTool === 'phonics')        return <Phonics onBack={() => setActiveTool(null)} />
+  if (activeTool === 'listening')      return <Listening onBack={() => setActiveTool(null)} />
+  if (activeTool === 'speaking')       return <Speaking user={user} onBack={() => setActiveTool(null)} />
+  if (activeTool === 'writing')        return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
   if (activeTool === 'textbook_vocab') return <TextbookVocab onBack={() => setActiveTool(null)} />
 
   return (
@@ -124,18 +58,14 @@ export default function English({ user }) {
 
       <div className="en-card-grid">
         {CARDS.map(card => (
-          <div
+          <button
             key={card.id}
             className={`en-card${card.ready ? '' : ' en-card--coming'}`}
             onClick={() => card.ready && setActiveTool(card.id)}
           >
-            <img src={card.image} alt={card.label} className="en-card-img" />
-            <div className="en-card-info">
-              <div className="en-card-label">{card.label}</div>
-              <div className="en-card-desc">{card.desc}</div>
-            </div>
+            <img src={card.img} alt={card.label} className="en-card-img" />
             {!card.ready && <span className="en-card-soon">即将上线</span>}
-          </div>
+          </button>
         ))}
       </div>
     </div>
