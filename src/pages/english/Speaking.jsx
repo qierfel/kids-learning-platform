@@ -11,47 +11,281 @@ const LEVELS = [
 
 const WELCOME_MESSAGE = `Hi there! I'm Emma, your English tutor! 🌟\nTell me anything in English — I'll help you practice!\nTopic ideas: your day, hobbies, school life...`
 
+const LEVEL_INSTRUCTIONS = {
+  KET: 'The student is a beginner. Use very simple vocabulary and short sentences. Speak slowly.',
+  PET: 'The student is at elementary level. Use common vocabulary at a moderate pace.',
+  FCE: 'The student is intermediate. Use varied vocabulary at a natural conversational pace.',
+}
+const BASE_INSTRUCTIONS = `You are Emma, a warm and encouraging English tutor for young learners.
+Keep responses concise — 1 to 3 sentences. Correct mistakes gently. Ask a follow-up question to keep the conversation going.`
+
 export default function Speaking({ user, onBack }) {
+  // ── Text chat state ──────────────────────────────────────────────────────
   const [messages, setMessages] = useState([])
   const [level, setLevel] = useState('KET')
   const [inputText, setInputText] = useState('')
   const [streamingText, setStreamingText] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
-  const [isVoiceCall, setIsVoiceCall] = useState(false)   // phone-call UI mode
-  const [isListening, setIsListening] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [interimText, setInterimText] = useState('')
   const [ttsEnabled, setTtsEnabled] = useState(true)
-  const [voiceError, setVoiceError] = useState('')
 
+  // ── Realtime voice state ─────────────────────────────────────────────────
+  const [isRealtimeMode, setIsRealtimeMode] = useState(false)
+  // idle | connecting | listening | thinking | speaking | error
+  const [rtStatus, setRtStatus] = useState('idle')
+  const [rtError, setRtError] = useState('')
+  const [rtMessages, setRtMessages] = useState([])
+  const [rtUserTranscript, setRtUserTranscript] = useState('')
+  const [rtAiTranscript, setRtAiTranscript] = useState('')
+  const [waveData, setWaveData] = useState(() => new Array(20).fill(2))
+
+  // ── Refs ─────────────────────────────────────────────────────────────────
   const bottomRef = useRef(null)
   const textareaRef = useRef(null)
-  const recognitionRef = useRef(null)
-
-  // Refs that stay current inside async/event callbacks
-  const voiceModeRef = useRef(false)
   const messagesRef = useRef([])
   const isStreamingRef = useRef(false)
-  const levelRef = useRef('KET')
   const ttsEnabledRef = useRef(true)
+  const levelRef = useRef('KET')
+
+  // Realtime refs
+  const pcRef = useRef(null)
+  const dcRef = useRef(null)
+  const audioElRef = useRef(null)
+  const micStreamRef = useRef(null)
+  const analyserRef = useRef(null)
+  const rafRef = useRef(null)
+  const rtAiTranscriptRef = useRef('')
 
   useEffect(() => { messagesRef.current = messages }, [messages])
   useEffect(() => { isStreamingRef.current = isStreaming }, [isStreaming])
-  useEffect(() => { levelRef.current = level }, [level])
   useEffect(() => { ttsEnabledRef.current = ttsEnabled }, [ttsEnabled])
+  useEffect(() => { levelRef.current = level }, [level])
+  useEffect(() => { rtAiTranscriptRef.current = rtAiTranscript }, [rtAiTranscript])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingText])
 
-  // ── Core send ─────────────────────────────────────────────────────────────
+  useEffect(() => () => cleanupRealtime(), [])
+
+  // Push level update to live session when changed mid-call
+  useEffect(() => {
+    if (!isRealtimeMode || dcRef.current?.readyState !== 'open') return
+    dcRef.current.send(JSON.stringify({
+      type: 'session.update',
+      session: {
+        instructions: `${BASE_INSTRUCTIONS}\n\n${LEVEL_INSTRUCTIONS[level]}`,
+      },
+    }))
+  }, [level, isRealtimeMode])
+
+  // ── Waveform (mic input visualiser) ─────────────────────────────────────
+  function startWaveform(stream) {
+    try {
+      const ctx = new AudioContext()
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 64
+      ctx.createMediaStreamSource(stream).connect(analyser)
+      analyserRef.current = analyser
+
+      const buf = new Uint8Array(analyser.frequencyBinCount)
+      const BARS = 20
+      const step = Math.max(1, Math.floor(buf.length / BARS))
+
+      function tick() {
+        analyser.getByteTimeDomainData(buf)
+        const bars = Array.from({ length: BARS }, (_, i) => {
+          const v = buf[i * step] - 128
+          return Math.max(2, Math.min(40, Math.abs(v) * 1.2))
+        })
+        setWaveData(bars)
+        rafRef.current = requestAnimationFrame(tick)
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    } catch {
+      // waveform is decorative — silently skip on unsupported browsers
+    }
+  }
+
+  function stopWaveform() {
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
+    setWaveData(new Array(20).fill(2))
+  }
+
+  // ── Realtime cleanup ─────────────────────────────────────────────────────
+  function cleanupRealtime() {
+    stopWaveform()
+    dcRef.current?.close(); dcRef.current = null
+    pcRef.current?.close(); pcRef.current = null
+    micStreamRef.current?.getTracks().forEach(t => t.stop()); micStreamRef.current = null
+    if (audioElRef.current) {
+      audioElRef.current.srcObject = null
+      audioElRef.current.remove()
+      audioElRef.current = null
+    }
+    analyserRef.current = null
+  }
+
+  // ── Realtime session ─────────────────────────────────────────────────────
+  async function startRealtimeSession() {
+    setRtError('')
+    setRtStatus('connecting')
+    setIsRealtimeMode(true)
+    setRtMessages([])
+    setRtUserTranscript('')
+    setRtAiTranscript('')
+
+    try {
+      // 1. Get ephemeral token from our server (keeps API key secret)
+      const sessRes = await fetch('/api/realtime-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level }),
+      })
+      const sessData = await sessRes.json()
+      if (!sessRes.ok || !sessData.client_secret?.value) {
+        throw new Error(sessData.error || 'Failed to get session token')
+      }
+      const ephemeralKey = sessData.client_secret.value
+
+      // 2. Microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+      })
+      micStreamRef.current = stream
+      startWaveform(stream)
+
+      // 3. RTCPeerConnection
+      const pc = new RTCPeerConnection()
+      pcRef.current = pc
+
+      // 4. Audio output element for AI speech
+      const audioEl = document.createElement('audio')
+      audioEl.autoplay = true
+      document.body.appendChild(audioEl)
+      audioElRef.current = audioEl
+      pc.ontrack = e => { audioEl.srcObject = e.streams[0] }
+
+      // 5. Add mic track
+      stream.getTracks().forEach(t => pc.addTrack(t, stream))
+
+      // 6. Data channel for events
+      const dc = pc.createDataChannel('oai-events')
+      dcRef.current = dc
+
+      dc.onopen = () => setRtStatus('listening')
+      dc.onmessage = e => {
+        try { handleRtEvent(JSON.parse(e.data)) } catch {}
+      }
+      dc.onerror = () => {
+        setRtError('连接出错，请重试')
+        setRtStatus('error')
+      }
+
+      // 7. SDP offer
+      const offer = await pc.createOffer()
+      await pc.setLocalDescription(offer)
+
+      // 8. Exchange SDP with OpenAI Realtime API
+      const sdpRes = await fetch(
+        'https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${ephemeralKey}`,
+            'Content-Type': 'application/sdp',
+          },
+          body: offer.sdp,
+        }
+      )
+
+      if (!sdpRes.ok) throw new Error(await sdpRes.text())
+
+      // 9. Set remote description (SDP answer from OpenAI)
+      await pc.setRemoteDescription({ type: 'answer', sdp: await sdpRes.text() })
+
+    } catch (e) {
+      const msg = e.message || ''
+      if (/Permission denied|NotAllowedError|not-allowed/i.test(msg)) {
+        setRtError('麦克风权限被拒绝。\n请在浏览器设置中允许使用麦克风，然后重试。')
+      } else if (/NotFoundError|device not found/i.test(msg)) {
+        setRtError('未找到麦克风设备，\n请确认麦克风已连接。')
+      } else {
+        setRtError(`连接失败：${msg}\n请检查网络并重试。`)
+      }
+      setRtStatus('error')
+      cleanupRealtime()
+    }
+  }
+
+  function handleRtEvent(ev) {
+    switch (ev.type) {
+      case 'input_audio_buffer.speech_started':
+        setRtStatus('listening')
+        break
+
+      case 'input_audio_buffer.speech_stopped':
+        setRtStatus('thinking')
+        break
+
+      case 'conversation.item.input_audio_transcription.completed': {
+        const t = ev.transcript?.trim()
+        if (t) {
+          setRtUserTranscript('')
+          setRtMessages(prev => [...prev, { role: 'user', content: t, time: Date.now() }])
+        }
+        break
+      }
+
+      case 'conversation.item.input_audio_transcription.delta':
+        setRtUserTranscript(prev => prev + (ev.delta || ''))
+        break
+
+      case 'response.created':
+        setRtStatus('thinking')
+        setRtAiTranscript('')
+        rtAiTranscriptRef.current = ''
+        break
+
+      case 'response.audio_transcript.delta':
+        setRtStatus('speaking')
+        setRtAiTranscript(prev => prev + (ev.delta || ''))
+        break
+
+      case 'response.audio_transcript.done': {
+        const t = (ev.transcript || rtAiTranscriptRef.current).trim()
+        if (t) {
+          setRtMessages(prev => [...prev, { role: 'ai', content: t, time: Date.now() }])
+          setRtAiTranscript('')
+          rtAiTranscriptRef.current = ''
+        }
+        break
+      }
+
+      case 'response.done':
+        setRtStatus('listening')
+        break
+
+      case 'error':
+        setRtError(`API 错误：${ev.error?.message || 'Unknown error'}`)
+        setRtStatus('error')
+        break
+    }
+  }
+
+  function stopRealtimeSession() {
+    cleanupRealtime()
+    setIsRealtimeMode(false)
+    setRtStatus('idle')
+    setRtUserTranscript('')
+    setRtAiTranscript('')
+  }
+
+  // ── Text chat ─────────────────────────────────────────────────────────────
   async function sendMessage(textOverride) {
     const text = (textOverride !== undefined ? textOverride : inputText).trim()
     if (!text || isStreamingRef.current) return
 
     setInputText('')
-    setInterimText('')
-
     const userMsg = { role: 'user', content: text, time: Date.now() }
     const newMessages = [...messagesRef.current, userMsg]
     setMessages(newMessages)
@@ -75,12 +309,9 @@ export default function Speaking({ user, onBack }) {
       if (data.error) throw new Error(data.error)
       const fullText = data.text || ''
 
-      // Only animate text in chat mode; in voice-call mode skip straight to TTS
-      if (!voiceModeRef.current) {
-        for (let i = 1; i <= fullText.length; i++) {
-          setStreamingText(fullText.slice(0, i))
-          await new Promise(r => setTimeout(r, 18))
-        }
+      for (let i = 1; i <= fullText.length; i++) {
+        setStreamingText(fullText.slice(0, i))
+        await new Promise(r => setTimeout(r, 18))
       }
 
       const aiMsg = { role: 'ai', content: fullText, time: Date.now() }
@@ -92,133 +323,19 @@ export default function Speaking({ user, onBack }) {
       isStreamingRef.current = false
 
       if (ttsEnabledRef.current && fullText) {
-        setIsSpeaking(true)
-        ttsSpeak(fullText, {
-          onEnd: () => {
-            setIsSpeaking(false)
-            if (voiceModeRef.current) setTimeout(() => startRecognition(), 300)
-          },
-        }).catch(() => {
-          setIsSpeaking(false)
-          if (voiceModeRef.current) setTimeout(() => startRecognition(), 300)
-        })
-      } else if (voiceModeRef.current) {
-        setTimeout(() => startRecognition(), 300)
+        ttsSpeak(fullText).catch(() => {})
       }
     } catch (e) {
-      const detail = e.message || 'Unknown error'
-      const errMsg = { role: 'ai', content: `Oops! Something went wrong: ${detail}`, time: Date.now() }
+      const errMsg = { role: 'ai', content: `Oops! Something went wrong: ${e.message || 'Unknown error'}`, time: Date.now() }
       const errMessages = [...newMessages, errMsg]
       setMessages(errMessages)
       messagesRef.current = errMessages
       setStreamingText('')
       setIsStreaming(false)
       isStreamingRef.current = false
-      if (voiceModeRef.current) setTimeout(() => startRecognition(), 1500)
     }
   }
 
-  // ── Recognition ───────────────────────────────────────────────────────────
-  function startRecognition() {
-    if (!voiceModeRef.current || isStreamingRef.current) return
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) return
-
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'en-US'
-    recognition.continuous = false
-    recognition.interimResults = true
-
-    let finalTranscript = ''
-    let errorHandled = false
-
-    recognition.onresult = e => {
-      let interim = ''
-      finalTranscript = ''
-      for (const result of e.results) {
-        if (result.isFinal) finalTranscript += result[0].transcript
-        else interim += result[0].transcript
-      }
-      setInterimText(finalTranscript || interim)
-    }
-
-    recognition.onerror = e => {
-      errorHandled = true
-      setIsListening(false)
-      setInterimText('')
-      if (e.error === 'no-speech' && voiceModeRef.current) {
-        // Silence timeout — restart quietly
-        setTimeout(() => startRecognition(), 600)
-      } else if (e.error === 'not-allowed') {
-        // Microphone permission denied — exit voice call, show message in chat
-        voiceModeRef.current = false
-        setIsVoiceCall(false)
-        setMessages(prev => [...prev, {
-          role: 'ai',
-          content: '🎙️ 麦克风权限被拒绝。请在浏览器设置中允许此网站使用麦克风，然后重试语音对话。您也可以直接在下方输入文字与我交流！',
-          time: Date.now(),
-        }])
-      } else if (e.error === 'service-not-allowed' || e.error === 'network') {
-        // Speech service unavailable (common on mobile/China) — exit voice call, use text
-        voiceModeRef.current = false
-        setIsVoiceCall(false)
-        setMessages(prev => [...prev, {
-          role: 'ai',
-          content: '🎙️ 语音识别服务暂时不可用（可能是网络限制）。已自动切换到文字模式，请直接在下方输入文字与我对话！',
-          time: Date.now(),
-        }])
-      }
-    }
-
-    recognition.onend = () => {
-      setIsListening(false)
-      setInterimText('')
-      if (errorHandled) return
-      const transcript = finalTranscript.trim()
-      if (transcript && voiceModeRef.current) {
-        sendMessage(transcript)
-      } else if (voiceModeRef.current && !isStreamingRef.current) {
-        setTimeout(() => startRecognition(), 600)
-      }
-    }
-
-    recognitionRef.current = recognition
-    try { recognition.start(); setIsListening(true) } catch { /* ignore */ }
-  }
-
-  // ── Start / end voice call ────────────────────────────────────────────────
-  function startVoiceCall() {
-    setVoiceError('')
-
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-      // Browser has no speech API at all — stay in text mode, show message
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: '🎙️ 您的浏览器不支持语音识别。请直接在下方输入文字与我对话，或在 Android 手机 Chrome / 桌面 Chrome 上使用语音功能。',
-        time: Date.now(),
-      }])
-      return
-    }
-
-    voiceModeRef.current = true
-    setIsVoiceCall(true)
-    ttsStop()
-    setIsSpeaking(false)
-    startRecognition()
-  }
-
-  function endVoiceCall() {
-    voiceModeRef.current = false
-    setIsVoiceCall(false)
-    recognitionRef.current?.stop()
-    ttsStop()
-    setIsListening(false)
-    setIsSpeaking(false)
-    setInterimText('')
-  }
-
-  // ── Text input helpers ────────────────────────────────────────────────────
   function handleInputChange(e) {
     setInputText(e.target.value)
     const ta = textareaRef.current
@@ -231,24 +348,31 @@ export default function Speaking({ user, onBack }) {
 
   const hasMessages = messages.length > 0
 
-  // ── Voice call UI (phone-call style) ──────────────────────────────────────
-  if (isVoiceCall) {
-    const callStatus = isSpeaking  ? { label: 'Emma is speaking…',  sub: 'Listen carefully',     icon: '🔊', cls: 'vc-speaking' }
-                     : isStreaming ? { label: 'Emma is thinking…',   sub: 'Just a moment',         icon: '💭', cls: 'vc-thinking' }
-                     : isListening ? { label: 'Listening…',          sub: interimText || 'Speak now', icon: '🎙️', cls: 'vc-listening' }
-                     :               { label: 'Getting ready…',      sub: 'Almost there',          icon: '⏳', cls: '' }
+  // ── Realtime voice overlay ─────────────────────────────────────────────
+  if (isRealtimeMode) {
+    const STATUS_CFG = {
+      connecting: { label: 'Connecting…',          sub: 'Setting up your session', icon: '⏳', ring: '' },
+      listening:  { label: 'Listening…',            sub: rtUserTranscript || 'Speak now', icon: '🎙️', ring: 'rt-ring-listen' },
+      thinking:   { label: 'Thinking…',             sub: 'Just a moment',           icon: '💭', ring: 'rt-ring-think' },
+      speaking:   { label: 'Emma is speaking…',     sub: '',                         icon: '🔊', ring: 'rt-ring-speak' },
+      error:      { label: 'Error',                 sub: '',                         icon: '❌', ring: '' },
+      idle:       { label: 'Ready',                 sub: '',                         icon: '✅', ring: '' },
+    }
+    const st = STATUS_CFG[rtStatus] || STATUS_CFG.idle
+
+    const displayMsgs = [...rtMessages]
+    if (rtUserTranscript) displayMsgs.push({ role: 'user', content: rtUserTranscript, partial: true })
+    if (rtAiTranscript)   displayMsgs.push({ role: 'ai',   content: rtAiTranscript,   partial: true })
 
     return (
-      <div className="vc-overlay">
-        {/* Exit button */}
-        <button className="vc-exit-btn" onClick={endVoiceCall}>✕ 退出对话</button>
+      <div className="rt-overlay">
+        <button className="rt-exit-btn" onClick={stopRealtimeSession}>✕ 退出对话</button>
 
-        {/* Level selector */}
-        <div className="vc-level-row">
+        <div className="rt-level-row">
           {LEVELS.map(l => (
             <button
               key={l.value}
-              className={`vc-level-btn ${level === l.value ? 'active' : ''}`}
+              className={`rt-level-btn ${level === l.value ? 'active' : ''}`}
               onClick={() => setLevel(l.value)}
             >
               {l.label}
@@ -256,53 +380,60 @@ export default function Speaking({ user, onBack }) {
           ))}
         </div>
 
-        {/* Emma avatar */}
-        <div className={`vc-avatar-wrap ${voiceError ? '' : callStatus.cls}`}>
-          <div className="vc-avatar-ring" />
-          <div className="vc-avatar">🧑‍🏫</div>
+        {/* Waveform — shows mic activity */}
+        <div className="rt-waveform">
+          {waveData.map((h, i) => (
+            <div key={i} className="rt-bar" style={{ height: `${h}px` }} />
+          ))}
         </div>
 
-        <div className="vc-name">Emma Teacher</div>
+        {/* Avatar with ring animation */}
+        <div className={`rt-avatar-wrap ${st.ring}`}>
+          <div className="rt-avatar">🧑‍🏫</div>
+        </div>
 
-        {/* Error state */}
-        {voiceError ? (
-          <div className="vc-error-box">
-            {voiceError.split('\n').map((line, i) => <p key={i}>{line}</p>)}
-            <button className="vc-error-close" onClick={endVoiceCall}>返回</button>
+        <div className="rt-name">Emma Teacher</div>
+
+        {rtStatus === 'error' ? (
+          <div className="rt-error-box">
+            {rtError.split('\n').map((ln, i) => <p key={i}>{ln}</p>)}
+            <button className="rt-error-close" onClick={stopRealtimeSession}>返回</button>
           </div>
         ) : (
           <>
-            {/* Status */}
-            <div className="vc-status-label">{callStatus.icon} {callStatus.label}</div>
-            {callStatus.sub && (
-              <div className="vc-status-sub">{callStatus.sub}</div>
-            )}
+            <div className="rt-status-label">{st.icon} {st.label}</div>
+            {st.sub && <div className="rt-status-sub">{st.sub}</div>}
           </>
         )}
 
-        {/* Big hang-up style end button */}
-        <button className="vc-hangup-btn" onClick={endVoiceCall}>
-          📵
-        </button>
-        <div className="vc-hangup-hint">点击结束</div>
+        {/* Conversation transcript */}
+        {displayMsgs.length > 0 && (
+          <div className="rt-history">
+            {displayMsgs.slice(-6).map((m, i) => (
+              <div
+                key={i}
+                className={`rt-history-item rt-history-${m.role}${m.partial ? ' partial' : ''}`}
+              >
+                <span className="rt-history-who">{m.role === 'ai' ? 'Emma' : 'You'}:</span>
+                {' '}{m.content}
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* Mute TTS toggle */}
-        {!voiceError && (
-          <button
-            className={`vc-mute-btn ${ttsEnabled ? '' : 'muted'}`}
-            onClick={() => { if (ttsEnabled) ttsStop(); setTtsEnabled(v => !v) }}
-          >
-            {ttsEnabled ? '🔊 有声' : '🔇 静音'}
-          </button>
+        {rtStatus !== 'error' && (
+          <>
+            <button className="rt-hangup-btn" onClick={stopRealtimeSession}>📵</button>
+            <div className="rt-hangup-hint">点击结束</div>
+          </>
         )}
       </div>
     )
   }
 
-  // ── Chat UI (default) ──────────────────────────────────────────────────────
+  // ── Text chat UI ──────────────────────────────────────────────────────────
   return (
     <div className="chat-view">
-      {/* Top bar */}
       <div className="chat-topbar">
         <div className="topbar-teacher">
           {onBack && (
@@ -325,7 +456,6 @@ export default function Speaking({ user, onBack }) {
         </div>
       </div>
 
-      {/* Level selector */}
       <div className="subject-selector speaking-level-selector">
         {LEVELS.map(l => (
           <button
@@ -339,7 +469,6 @@ export default function Speaking({ user, onBack }) {
         ))}
       </div>
 
-      {/* Messages */}
       <div className="chat-messages">
         {!hasMessages && !isStreaming && (
           <div className="chat-welcome">
@@ -374,17 +503,16 @@ export default function Speaking({ user, onBack }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Voice call entry banner */}
-      <div className="vc-entry-banner" onClick={startVoiceCall}>
-        <span className="vc-entry-icon">📞</span>
+      {/* Realtime voice entry banner */}
+      <div className="vc-entry-banner" onClick={startRealtimeSession}>
+        <span className="vc-entry-icon">🎙️</span>
         <div className="vc-entry-text">
-          <div className="vc-entry-title">开始语音对话</div>
-          <div className="vc-entry-sub">和 Emma 直接用语音交流，无需打字</div>
+          <div className="vc-entry-title">开始实时语音对话</div>
+          <div className="vc-entry-sub">AI 语音直接和 Emma 对话，低延迟，更自然</div>
         </div>
         <span className="vc-entry-arrow">›</span>
       </div>
 
-      {/* Text input bar */}
       <div className="chat-input-bar">
         <textarea
           ref={textareaRef}
