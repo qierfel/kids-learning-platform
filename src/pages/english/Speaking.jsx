@@ -22,6 +22,7 @@ export default function Speaking({ user, onBack }) {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [interimText, setInterimText] = useState('')
   const [ttsEnabled, setTtsEnabled] = useState(true)
+  const [voiceError, setVoiceError] = useState('')
 
   const bottomRef = useRef(null)
   const textareaRef = useRef(null)
@@ -147,7 +148,17 @@ export default function Speaking({ user, onBack }) {
       setIsListening(false)
       setInterimText('')
       if (e.error === 'no-speech' && voiceModeRef.current) {
+        // Silence timeout — restart quietly
         setTimeout(() => startRecognition(), 600)
+      } else if (e.error === 'not-allowed') {
+        // Microphone permission denied
+        setVoiceError('麦克风权限被拒绝。\n请在浏览器设置中允许此网站使用麦克风，然后刷新页面重试。')
+        voiceModeRef.current = false
+        setIsVoiceCall(false)
+      } else if (e.error === 'service-not-allowed') {
+        setVoiceError('语音识别在当前浏览器不可用。\n请使用 Chrome 浏览器（桌面版）以获得最佳体验。')
+        voiceModeRef.current = false
+        setIsVoiceCall(false)
       }
     }
 
@@ -169,10 +180,22 @@ export default function Speaking({ user, onBack }) {
 
   // ── Start / end voice call ────────────────────────────────────────────────
   function startVoiceCall() {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-      alert('请使用 Chrome 浏览器以支持语音功能。Safari 暂不支持实时语音识别。')
+    setVoiceError('')
+
+    // iOS Safari: SpeechRecognition exists but doesn't actually work
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+    if (isIOS) {
+      setVoiceError('iOS Safari 暂不支持语音识别。\n请在 Mac 电脑上用 Chrome 浏览器访问，即可实现语音对话。')
+      setIsVoiceCall(true)
       return
     }
+
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      setVoiceError('您的浏览器不支持语音识别。\n请使用 Chrome 浏览器（桌面版）重试。')
+      setIsVoiceCall(true)
+      return
+    }
+
     voiceModeRef.current = true
     setIsVoiceCall(true)
     ttsStop()
@@ -229,17 +252,27 @@ export default function Speaking({ user, onBack }) {
         </div>
 
         {/* Emma avatar */}
-        <div className={`vc-avatar-wrap ${callStatus.cls}`}>
+        <div className={`vc-avatar-wrap ${voiceError ? '' : callStatus.cls}`}>
           <div className="vc-avatar-ring" />
           <div className="vc-avatar">🧑‍🏫</div>
         </div>
 
         <div className="vc-name">Emma Teacher</div>
 
-        {/* Status */}
-        <div className="vc-status-label">{callStatus.icon} {callStatus.label}</div>
-        {callStatus.sub && (
-          <div className="vc-status-sub">{callStatus.sub}</div>
+        {/* Error state */}
+        {voiceError ? (
+          <div className="vc-error-box">
+            {voiceError.split('\n').map((line, i) => <p key={i}>{line}</p>)}
+            <button className="vc-error-close" onClick={endVoiceCall}>返回</button>
+          </div>
+        ) : (
+          <>
+            {/* Status */}
+            <div className="vc-status-label">{callStatus.icon} {callStatus.label}</div>
+            {callStatus.sub && (
+              <div className="vc-status-sub">{callStatus.sub}</div>
+            )}
+          </>
         )}
 
         {/* Big hang-up style end button */}
@@ -249,12 +282,14 @@ export default function Speaking({ user, onBack }) {
         <div className="vc-hangup-hint">点击结束</div>
 
         {/* Mute TTS toggle */}
-        <button
-          className={`vc-mute-btn ${ttsEnabled ? '' : 'muted'}`}
-          onClick={() => { if (ttsEnabled) ttsStop(); setTtsEnabled(v => !v) }}
-        >
-          {ttsEnabled ? '🔊 有声' : '🔇 静音'}
-        </button>
+        {!voiceError && (
+          <button
+            className={`vc-mute-btn ${ttsEnabled ? '' : 'muted'}`}
+            onClick={() => { if (ttsEnabled) ttsStop(); setTtsEnabled(v => !v) }}
+          >
+            {ttsEnabled ? '🔊 有声' : '🔇 静音'}
+          </button>
+        )}
       </div>
     )
   }
