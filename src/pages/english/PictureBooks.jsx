@@ -101,7 +101,10 @@ export default function PictureBooks({ onBack }) {
     if (!audio) return
     audio.src = mediaUrl(book.audio)
     audio.load()
-    audio.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true))
+    audio.play().then(() => setIsPlaying(true)).catch(err => {
+      // AbortError = new src was set before this play resolved; not a real error
+      if (err?.name !== 'AbortError') setAudioError(true)
+    })
   }
 
   function togglePlay() {

@@ -134,8 +134,9 @@ function ReadAlongText({ text, charIndex, playing }) {
   return <div className="read-along-text" ref={containerRef}>{parts}</div>
 }
 
-function TextCard({ item, badge, playingId, charIndex, onPlay, loading }) {
+function TextCard({ item, badge, playingId, charIndex, onPlay, loading, ttsErrorId }) {
   const isPlaying = playingId === item.id
+  const hasTtsError = ttsErrorId === item.id
   return (
     <div className={`listen-card${isPlaying ? ' listen-card-active' : ''}`} style={{ '--card-color': item.color }}>
       <div className="listen-card-header">
@@ -152,6 +153,11 @@ function TextCard({ item, badge, playingId, charIndex, onPlay, loading }) {
           {loading ? '⏳ 生成…' : isPlaying ? '⏹ Stop' : '▶ Listen'}
         </button>
       </div>
+      {hasTtsError && (
+        <div style={{ fontSize: 12, color: '#ef4444', padding: '4px 0 2px', opacity: 0.85 }}>
+          ⚠️ 语音生成失败，请稍后重试（检查网络或 TTS 服务配置）
+        </div>
+      )}
       <ReadAlongText text={item.text} charIndex={isPlaying ? charIndex : -1} playing={isPlaying} />
     </div>
   )
@@ -413,6 +419,7 @@ export default function Listening({ onBack }) {
   const [playingId, setPlayingId]   = useState(null)
   const [charIndex, setCharIndex]   = useState(-1)
   const [loading, setLoading]       = useState(false)
+  const [ttsErrorId, setTtsErrorId] = useState(null)   // id of item whose TTS failed
   const audioRef  = useRef(null)
   const wordTimingsRef = useRef([])
   const rafRef    = useRef(null)
@@ -443,6 +450,7 @@ export default function Listening({ onBack }) {
   const handlePlay = useCallback(async (item) => {
     if (playingId === item.id) { stopAll(); return }
     stopAll()
+    setTtsErrorId(null)
     setLoading(true)
     setPlayingId(item.id)
 
@@ -453,6 +461,7 @@ export default function Listening({ onBack }) {
       console.error('TTS failed:', e)
       setLoading(false)
       setPlayingId(null)
+      setTtsErrorId(item.id)
       return
     }
 
@@ -509,7 +518,7 @@ export default function Listening({ onBack }) {
           {items.map(item => (
             <TextCard key={item.id} item={item} badge={item.grade || item.level}
               playingId={playingId} charIndex={charIndex} onPlay={handlePlay}
-              loading={loading && playingId === item.id} />
+              loading={loading && playingId === item.id} ttsErrorId={ttsErrorId} />
           ))}
         </div>
       )}

@@ -151,14 +151,23 @@ export default function Speaking({ user, onBack }) {
         // Silence timeout — restart quietly
         setTimeout(() => startRecognition(), 600)
       } else if (e.error === 'not-allowed') {
-        // Microphone permission denied
-        setVoiceError('麦克风权限被拒绝。\n请在浏览器设置中允许此网站使用麦克风，然后刷新页面重试。')
+        // Microphone permission denied — exit voice call, show message in chat
         voiceModeRef.current = false
         setIsVoiceCall(false)
-      } else if (e.error === 'service-not-allowed') {
-        setVoiceError('语音识别在当前浏览器不可用。\n请使用 Chrome 浏览器（桌面版）以获得最佳体验。')
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: '🎙️ 麦克风权限被拒绝。请在浏览器设置中允许此网站使用麦克风，然后重试语音对话。您也可以直接在下方输入文字与我交流！',
+          time: Date.now(),
+        }])
+      } else if (e.error === 'service-not-allowed' || e.error === 'network') {
+        // Speech service unavailable (common on mobile/China) — exit voice call, use text
         voiceModeRef.current = false
         setIsVoiceCall(false)
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: '🎙️ 语音识别服务暂时不可用（可能是网络限制）。已自动切换到文字模式，请直接在下方输入文字与我对话！',
+          time: Date.now(),
+        }])
       }
     }
 
@@ -182,17 +191,13 @@ export default function Speaking({ user, onBack }) {
   function startVoiceCall() {
     setVoiceError('')
 
-    // iOS Safari: SpeechRecognition exists but doesn't actually work
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-    if (isIOS) {
-      setVoiceError('iOS Safari 暂不支持语音识别。\n请在 Mac 电脑上用 Chrome 浏览器访问，即可实现语音对话。')
-      setIsVoiceCall(true)
-      return
-    }
-
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-      setVoiceError('您的浏览器不支持语音识别。\n请使用 Chrome 浏览器（桌面版）重试。')
-      setIsVoiceCall(true)
+      // Browser has no speech API at all — stay in text mode, show message
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        content: '🎙️ 您的浏览器不支持语音识别。请直接在下方输入文字与我对话，或在 Android 手机 Chrome / 桌面 Chrome 上使用语音功能。',
+        time: Date.now(),
+      }])
       return
     }
 
