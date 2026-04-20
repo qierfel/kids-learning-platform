@@ -16,6 +16,9 @@ export function mediaUrl(path) {
   if (!path) return path
   if (!MEDIA_HOST) return path                // 本地直接用相对路径
   if (!path.startsWith('/media/')) return path
-  // /media/foo → https://media.qierfel-kid.com/foo
-  return MEDIA_HOST + path.slice(6)           // 去掉 '/media' 保留 '/foo'
+  // Encode each path segment to handle Chinese chars, spaces, brackets, etc.
+  // /media/foo/bar baz → https://media.qierfel-kid.com/foo/bar%20baz
+  const pathPart = path.slice(6)              // 去掉 '/media' 保留 '/foo/...'
+  const encodedPath = pathPart.split('/').map(seg => encodeURIComponent(seg)).join('/')
+  return MEDIA_HOST + encodedPath
 }
