@@ -17,27 +17,48 @@ export default function Speaking({ user, onBack }) {
   const [inputText, setInputText] = useState('')
   const [streamingText, setStreamingText] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
+  const [isVoiceMode, setIsVoiceMode] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [interimText, setInterimText] = useState('')
   const [ttsEnabled, setTtsEnabled] = useState(true)
 
   const bottomRef = useRef(null)
-  const recognitionRef = useRef(null)
   const textareaRef = useRef(null)
+  const recognitionRef = useRef(null)
+
+  // Refs that stay current inside async/event callbacks
+  const voiceModeRef = useRef(false)
+  const messagesRef = useRef([])
+  const isStreamingRef = useRef(false)
+  const levelRef = useRef('KET')
+  const ttsEnabledRef = useRef(true)
+
+  // Keep refs in sync with state
+  useEffect(() => { messagesRef.current = messages }, [messages])
+  useEffect(() => { isStreamingRef.current = isStreaming }, [isStreaming])
+  useEffect(() => { levelRef.current = level }, [level])
+  useEffect(() => { ttsEnabledRef.current = ttsEnabled }, [ttsEnabled])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingText])
 
-  async function sendMessage() {
-    const text = inputText.trim()
-    if (!text || isStreaming) return
+  // ── Core send (accepts override text for voice auto-send) ─────────────────
+  async function sendMessage(textOverride) {
+    const text = (textOverride !== undefined ? textOverride : inputText).trim()
+    if (!text || isStreamingRef.current) return
+
     setInputText('')
+    setInterimText('')
 
     const userMsg = { role: 'user', content: text, time: Date.now() }
-    const newMessages = [...messages, userMsg]
+    const newMessages = [...messagesRef.current, userMsg]
     setMessages(newMessages)
+    messagesRef.current = newMessages
 
     setIsStreaming(true)
+    isStreamingRef.current = true
     setStreamingText('')
 
     try {
@@ -46,7 +67,7 @@ export default function Speaking({ user, onBack }) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           type: 'speaking_tutor',
-          payload: { messages: newMessages, level },
+          payload: { messages: newMessages, level: levelRef.current },
         }),
       })
 
@@ -54,57 +75,142 @@ export default function Speaking({ user, onBack }) {
       if (data.error) throw new Error(data.error)
       const fullText = data.text || ''
 
-      // Typing animation — same 18ms pattern as Notebook.jsx
+      // Typing animation
       for (let i = 1; i <= fullText.length; i++) {
         setStreamingText(fullText.slice(0, i))
         await new Promise(r => setTimeout(r, 18))
       }
 
       const aiMsg = { role: 'ai', content: fullText, time: Date.now() }
-      setMessages([...newMessages, aiMsg])
+      const finalMessages = [...newMessages, aiMsg]
+      setMessages(finalMessages)
+      messagesRef.current = finalMessages
       setStreamingText('')
 
-      if (ttsEnabled && fullText) {
-        ttsSpeak(fullText).catch(() => {})
+      setIsStreaming(false)
+      isStreamingRef.current = false
+
+      if (ttsEnabledRef.current && fullText) {
+        // TTS plays → after it ends, restart listening if still in voice mode
+        setIsSpeaking(true)
+        ttsSpeak(fullText, {
+          onEnd: () => {
+            setIsSpeaking(false)
+            if (voiceModeRef.current) {
+              setTimeout(() => startRecognition(), 300)
+            }
+          },
+        }).catch(() => {
+          setIsSpeaking(false)
+          if (voiceModeRef.current) setTimeout(() => startRecognition(), 300)
+        })
+      } else {
+        // TTS disabled — restart listening right away
+        if (voiceModeRef.current) {
+          setTimeout(() => startRecognition(), 300)
+        }
       }
     } catch (e) {
       const detail = e.message || 'Unknown error'
       const errMsg = { role: 'ai', content: `Oops! Something went wrong: ${detail}`, time: Date.now() }
-      setMessages([...newMessages, errMsg])
+      const errMessages = [...newMessages, errMsg]
+      setMessages(errMessages)
+      messagesRef.current = errMessages
       setStreamingText('')
+      setIsStreaming(false)
+      isStreamingRef.current = false
+      // Try restarting voice conversation after error
+      if (voiceModeRef.current) {
+        setTimeout(() => startRecognition(), 1500)
+      }
     }
-
-    setIsStreaming(false)
   }
 
-  function toggleVoice() {
-    if (isListening) {
-      recognitionRef.current?.stop()
-      setIsListening(false)
-      return
-    }
+  // ── Start a recognition round ─────────────────────────────────────────────
+  function startRecognition() {
+    if (!voiceModeRef.current || isStreamingRef.current) return
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) {
-      alert('Your browser does not support voice input. Please type instead.')
-      return
-    }
+    if (!SpeechRecognition) return
 
     const recognition = new SpeechRecognition()
     recognition.lang = 'en-US'
     recognition.continuous = false
     recognition.interimResults = true
+
+    let finalTranscript = ''
+    let errorHandled = false
+
     recognition.onresult = e => {
-      const transcript = Array.from(e.results).map(r => r[0].transcript).join('')
-      setInputText(transcript)
+      let interim = ''
+      finalTranscript = ''
+      for (const result of e.results) {
+        if (result.isFinal) {
+          finalTranscript += result[0].transcript
+        } else {
+          interim += result[0].transcript
+        }
+      }
+      setInterimText(finalTranscript || interim)
     }
-    recognition.onend = () => setIsListening(false)
-    recognition.onerror = () => setIsListening(false)
+
+    recognition.onerror = e => {
+      errorHandled = true
+      setIsListening(false)
+      setInterimText('')
+      // 'no-speech' = silence timeout → restart quietly
+      if (e.error === 'no-speech' && voiceModeRef.current) {
+        setTimeout(() => startRecognition(), 600)
+      }
+      // other errors (aborted, network) → stop voice mode
+    }
+
+    recognition.onend = () => {
+      setIsListening(false)
+      setInterimText('')
+      if (errorHandled) return // already handled above
+      const transcript = finalTranscript.trim()
+      if (transcript && voiceModeRef.current) {
+        sendMessage(transcript)
+      } else if (voiceModeRef.current && !isStreamingRef.current) {
+        // Nothing said — restart listening
+        setTimeout(() => startRecognition(), 600)
+      }
+    }
+
     recognitionRef.current = recognition
-    recognition.start()
-    setIsListening(true)
+    try {
+      recognition.start()
+      setIsListening(true)
+    } catch {
+      // ignore "already started" errors
+    }
   }
 
+  // ── Toggle voice conversation mode ────────────────────────────────────────
+  function toggleVoiceMode() {
+    if (isVoiceMode) {
+      voiceModeRef.current = false
+      setIsVoiceMode(false)
+      recognitionRef.current?.stop()
+      ttsStop()
+      setIsListening(false)
+      setIsSpeaking(false)
+      setInterimText('')
+    } else {
+      if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+        alert('Voice recognition is not supported in your browser. Please use Chrome.')
+        return
+      }
+      voiceModeRef.current = true
+      setIsVoiceMode(true)
+      ttsStop()
+      setIsSpeaking(false)
+      startRecognition()
+    }
+  }
+
+  // ── Text input helpers ────────────────────────────────────────────────────
   function handleInputChange(e) {
     setInputText(e.target.value)
     const ta = textareaRef.current
@@ -117,6 +223,21 @@ export default function Speaking({ user, onBack }) {
   function handleKeyDown(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
   }
+
+  // ── Mic button state ──────────────────────────────────────────────────────
+  const micState = isVoiceMode
+    ? isSpeaking   ? 'voice-speaking'
+    : isStreaming  ? 'voice-thinking'
+    : isListening  ? 'listening'
+    : 'voice-idle'
+    : ''
+
+  const micIcon = isVoiceMode
+    ? isSpeaking   ? '🔊'
+    : isStreaming  ? '💭'
+    : isListening  ? '🎙️'
+    : '⏸'
+    : '🎤'
 
   const hasMessages = messages.length > 0
 
@@ -203,29 +324,59 @@ export default function Speaking({ user, onBack }) {
         <div ref={bottomRef} />
       </div>
 
+      {/* Voice status banner (shown above input when in voice mode) */}
+      {isVoiceMode && (
+        <div className="voice-status-bar">
+          {isListening ? (
+            <div className="voice-status-row">
+              <span className="voice-dot voice-dot--listening" />
+              <span className="voice-status-text">
+                {interimText ? `"${interimText}"` : 'Listening…'}
+              </span>
+            </div>
+          ) : isStreaming ? (
+            <div className="voice-status-row">
+              <div className="thinking thinking--inline"><span /><span /><span /></div>
+              <span className="voice-status-text">Emma is thinking…</span>
+            </div>
+          ) : isSpeaking ? (
+            <div className="voice-status-row">
+              <span className="voice-dot voice-dot--speaking" />
+              <span className="voice-status-text">Emma is speaking…</span>
+            </div>
+          ) : (
+            <div className="voice-status-row">
+              <span className="voice-dot voice-dot--idle" />
+              <span className="voice-status-text">Tap 🎤 to stop · preparing to listen…</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Input bar */}
       <div className="chat-input-bar">
         <button
-          className={`mic-btn ${isListening ? 'listening' : ''}`}
-          onClick={toggleVoice}
-          title={isListening ? 'Stop recording' : 'Speak in English'}
+          className={`mic-btn ${micState}`}
+          onClick={toggleVoiceMode}
+          title={isVoiceMode ? 'Exit voice mode' : 'Start voice conversation'}
         >
-          🎤
+          {micIcon}
         </button>
         <textarea
           ref={textareaRef}
           className="chat-input"
-          placeholder="Type or speak in English..."
-          value={inputText}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          placeholder={isVoiceMode ? 'Voice mode active — speak in English…' : 'Type or speak in English…'}
+          value={isListening ? interimText : inputText}
+          onChange={isListening ? undefined : handleInputChange}
+          onKeyDown={isListening ? undefined : handleKeyDown}
+          readOnly={isListening}
           rows={1}
-          disabled={isStreaming}
+          disabled={isStreaming && !isListening}
         />
         <button
           className="send-btn"
-          onClick={sendMessage}
-          disabled={isStreaming || !inputText.trim()}
+          onClick={() => sendMessage()}
+          disabled={isStreaming || isListening || !inputText.trim()}
         >
           Send
         </button>
