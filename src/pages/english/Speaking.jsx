@@ -134,89 +134,90 @@ export default function Speaking({ user, onBack }) {
     setRtUserTranscript('')
     setRtAiTranscript('')
 
+    let step = '初始化'
     try {
-      // 1. Get ephemeral token from our server (keeps API key secret)
+      // 1. Get ephemeral token
+      step = '获取会话令牌 (/api/realtime-session)'
       const sessRes = await fetch('/api/realtime-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level }),
       })
-      const sessData = await sessRes.json()
+      const sessText = await sessRes.text()
+      let sessData
+      try { sessData = JSON.parse(sessText) } catch {
+        throw new Error(`服务器返回非 JSON 响应 (HTTP ${sessRes.status})`)
+      }
       if (!sessRes.ok || !sessData.client_secret?.value) {
-        throw new Error(sessData.error || 'Failed to get session token')
+        throw new Error(sessData.error || `HTTP ${sessRes.status}`)
       }
       const ephemeralKey = sessData.client_secret.value
 
       // 2. Microphone access
+      step = '请求麦克风权限'
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       })
       micStreamRef.current = stream
       startWaveform(stream)
 
-      // 3. RTCPeerConnection (with STUN for ICE candidate discovery)
+      // 3. RTCPeerConnection
+      step = '建立 WebRTC 连接'
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
       })
       pcRef.current = pc
 
-      // 4. Audio output element for AI speech
       const audioEl = document.createElement('audio')
       audioEl.autoplay = true
       document.body.appendChild(audioEl)
       audioElRef.current = audioEl
       pc.ontrack = e => { audioEl.srcObject = e.streams[0] }
-
-      // 5. Add mic track
       stream.getTracks().forEach(t => pc.addTrack(t, stream))
 
-      // 6. Data channel for events
       const dc = pc.createDataChannel('oai-events')
       dcRef.current = dc
-
       dc.onopen = () => setRtStatus('listening')
-      dc.onmessage = e => {
-        try { handleRtEvent(JSON.parse(e.data)) } catch {}
-      }
-      dc.onerror = () => {
-        setRtError('连接出错，请重试')
-        setRtStatus('error')
-      }
+      dc.onmessage = e => { try { handleRtEvent(JSON.parse(e.data)) } catch {} }
+      dc.onerror = () => { setRtError('连接出错，请重试'); setRtStatus('error') }
 
-      // 7. SDP offer
+      // 4. SDP offer
+      step = '创建 SDP Offer'
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
 
-      // 8. Exchange SDP via our CF proxy (avoids Safari CORS block on api.openai.com)
+      // 5. SDP exchange via CF proxy
+      step = 'SDP 交换 (/api/realtime-sdp)'
       const sdpRes = await fetch(
         '/api/realtime-sdp?model=gpt-4o-realtime-preview',
         {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${ephemeralKey}`,
-            'Content-Type': 'application/sdp',
-          },
+          headers: { Authorization: `Bearer ${ephemeralKey}`, 'Content-Type': 'application/sdp' },
           body: offer.sdp,
         }
       )
+      const answerSdp = await sdpRes.text()
+      if (!sdpRes.ok) throw new Error(`HTTP ${sdpRes.status}: ${answerSdp.slice(0, 120)}`)
 
-      if (!sdpRes.ok) throw new Error(`SDP exchange failed (${sdpRes.status}): ${await sdpRes.text()}`)
-
-      // 9. Set remote description (SDP answer from OpenAI)
-      await pc.setRemoteDescription({ type: 'answer', sdp: await sdpRes.text() })
+      // 6. Set remote description
+      step = '设置远程 SDP'
+      await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp })
 
     } catch (e) {
       const msg = e.message || ''
       const name = e.name || ''
-      if (/NotAllowedError|SecurityError|Permission denied|not-allowed/i.test(name + msg)) {
-        setRtError('麦克风权限被拒绝。\n请在浏览器设置中允许此网站使用麦克风，然后重试。')
-      } else if (/NotFoundError|device not found/i.test(name + msg)) {
-        setRtError('未找到麦克风设备，\n请确认麦克风已连接。')
-      } else if (/NotSupportedError|not supported/i.test(name + msg)) {
-        setRtError('当前浏览器不支持 WebRTC 语音功能。\n请使用 Chrome（桌面版）重试。')
+      const combined = name + msg
+      let errText
+      if (/NotAllowedError|SecurityError|Permission denied|not-allowed/i.test(combined)) {
+        errText = '麦克风权限被拒绝。\n请在浏览器设置中允许此网站使用麦克风，然后重试。'
+      } else if (/NotFoundError|device not found/i.test(combined)) {
+        errText = '未找到麦克风设备，\n请确认麦克风已连接。'
+      } else if (/NotSupportedError|not supported/i.test(combined)) {
+        errText = '当前浏览器不支持 WebRTC 语音功能。\n请使用 Chrome（桌面版）重试。'
       } else {
-        setRtError(`连接失败：${msg || name || 'Unknown error'}\n请检查网络并重试。`)
+        errText = `步骤「${step}」失败：\n${name ? name + ': ' : ''}${msg || 'Unknown error'}`
       }
+      setRtError(errText)
       setRtStatus('error')
       cleanupRealtime()
     }
