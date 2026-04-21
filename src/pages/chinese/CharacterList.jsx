@@ -100,15 +100,17 @@ export default function CharacterList({ onBack }) {
                       {l.type2?.length > 0 && `认${l.type2.length}`}
                     </span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: 10 }}>
                     {lessonChars.map((char, i) => {
                       const isType1 = (l.type1 || []).includes(char)
+                      const pinyin = characters[char]?.pinyin || ''
                       return (
                         <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
-                          style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
-                            background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
-                            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                          style={{ padding: '10px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
+                            background: isType1?'#fff5f5':'#eff6ff', fontSize: 22, fontWeight: 700,
+                            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                           {char}
+                          {pinyin && <span style={{ fontSize: 9, color: '#7c6b8e', fontWeight: 400, lineHeight: 1.4 }}>{pinyin}</span>}
                           <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
                             {isType1?'写':'认'}
                           </span>
@@ -120,15 +122,17 @@ export default function CharacterList({ onBack }) {
               )
             })
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: 10 }}>
               {chars.map((char, i) => {
                 const isType1 = data?.type1.includes(char)
+                const pinyin = characters[char]?.pinyin || ''
                 return (
                   <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
-                    style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
-                      background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
-                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    style={{ padding: '10px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
+                      background: isType1?'#fff5f5':'#eff6ff', fontSize: 22, fontWeight: 700,
+                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                     {char}
+                    {pinyin && <span style={{ fontSize: 9, color: '#7c6b8e', fontWeight: 400, lineHeight: 1.4 }}>{pinyin}</span>}
                     <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
                       {isType1?'写':'认'}
                     </span>
