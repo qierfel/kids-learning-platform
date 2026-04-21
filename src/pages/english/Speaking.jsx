@@ -154,8 +154,10 @@ export default function Speaking({ user, onBack }) {
       micStreamRef.current = stream
       startWaveform(stream)
 
-      // 3. RTCPeerConnection
-      const pc = new RTCPeerConnection()
+      // 3. RTCPeerConnection (with STUN for ICE candidate discovery)
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      })
       pcRef.current = pc
 
       // 4. Audio output element for AI speech
@@ -185,9 +187,9 @@ export default function Speaking({ user, onBack }) {
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
 
-      // 8. Exchange SDP with OpenAI Realtime API
+      // 8. Exchange SDP via our CF proxy (avoids Safari CORS block on api.openai.com)
       const sdpRes = await fetch(
-        'https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview',
+        '/api/realtime-sdp?model=gpt-4o-realtime-preview',
         {
           method: 'POST',
           headers: {
@@ -198,19 +200,22 @@ export default function Speaking({ user, onBack }) {
         }
       )
 
-      if (!sdpRes.ok) throw new Error(await sdpRes.text())
+      if (!sdpRes.ok) throw new Error(`SDP exchange failed (${sdpRes.status}): ${await sdpRes.text()}`)
 
       // 9. Set remote description (SDP answer from OpenAI)
       await pc.setRemoteDescription({ type: 'answer', sdp: await sdpRes.text() })
 
     } catch (e) {
       const msg = e.message || ''
-      if (/Permission denied|NotAllowedError|not-allowed/i.test(msg)) {
-        setRtError('麦克风权限被拒绝。\n请在浏览器设置中允许使用麦克风，然后重试。')
-      } else if (/NotFoundError|device not found/i.test(msg)) {
+      const name = e.name || ''
+      if (/NotAllowedError|SecurityError|Permission denied|not-allowed/i.test(name + msg)) {
+        setRtError('麦克风权限被拒绝。\n请在浏览器设置中允许此网站使用麦克风，然后重试。')
+      } else if (/NotFoundError|device not found/i.test(name + msg)) {
         setRtError('未找到麦克风设备，\n请确认麦克风已连接。')
+      } else if (/NotSupportedError|not supported/i.test(name + msg)) {
+        setRtError('当前浏览器不支持 WebRTC 语音功能。\n请使用 Chrome（桌面版）重试。')
       } else {
-        setRtError(`连接失败：${msg}\n请检查网络并重试。`)
+        setRtError(`连接失败：${msg || name || 'Unknown error'}\n请检查网络并重试。`)
       }
       setRtStatus('error')
       cleanupRealtime()
