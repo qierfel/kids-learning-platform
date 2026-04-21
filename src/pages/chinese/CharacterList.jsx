@@ -69,7 +69,7 @@ export default function CharacterList({ onBack }) {
       {view === 'chars' && (
         <>
           {/* type filter */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
             {[['all','全部字'],['type1','一类字（必写）'],['type2','二类字（认读）']].map(([v,l]) => (
               <button key={v} onClick={() => setTypeFilter(v)}
                 style={{ padding: '5px 14px', borderRadius: 16, border: `2px solid ${typeFilter===v?'#e85d4a':'#e2e8f0'}`,
@@ -82,23 +82,61 @@ export default function CharacterList({ onBack }) {
           {data && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
             一类字 {data.type1.length} 个 · 二类字 {data.type2.length} 个
           </div>}
-          {/* char grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
-            {chars.map((char, i) => {
-              const isType1 = data?.type1.includes(char)
+          {/* per-lesson char groups */}
+          {data?.lessons ? (
+            data.lessons.map(l => {
+              const lessonChars = typeFilter === 'type1' ? (l.type1 || []) :
+                typeFilter === 'type2' ? (l.type2 || []) :
+                [...(l.type1 || []), ...(l.type2 || [])]
+              if (lessonChars.length === 0) return null
               return (
-                <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
-                  style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
-                    background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
-                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                  {char}
-                  <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
-                    {isType1?'写':'认'}
-                  </span>
-                </button>
+                <div key={l.lesson} style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8,
+                    borderLeft: '3px solid #e85d4a', paddingLeft: 8 }}>
+                    第{l.lesson}课 · {l.title}
+                    <span style={{ marginLeft: 8, fontWeight: 400, fontSize: 11 }}>
+                      {l.type1?.length > 0 && `写${l.type1.length}`}
+                      {l.type1?.length > 0 && l.type2?.length > 0 && '·'}
+                      {l.type2?.length > 0 && `认${l.type2.length}`}
+                    </span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
+                    {lessonChars.map((char, i) => {
+                      const isType1 = (l.type1 || []).includes(char)
+                      return (
+                        <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
+                          style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
+                            background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
+                            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                          {char}
+                          <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
+                            {isType1?'写':'认'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
               )
-            })}
-          </div>
+            })
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', gap: 10 }}>
+              {chars.map((char, i) => {
+                const isType1 = data?.type1.includes(char)
+                return (
+                  <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
+                    style={{ padding: '12px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
+                      background: isType1?'#fff5f5':'#eff6ff', fontSize: 24, fontWeight: 700,
+                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    {char}
+                    <span style={{ fontSize: 9, color: isType1?'#ef4444':'#3b82f6', fontWeight: 600 }}>
+                      {isType1?'写':'认'}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </>
       )}
 
