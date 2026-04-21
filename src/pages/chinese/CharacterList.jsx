@@ -158,7 +158,7 @@ export default function CharacterList({ onBack }) {
             <div key={lesson} style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 8,
                 borderLeft: '3px solid #e85d4a', paddingLeft: 8 }}>
-                第{lesson}课 · {title}
+                {typeof lesson === 'number' ? `第${lesson}课 · ${title}` : title}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 8 }}>
                 {words.map((word, i) => {
