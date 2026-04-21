@@ -143,7 +143,7 @@ export default function Notebook({ user }) {
       }
 
       if (ttsEnabled && fullText) {
-        ttsSpeak(fullText, { voice: 'shimmer' }).catch(() => {})
+        ttsSpeak(fullText, { lang: 'zh-CN' }).catch(() => {})
       }
     } catch (e) {
       const detail = e.message || '未知错误'

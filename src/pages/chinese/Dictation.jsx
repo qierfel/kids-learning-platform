@@ -252,7 +252,7 @@ export default function Dictation({ onBack }) {
 
   function speakItem(item) {
     if (!item) return
-    ttsSpeak(item, { voice: 'shimmer' }).catch(() => {})
+    ttsSpeak(item, { lang: 'zh-CN' }).catch(() => {})
   }
 
   function handleReveal() { setRevealed(true) }
@@ -422,7 +422,7 @@ export default function Dictation({ onBack }) {
                 <div
                   key={item}
                   style={{ background: '#fff0f4', border: '2px solid #ef9a9a', borderRadius: 10, textAlign: 'center', padding: '8px 4px', cursor: 'pointer' }}
-                  onClick={() => ttsSpeak(item, { voice: 'shimmer' }).catch(() => {})}
+                  onClick={() => ttsSpeak(item, { lang: 'zh-CN' }).catch(() => {})}
                 >
                   <div style={{ fontSize: item.length === 1 ? 22 : 15, fontWeight: 700, color: '#c62828' }}>{item}</div>
                   <div style={{ fontSize: 10, color: '#e57373' }}>错{wrong}次</div>
@@ -647,7 +647,7 @@ export default function Dictation({ onBack }) {
             <div style={S.resultGrid}>
               {wrongItems.map(({ item }) => (
                 <div key={item} style={{ ...S.resultCell(false), fontSize: item.length > 1 ? 14 : 20 }}
-                  onClick={() => ttsSpeak(item, { voice: 'shimmer' }).catch(() => {})}
+                  onClick={() => ttsSpeak(item, { lang: 'zh-CN' }).catch(() => {})}
                   title="点击朗读"
                 >
                   {item}
@@ -662,7 +662,7 @@ export default function Dictation({ onBack }) {
           <div style={S.resultGrid}>
             {sessionResults.map(({ item, correct: c }, i) => (
               <div key={`${item}-${i}`} style={{ ...S.resultCell(c), fontSize: item.length > 1 ? 14 : 20 }}
-                onClick={() => ttsSpeak(item, { voice: 'shimmer' }).catch(() => {})}
+                onClick={() => ttsSpeak(item, { lang: 'zh-CN' }).catch(() => {})}
                 title="点击朗读"
               >
                 {item}

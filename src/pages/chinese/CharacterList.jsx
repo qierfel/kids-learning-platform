@@ -105,7 +105,7 @@ export default function CharacterList({ onBack }) {
                       const isType1 = (l.type1 || []).includes(char)
                       const pinyin = characters[char]?.pinyin || ''
                       return (
-                        <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
+                        <button key={i} onClick={() => ttsSpeak(char, { lang: 'zh-CN' }).catch(()=>{})}
                           style={{ padding: '10px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
                             background: isType1?'#fff5f5':'#eff6ff', fontSize: 22, fontWeight: 700,
                             cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -127,7 +127,7 @@ export default function CharacterList({ onBack }) {
                 const isType1 = data?.type1.includes(char)
                 const pinyin = characters[char]?.pinyin || ''
                 return (
-                  <button key={i} onClick={() => ttsSpeak(char, { voice: 'shimmer' }).catch(()=>{})}
+                  <button key={i} onClick={() => ttsSpeak(char, { lang: 'zh-CN' }).catch(()=>{})}
                     style={{ padding: '10px 4px', borderRadius: 10, border: `2px solid ${isType1?'#fca5a5':'#bfdbfe'}`,
                       background: isType1?'#fff5f5':'#eff6ff', fontSize: 22, fontWeight: 700,
                       cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -164,7 +164,7 @@ export default function CharacterList({ onBack }) {
                 {words.map((word, i) => {
                   const pinyin = getWordPinyin(word)
                   return (
-                    <button key={i} onClick={() => ttsSpeak(word, { voice: 'shimmer' }).catch(()=>{})}
+                    <button key={i} onClick={() => ttsSpeak(word, { lang: 'zh-CN' }).catch(()=>{})}
                       style={{ padding: '10px 6px', borderRadius: 10, border: '2px solid #fde68a',
                         background: '#fffbeb', cursor: 'pointer',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>

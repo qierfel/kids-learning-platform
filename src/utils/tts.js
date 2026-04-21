@@ -1,13 +1,23 @@
-// Shared OpenAI TTS utility
+// Shared TTS utility
+// Chinese text: uses Web Speech API with lang="zh-CN" for correct Mandarin tones
+// English text: uses OpenAI TTS via /api/tts
 // Usage: await ttsSpeak('Hello world')
-// Usage: await ttsSpeak('你好', { voice: 'shimmer' })
+// Usage: await ttsSpeak('你好', { lang: 'zh-CN' })
 
 const cache = new Map()
 let currentAudio = null
 
-export async function ttsSpeak(text, { voice = 'nova', onEnd } = {}) {
-  // Stop any currently playing TTS audio
+export async function ttsSpeak(text, { voice = 'nova', lang, onEnd } = {}) {
   ttsStop()
+
+  if (lang === 'zh-CN' && typeof window !== 'undefined' && window.speechSynthesis) {
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'zh-CN'
+    utterance.rate = 0.85
+    if (onEnd) utterance.onend = onEnd
+    window.speechSynthesis.speak(utterance)
+    return
+  }
 
   let objUrl = cache.get(text)
   if (!objUrl) {
@@ -31,5 +41,8 @@ export function ttsStop() {
   if (currentAudio) {
     currentAudio.pause()
     currentAudio = null
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.cancel()
   }
 }

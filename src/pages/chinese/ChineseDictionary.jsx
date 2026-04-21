@@ -63,7 +63,7 @@ export default function ChineseDictionary() {
   }
 
   function speak(text) {
-    ttsSpeak(text, { voice: 'shimmer' }).catch(() => {})
+    ttsSpeak(text, { lang: 'zh-CN' }).catch(() => {})
   }
 
   function addToBook() {
