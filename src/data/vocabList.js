@@ -251,7 +251,7 @@ export const vocabList = {
     },
     {
       lesson: 8,
-      title: "第4课",
+      title: "古诗两首",
       words: ["美丽", "鸟鸣", "圆圆", "秋天", "哥哥"]
     },
     {
@@ -261,12 +261,12 @@ export const vocabList = {
     },
     {
       lesson: 10,
-      title: "第6课",
+      title: "一封信",
       words: ["桌子", "品尝", "购买", "甘蔗", "甜菜", "劳动", "应该"]
     },
     {
       lesson: 11,
-      title: "第7课",
+      title: "妈妈睡了",
       words: ["弱小", "周末", "母亲", "芬芳", "递给", "勇敢"]
     },
     {
@@ -313,6 +313,16 @@ export const vocabList = {
       lesson: 20,
       title: "难忘的泼水节",
       words: ["泼水", "傣族", "节日", "端着", "花炮", "龙船", "难忘"]
+    },
+    {
+      lesson: 23,
+      title: "第23课",
+      words: ["忽然", "召集", "众人", "完成", "启发", "供给"]
+    },
+    {
+      lesson: 24,
+      title: "第24课",
+      words: ["治水", "洪水", "百姓", "必须", "继续", "事业", "仍然"]
     }
   ],
 
