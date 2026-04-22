@@ -13,17 +13,17 @@ import TextbookVocab from './english/TextbookVocab'
 import './English.css'
 
 const CARDS = [
-  { id: 'listening',      img: '/icons/card_listening.png',  label: '听力练习',      desc: 'TTS朗读 · 分级故事',                ready: true  },
-  { id: 'history',        img: '/icons/card_history.png',    label: '人类大历史',    desc: '中英双语 · 98讲 · TTS朗读',          ready: true  },
-  { id: 'phonics',        img: '/icons/card_phonics.png',    label: '自然拼读',      desc: '尼尔森体系 · 148集视频',              ready: true  },
-  { id: 'speaking',       img: '/icons/card_speaking.png',   label: '口语对话',      desc: 'AI外教 Emma · 实时纠错',             ready: true  },
-  { id: 'reading_hub',    img: '/icons/card_reading.png',    label: '阅读中心',      desc: '分级 · 绘本 · 章节书 · 考试阅读',    ready: true  },
-  { id: 'writing',        img: '/icons/card_writing.png',    label: '写作练习',      desc: 'AI批改 · 自动录入错题本',             ready: true  },
-  { id: 'grammar',        img: '/icons/card_grammar.png',    label: '语法讲解',      desc: '14章65个知识点 · AI练习题',           ready: true  },
-  { id: 'srs',            img: '/icons/card_vocab.png',      label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
-  { id: 'words',          img: '/icons/card_flashcard.png',  label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
-  { id: 'textbook_vocab', img: '/icons/card_textbook.png',   label: '教材词汇',      desc: '沪教版 · 单词句型 · 听写练习',        ready: true  },
-  { id: 'dictionary',     img: '/icons/card_lookup.png',     label: '查词 · 生词本', desc: '即查即存 · 闪音 · 例句 · 闪卡复习',  ready: true  },
+  { id: 'listening',      img: '/icons/extracted_named/listening_practice_card.png',  label: '听力练习',      desc: 'TTS朗读 · 分级故事',                ready: true  },
+  { id: 'history',        img: '/icons/extracted_named/human_history_card.png',        label: '人类大历史',    desc: '中英双语 · 98讲 · TTS朗读',          ready: true  },
+  { id: 'phonics',        img: '/icons/extracted_named/natural_phonics_card.png',      label: '自然拼读',      desc: '尼尔森体系 · 148集视频',              ready: true  },
+  { id: 'speaking',       img: '/icons/extracted_named/oral_dialogue_card.png',        label: '口语对话',      desc: 'AI外教 Emma · 实时纠错',             ready: true  },
+  { id: 'reading_hub',    img: '/icons/extracted_named/reading_card.png',              label: '阅读中心',      desc: '分级 · 绘本 · 章节书 · 考试阅读',    ready: true  },
+  { id: 'writing',        img: '/icons/extracted_named/writing_practice_card.png',     label: '写作练习',      desc: 'AI批改 · 自动录入错题本',             ready: true  },
+  { id: 'grammar',        img: '/icons/extracted_named/grammar_globe_card.png',        label: '语法讲解',      desc: '14章65个知识点 · AI练习题',           ready: true  },
+  { id: 'srs',            img: '/icons/extracted_named/lookup_vocab_card.png',         label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
+  { id: 'words',          img: '/icons/extracted_named/word_speed_training_card.png',  label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
+  { id: 'textbook_vocab', img: '/icons/extracted_named/textbook_vocabulary_card.png',  label: '教材词汇',      desc: '沪教版 · 单词句型 · 听写练习',        ready: true  },
+  { id: 'dictionary',     img: '/icons/extracted_named/lookup_notebook_card.png',      label: '查词 · 生词本', desc: '即查即存 · 闪音 · 例句 · 闪卡复习',  ready: true  },
 ]
 
 export default function English({ user }) {
