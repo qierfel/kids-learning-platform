@@ -63,7 +63,13 @@ export default function English({ user }) {
             className={`en-card${card.ready ? '' : ' en-card--coming'}`}
             onClick={() => card.ready && setActiveTool(card.id)}
           >
-            <img src={card.img} alt={card.label} className="en-card-img" />
+            <div className="en-card-img-wrap">
+              <img src={card.img} alt={card.label} className="en-card-img" />
+            </div>
+            <div className="en-card-info">
+              <div className="en-card-label">{card.label}</div>
+              <div className="en-card-desc">{card.desc}</div>
+            </div>
             {!card.ready && <span className="en-card-soon">即将上线</span>}
           </button>
         ))}
