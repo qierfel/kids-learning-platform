@@ -20,8 +20,8 @@ const CARDS = [
   { id: 'reading_hub',    img: '/icons/extracted_named/reading_card.png',              label: '阅读中心',      desc: '分级 · 绘本 · 章节书 · 考试阅读',    ready: true  },
   { id: 'writing',        img: '/icons/extracted_named/writing_practice_card.png',     label: '写作练习',      desc: 'AI批改 · 自动录入错题本',             ready: true  },
   { id: 'grammar',        img: '/icons/extracted_named/grammar_globe_card.png',        label: '语法讲解',      desc: '14章65个知识点 · AI练习题',           ready: true  },
-  { id: 'srs',            img: '/icons/extracted_named/lookup_vocab_card.png',         label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
-  { id: 'words',          img: '/icons/extracted_named/word_speed_training_card.png',  label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
+  { id: 'srs',            img: '/icons/extracted_named/abc_cards_icon_large.png',       label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
+  { id: 'words',          img: '/icons/extracted_named/word_training_machine_icon.png', label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
   { id: 'textbook_vocab', img: '/icons/extracted_named/textbook_vocabulary_card.png',  label: '教材词汇',      desc: '沪教版 · 单词句型 · 听写练习',        ready: true  },
   { id: 'dictionary',     img: '/icons/extracted_named/lookup_notebook_card.png',      label: '查词 · 生词本', desc: '即查即存 · 闪音 · 例句 · 闪卡复习',  ready: true  },
 ]
