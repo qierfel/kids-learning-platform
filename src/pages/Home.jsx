@@ -2,17 +2,17 @@ import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
 const GRID_ITEMS = [
-  { path: '/mistakes', label: '错题本', icon: '/icons/extracted_named/lookup_notebook_icon.png' },
-  { path: '/notebook', label: '问题讨论', icon: '/icons/extracted_named/robot_mascot_icon.png' },
-  { path: '/math', label: '数学', icon: '/icons/extracted_named/fun_math_button.png' },
-  { path: '/chinese', label: '语文', icon: '/icons/extracted_named/fun_chinese_button_green.png' },
-  { path: '/english', label: '英语', icon: '/icons/extracted_named/fun_english_button_blue.png' },
-  { path: '/physics', label: '物理', icon: '/icons/extracted_named/fun_physics_button_red.png' },
-  { path: '/chemistry', label: '化学', icon: '/icons/extracted_named/fun_chemistry_button_orange.png' },
-  { path: '/history', label: '历史', icon: '/icons/extracted_named/fun_history_button_brown.png' },
-  { path: '/geography', label: '地理', icon: '/icons/extracted_named/fun_geography_button_gold.png' },
-  { path: '/chinese', label: '小学', icon: '/icons/extracted_named/schoolhouse_icon.png' },
-  { path: '/physics', label: '初中', icon: '/icons/extracted_named/junior_torch_icon.png' },
+  { path: '/mistakes', label: '错题本', icon: '/icons/extracted_named/wrong_book_card_sheet.png', card: true },
+  { path: '/notebook', label: '问题讨论', icon: '/icons/extracted_named/problem_discussion_card_sheet.png', card: true },
+  { path: '/math', label: '数学', icon: '/icons/extracted_named/math_icon_sheet.png' },
+  { path: '/chinese', label: '语文', icon: '/icons/extracted_named/chinese_icon_sheet.png' },
+  { path: '/english', label: '英语', icon: '/icons/extracted_named/english_icon_sheet.png' },
+  { path: '/physics', label: '物理', icon: '/icons/extracted_named/physics_icon_sheet.png' },
+  { path: '/chemistry', label: '化学', icon: '/icons/extracted_named/chemistry_icon_sheet.png' },
+  { path: '/history', label: '历史', icon: '/icons/extracted_named/history_icon_sheet.png' },
+  { path: '/geography', label: '地理', icon: '/icons/extracted_named/geography_icon_sheet.png' },
+  { path: '/chinese', label: '小学', icon: '/icons/extracted_named/elementary_icon_sheet.png' },
+  { path: '/physics', label: '初中', icon: '/icons/extracted_named/junior_icon_sheet.png' },
 ]
 
 export default function Home() {
@@ -25,9 +25,8 @@ export default function Home() {
       </div>
       <div className="home-grid">
         {GRID_ITEMS.map((item, i) => (
-          <button key={i} className="home-grid-item" onClick={() => navigate(item.path)}>
-            <img src={item.icon} alt={item.label} className="home-grid-icon" />
-            <span className="home-grid-label">{item.label}</span>
+          <button key={i} className="home-grid-item" aria-label={item.label} onClick={() => navigate(item.path)}>
+            <img src={item.icon} alt={item.label} className={item.card ? 'home-grid-icon' : 'home-grid-icon home-grid-icon--sheet'} />
           </button>
         ))}
       </div>
