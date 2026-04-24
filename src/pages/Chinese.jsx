@@ -81,7 +81,11 @@ export default function Chinese() {
   return (
     <div className="subject-page cn-page">
       <div className="cn-hero">
+        <div className="subject-eyebrow">Chinese Language Hall</div>
         <h2 className="subject-title">趣味语文 <span className="edition">人教版</span></h2>
+        <p className="subject-lead">
+          把生字、古诗词、词典、听写和初中拓展整理成更清楚的入口，让孩子更容易找到自己现在要继续学的内容。
+        </p>
       </div>
 
       <div className="stage-tabs">
@@ -93,7 +97,11 @@ export default function Chinese() {
         </button>
       </div>
 
-      {stage === 'primary' && <TextbookLink subject="语文" />}
+      {stage === 'primary' && (
+        <div className="cn-textbook-wrap">
+          <TextbookLink subject="语文" />
+        </div>
+      )}
 
       <div className="cn-card-grid">
         {tools.map(t => (

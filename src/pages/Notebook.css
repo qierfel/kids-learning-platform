@@ -3,8 +3,12 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 80px);
-  padding: 0;
+  padding: 16px 16px 20px;
   overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(93, 134, 218, 0.08), transparent 24%),
+    radial-gradient(circle at top right, rgba(203, 174, 118, 0.10), transparent 26%),
+    linear-gradient(180deg, #f6f0e7 0%, #efe5d8 100%);
 }
 
 /* ============ Top Bar ============ */
@@ -12,12 +16,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-radius: 16px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  border: 1.5px solid #e8edf2;
+  background: rgba(255, 252, 247, 0.94);
+  border-radius: 22px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(108, 88, 66, 0.08);
   flex-shrink: 0;
+  box-shadow: 0 16px 34px rgba(67, 52, 35, 0.08);
 }
 
 .topbar-teacher {
@@ -30,7 +35,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #ede9fe;
+  background: linear-gradient(135deg, #e9eefc, #d9e8ff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,8 +50,8 @@
 
 .teacher-name {
   font-size: 15px;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-weight: 800;
+  color: #24313b;
 }
 
 .teacher-status {
@@ -64,7 +69,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: rgba(245, 241, 235, 0.92);
   border: none;
   cursor: pointer;
   font-size: 16px;
@@ -94,7 +99,7 @@
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   flex-shrink: 0;
   scrollbar-width: none;
 }
@@ -107,9 +112,9 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
-  border: 1.5px solid #e8edf2;
-  background: #fff;
-  color: #666;
+  border: 1px solid rgba(108, 88, 66, 0.10);
+  background: rgba(255, 252, 247, 0.90);
+  color: #66625b;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -135,7 +140,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 4px 0 12px;
+  padding: 6px 4px 14px;
   scrollbar-width: thin;
   scrollbar-color: #e8edf2 transparent;
 }
@@ -163,9 +168,9 @@
 }
 
 .welcome-bubble {
-  background: #fff;
-  border: 1.5px solid #e8edf2;
-  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.96);
+  border: 1px solid rgba(108, 88, 66, 0.08);
+  border-radius: 22px;
   padding: 16px 20px;
   font-size: 15px;
   color: #1a1a2e;
@@ -208,8 +213,8 @@
 
 .msg-bubble {
   max-width: 78%;
-  padding: 10px 14px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: 20px;
   font-size: 14px;
   line-height: 1.65;
   white-space: pre-wrap;
@@ -217,15 +222,18 @@
 }
 
 .bubble-ai {
-  background: #f3f4f6;
+  background: rgba(255, 252, 247, 0.96);
   color: #1a1a2e;
-  border-radius: 4px 18px 18px 18px;
+  border-radius: 8px 20px 20px 20px;
+  border: 1px solid rgba(108, 88, 66, 0.08);
+  box-shadow: 0 10px 24px rgba(67, 52, 35, 0.06);
 }
 
 .bubble-user {
-  background: #4f46e5;
+  background: linear-gradient(135deg, #4d6cc9, #3459b5);
   color: #fff;
-  border-radius: 18px 4px 18px 18px;
+  border-radius: 20px 8px 20px 20px;
+  box-shadow: 0 12px 28px rgba(55, 87, 175, 0.20);
 }
 
 /* Streaming */
@@ -277,8 +285,8 @@
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  padding: 10px 0 0;
-  border-top: 1px solid #e8edf2;
+  padding: 12px 0 0;
+  border-top: 1px solid rgba(108, 88, 66, 0.10);
   flex-shrink: 0;
 }
 
@@ -286,8 +294,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1.5px solid #e8edf2;
-  background: #fff;
+  border: 1px solid rgba(108, 88, 66, 0.10);
+  background: rgba(255, 252, 247, 0.96);
   font-size: 18px;
   cursor: pointer;
   display: flex;
@@ -310,8 +318,8 @@
 
 .chat-input {
   flex: 1;
-  border: 1.5px solid #e8edf2;
-  border-radius: 12px;
+  border: 1px solid rgba(108, 88, 66, 0.10);
+  border-radius: 16px;
   padding: 10px 14px;
   font-size: 14px;
   resize: none;
@@ -336,8 +344,8 @@
 .send-btn {
   padding: 0 18px;
   height: 40px;
-  border-radius: 12px;
-  background: #4f46e5;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4d6cc9, #3459b5);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
@@ -374,12 +382,13 @@
 }
 
 .history-card {
-  background: #fff;
-  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.96);
+  border-radius: 20px;
   padding: 14px 16px;
-  border: 1.5px solid #e8edf2;
+  border: 1px solid rgba(108, 88, 66, 0.08);
   cursor: pointer;
   transition: box-shadow 0.15s;
+  box-shadow: 0 12px 28px rgba(67, 52, 35, 0.06);
 }
 
 .history-card:hover {
@@ -421,8 +430,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1.5px solid #e8edf2;
-  background: #fff;
+  border: 1px solid rgba(108, 88, 66, 0.10);
+  background: rgba(255, 252, 247, 0.96);
   font-size: 18px;
   cursor: pointer;
   display: flex;
@@ -441,10 +450,12 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: #f0f9ff;
-  border-top: 1px solid #bae6fd;
-  border-bottom: 1px solid #bae6fd;
+  background: rgba(235, 244, 255, 0.92);
+  border-top: 1px solid rgba(126, 170, 231, 0.26);
+  border-bottom: 1px solid rgba(126, 170, 231, 0.26);
   flex-shrink: 0;
+  border-radius: 16px;
+  margin-bottom: 8px;
 }
 .image-preview-loading {
   font-size: 13px;
@@ -496,6 +507,25 @@
   display: block;
   cursor: pointer;
   border: 1px solid rgba(0,0,0,0.08);
+}
+
+@media (max-width: 640px) {
+  .chat-view {
+    padding: 10px 10px 16px;
+    height: calc(100vh - 72px);
+  }
+
+  .chat-topbar {
+    border-radius: 18px;
+  }
+
+  .msg-bubble {
+    max-width: 86%;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+  }
 }
 .msg-text-below-image {
   margin-top: 6px;

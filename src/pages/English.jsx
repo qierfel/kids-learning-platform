@@ -52,8 +52,34 @@ export default function English({ user }) {
   return (
     <div className="en-page">
       <div className="en-hero">
+        <div className="en-hero-badge">English Studio</div>
         <h1 className="en-hero-title">趣味英语</h1>
         <p className="en-hero-sub">听说读写 · 词汇 · 查词 · 全方位英语学习</p>
+        <p className="en-hero-desc">
+          从听力、口语、阅读到写作，把最常用的英语学习工具整理成一张更清楚的学习桌面。
+        </p>
+      </div>
+
+      <div className="en-overview">
+        <div className="en-overview-card">
+          <div className="en-overview-label">适合场景</div>
+          <div className="en-overview-value">日常练习 + 长期积累</div>
+        </div>
+        <div className="en-overview-card">
+          <div className="en-overview-label">推荐设备</div>
+          <div className="en-overview-value">手机 / iPad / 电脑</div>
+        </div>
+        <div className="en-overview-card en-overview-card--accent">
+          <div className="en-overview-label">学习重点</div>
+          <div className="en-overview-value">听说读写一体推进</div>
+        </div>
+      </div>
+
+      <div className="en-section-head">
+        <div>
+          <h2 className="en-section-title">开始学习</h2>
+          <p className="en-section-subtitle">入口更稳定、层次更清楚，孩子更容易直接找到自己熟悉的学习方式。</p>
+        </div>
       </div>
 
       <div className="en-card-grid">
