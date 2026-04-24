@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { GRADE_WORDS, EXAM_WORDS, IELTS_WORDS } from '../../data/englishWords'
 import { sm2Update, newCard, getTodayPlan, estimatePlan, getStats } from '../../utils/srs'
 import { ttsSpeak } from '../../utils/tts'
+import { logActivity } from '../../utils/activityLogger'
 import './SRSStudy.css'
 
 const LEVEL_LABELS = {
@@ -114,6 +115,10 @@ export default function SRSStudy({ user, onBack }) {
         onFinish={async (newProgress) => {
           await saveProgress(newProgress)
           const pool = getWordPool(level)
+          const wordCount = (todayPlan?.dueReviews?.length || 0) + (todayPlan?.todayNew?.length || 0)
+          if (wordCount > 0) {
+            logActivity(user.uid, { type: 'srs_review', subject: '英语', moduleKey: 'srs', count: wordCount })
+          }
           setTodayPlan(getTodayPlan(pool, newProgress, plan.wordsPerDay))
           setPhase('home')
         }}

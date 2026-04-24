@@ -1,6 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { ttsSpeak } from '../utils/tts'
+import { logActivity } from '../utils/activityLogger'
 import './Notebook.css'
+
+const READ_MARKS_KEY = uid => `notebook_read_marks_${uid}`
+
+function updateReadMark(userId, threadId) {
+  if (!userId || !threadId) return
+  let marks = {}
+  try { marks = JSON.parse(localStorage.getItem(READ_MARKS_KEY(userId))) || {} } catch {}
+  marks[threadId] = Date.now()
+  try { localStorage.setItem(READ_MARKS_KEY(userId), JSON.stringify(marks)) } catch {}
+}
 
 const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
 
@@ -78,6 +89,7 @@ export default function Notebook({ user }) {
     if ((!text && !pendingImage) || isStreaming) return
     setInputText('')
     if (textareaRef.current) { textareaRef.current.style.height = 'auto' }
+    logActivity(user?.uid, { type: 'discussion_ask', subject, moduleKey: 'notebook', count: 1 })
 
     const userName = user.nickname || user.email.split('@')[0]
     const userMsg = {
@@ -202,6 +214,7 @@ export default function Notebook({ user }) {
     setMessages(thread.messages || []); setThreadId(thread.id)
     setSubject(thread.subject || '不限科目'); setShowHistory(false)
     setStreamingText(''); setPendingImage(null)
+    updateReadMark(user?.uid, thread.id)
   }
 
   function handleInputChange(e) {
