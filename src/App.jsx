@@ -79,24 +79,29 @@ export default function App() {
     setUser(null)
   }
 
-  if (user === undefined) return <div className="page-loading">加载中...</div>
+  if (user === undefined) {
+    return (
+      <div className="page-state-wrap">
+        <div className="page-state-card">
+          <div className="page-state-emoji">✨</div>
+          <h2 className="page-state-title">正在准备学习空间</h2>
+          <p className="page-state-text">页面和学习内容正在加载，请稍候一下。</p>
+        </div>
+      </div>
+    )
+  }
 
   if (user?.status === 'pending') {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f3ff' }}>
-        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '20px', maxWidth: '360px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
-          <h2 style={{ color: '#1a1a2e', marginBottom: '8px' }}>等待审批</h2>
-          <p style={{ color: '#888', fontSize: '14px', marginBottom: '20px' }}>
+      <div className="page-state-wrap">
+        <div className="page-state-card">
+          <div className="page-state-emoji">⏳</div>
+          <h2 className="page-state-title">等待审批</h2>
+          <p className="page-state-text">
             你的账号（{user.nickname || user.email}）已提交，管理员审批通过后即可使用。
           </p>
-          <p style={{ color: '#bbb', fontSize: '12px', marginBottom: '20px' }}>页面将自动检测状态...</p>
-          <button
-            onClick={handleLogout}
-            style={{ padding: '10px 24px', background: '#f3f4f6', color: '#555', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '14px' }}
-          >
-            退出登录
-          </button>
+          <p className="page-state-note">页面会自动检测审批结果。</p>
+          <button onClick={handleLogout} className="page-state-btn">退出登录</button>
         </div>
       </div>
     )
@@ -104,17 +109,12 @@ export default function App() {
 
   if (user?.status === 'rejected') {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff5f5' }}>
-        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '20px', maxWidth: '360px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>❌</div>
-          <h2 style={{ color: '#e53e3e', marginBottom: '8px' }}>申请未通过</h2>
-          <p style={{ color: '#888', fontSize: '14px', marginBottom: '20px' }}>请联系管理员了解原因。</p>
-          <button
-            onClick={handleLogout}
-            style={{ padding: '10px 24px', background: '#f3f4f6', color: '#555', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '14px' }}
-          >
-            退出登录
-          </button>
+      <div className="page-state-wrap page-state-wrap--warning">
+        <div className="page-state-card">
+          <div className="page-state-emoji">❌</div>
+          <h2 className="page-state-title">申请未通过</h2>
+          <p className="page-state-text">请联系管理员了解原因，或稍后重新申请。</p>
+          <button onClick={handleLogout} className="page-state-btn">退出登录</button>
         </div>
       </div>
     )
