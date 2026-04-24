@@ -85,6 +85,13 @@ function todayLabel() {
   return new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
 }
 
+const STAT_CARDS = [
+  { key: 'mistakes', path: '/mistakes', label: '错题本', icon: '/icons/generated/mistakes-icon.png', sub: '道待复习' },
+  { key: 'notebook', path: '/notebook', label: '问题讨论', icon: '/icons/generated/discussion-icon.png' },
+  { key: 'words', path: '/english', label: '单词记忆', icon: '/icons/generated/english-icon.png', sub: '今日已背（词）' },
+  { key: 'ai', path: '/coding', label: 'AI 练习', icon: '/icons/generated/ai-coding-icon.png', sub: '今日完成（题/篇）' },
+]
+
 export default function Home({ user }) {
   const navigate = useNavigate()
   const stats = useHomeStats(user)
@@ -117,23 +124,23 @@ export default function Home({ user }) {
         </div>
 
         <div className="home-stats-grid">
-          {/* Card 1: 错题本 */}
-          <button className="home-stat-card" onClick={() => navigate('/mistakes')}>
-            <div className="home-stat-icon">📕</div>
+          <button className="home-stat-card" onClick={() => navigate(STAT_CARDS[0].path)}>
+            <div className="home-stat-icon-wrap">
+              <img src={STAT_CARDS[0].icon} alt={STAT_CARDS[0].label} className="home-stat-icon" />
+            </div>
             <div className="home-stat-body">
-              <div className="home-stat-label">错题本</div>
-              <div className="home-stat-value">
-                {stats.loading ? '—' : stats.mistakesCount}
-              </div>
-              <div className="home-stat-sub">道待复习</div>
+              <div className="home-stat-label">{STAT_CARDS[0].label}</div>
+              <div className="home-stat-value">{stats.loading ? '—' : stats.mistakesCount}</div>
+              <div className="home-stat-sub">{STAT_CARDS[0].sub}</div>
             </div>
           </button>
 
-          {/* Card 2: 问题讨论 */}
-          <button className="home-stat-card" onClick={() => navigate('/notebook')}>
-            <div className="home-stat-icon">💬</div>
+          <button className="home-stat-card" onClick={() => navigate(STAT_CARDS[1].path)}>
+            <div className="home-stat-icon-wrap">
+              <img src={STAT_CARDS[1].icon} alt={STAT_CARDS[1].label} className="home-stat-icon" />
+            </div>
             <div className="home-stat-body">
-              <div className="home-stat-label">问题讨论</div>
+              <div className="home-stat-label">{STAT_CARDS[1].label}</div>
               {stats.notebookUnread.length > 0
                 ? <div className="home-stat-value home-stat-value--highlight">{stats.notebookUnread.length}</div>
                 : <div className="home-stat-value">{stats.todayDiscussions}</div>
@@ -146,23 +153,25 @@ export default function Home({ user }) {
             </div>
           </button>
 
-          {/* Card 3: 单词记忆 */}
-          <button className="home-stat-card" onClick={() => navigate('/english')}>
-            <div className="home-stat-icon">📖</div>
+          <button className="home-stat-card" onClick={() => navigate(STAT_CARDS[2].path)}>
+            <div className="home-stat-icon-wrap">
+              <img src={STAT_CARDS[2].icon} alt={STAT_CARDS[2].label} className="home-stat-icon" />
+            </div>
             <div className="home-stat-body">
-              <div className="home-stat-label">单词记忆</div>
+              <div className="home-stat-label">{STAT_CARDS[2].label}</div>
               <div className="home-stat-value">{stats.srsWordsToday}</div>
-              <div className="home-stat-sub">今日已背（词）</div>
+              <div className="home-stat-sub">{STAT_CARDS[2].sub}</div>
             </div>
           </button>
 
-          {/* Card 4: AI练习 / 写作 */}
-          <button className="home-stat-card" onClick={() => navigate('/english')}>
-            <div className="home-stat-icon">🧠</div>
+          <button className="home-stat-card" onClick={() => navigate(STAT_CARDS[3].path)}>
+            <div className="home-stat-icon-wrap">
+              <img src={STAT_CARDS[3].icon} alt={STAT_CARDS[3].label} className="home-stat-icon" />
+            </div>
             <div className="home-stat-body">
-              <div className="home-stat-label">AI 练习</div>
+              <div className="home-stat-label">{STAT_CARDS[3].label}</div>
               <div className="home-stat-value">{stats.exercisesToday + stats.writingToday}</div>
-              <div className="home-stat-sub">今日完成（题/篇）</div>
+              <div className="home-stat-sub">{STAT_CARDS[3].sub}</div>
             </div>
           </button>
         </div>
@@ -172,16 +181,20 @@ export default function Home({ user }) {
       <section className="home-section home-section--achievements">
         <div className="home-ach-row">
           <div className="home-ach-info">
-            <div className="home-ach-title">🏆 成就</div>
+            <div className="home-ach-kicker">Achievement</div>
+            <div className="home-ach-title">学习成就</div>
             <div className="home-ach-streak">
               {stats.streak.currentStreak > 0
                 ? `连续打卡 ${stats.streak.currentStreak} 天`
                 : '今天还没打卡，快来学习吧！'}
             </div>
           </div>
-          <button className="home-ach-link" onClick={() => navigate('/achievements')}>
-            查看全部 →
-          </button>
+          <div className="home-ach-side">
+            <div className="home-ach-badge">{stats.streak.currentStreak > 0 ? `${stats.streak.currentStreak} Day Streak` : 'Start Today'}</div>
+            <button className="home-ach-link" onClick={() => navigate('/achievements')}>
+              查看全部 →
+            </button>
+          </div>
         </div>
       </section>
 

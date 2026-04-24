@@ -436,10 +436,12 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-  padding: 14px 18px;
-  border-radius: 18px;
-  background: rgba(255, 252, 247, 0.80);
+  padding: 16px 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(140deg, rgba(255, 252, 247, 0.92), rgba(247, 241, 232, 0.88));
   border: 1px solid rgba(96, 77, 56, 0.08);
+  box-shadow: 0 14px 30px rgba(73, 54, 36, 0.06);
 }
 
 .home-greeting-text {
@@ -467,17 +469,18 @@
 }
 
 .home-stat-card {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
-  padding: 16px 12px;
-  border-radius: 20px;
-  background: rgba(255, 253, 249, 0.95);
+  gap: 12px;
+  padding: 16px 14px;
+  border-radius: 22px;
+  background:
+    linear-gradient(160deg, rgba(255, 253, 249, 0.98), rgba(249, 243, 234, 0.94));
   border: 1px solid rgba(96, 77, 56, 0.09);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
-  text-align: center;
+  text-align: left;
 }
 
 .home-stat-card:hover {
@@ -485,15 +488,27 @@
   box-shadow: 0 10px 28px rgba(70, 50, 29, 0.10);
 }
 
+.home-stat-icon-wrap {
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255, 248, 239, 0.92);
+  border: 1px solid rgba(96, 77, 56, 0.06);
+}
+
 .home-stat-icon {
-  font-size: 28px;
-  line-height: 1;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(44, 38, 28, 0.10));
 }
 
 .home-stat-body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
 }
 
@@ -523,7 +538,10 @@
 
 /* ── Achievements entry strip ── */
 .home-section--achievements {
-  padding: 16px 22px;
+  padding: 18px 22px;
+  background:
+    radial-gradient(circle at top right, rgba(238, 132, 58, 0.14), transparent 28%),
+    linear-gradient(140deg, rgba(255, 251, 246, 0.94), rgba(248, 241, 231, 0.94));
 }
 
 .home-ach-row {
@@ -534,9 +552,21 @@
 }
 
 .home-ach-title {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 900;
   color: #27352f;
+}
+
+.home-ach-kicker {
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(49, 79, 71, 0.08);
+  color: #314f47;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .home-ach-streak {
@@ -544,6 +574,23 @@
   font-size: 13px;
   color: #6d7469;
   font-weight: 600;
+}
+
+.home-ach-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-ach-badge {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #314f47, #bd6b49);
+  color: #fff9f1;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 12px 24px rgba(73, 54, 36, 0.14);
+  white-space: nowrap;
 }
 
 .home-ach-link {
@@ -615,8 +662,32 @@
     grid-template-columns: 1fr;
   }
 
+  .home-stat-card {
+    grid-template-columns: 66px minmax(0, 1fr);
+  }
+
+  .home-stat-icon-wrap {
+    width: 66px;
+    height: 66px;
+  }
+
+  .home-stat-icon {
+    width: 58px;
+    height: 58px;
+  }
+
   .home-tool-card {
     grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .home-ach-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-ach-side {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
