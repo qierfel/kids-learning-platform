@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useHomeStats } from '../hooks/useHomeStats'
+import { trackDailyVisit } from '../utils/sessionTracker'
 import './Home.css'
 
 const FEATURED_TRACKS = [
@@ -15,7 +18,7 @@ const FEATURED_TRACKS = [
     path: '/coding',
     title: 'AI 编程创作屋',
     subtitle: '做网页、做小工具、做自己的作品',
-    description: '把 AI 当成创作搭档，让孩子更快进入“我做出来了”的状态。',
+    description: '把 AI 当成创作搭档，让孩子更快进入"我做出来了"的状态。',
     icon: '/icons/generated/ai-coding-icon.png',
     tone: 'coding',
     tag: '项目制作',
@@ -68,54 +71,126 @@ const SUBJECT_GROUPS = [
   },
 ]
 
-const HOME_NOTES = [
-  '手机上更适合快速进入今天的任务。',
-  'iPad 上最适合沉浸式学习和陪学。',
-  '电脑上更适合总览内容、讨论和作品展示。',
-]
+// Greeting based on time of day
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h < 6)  return '夜深了，注意休息 🌙'
+  if (h < 12) return '早上好'
+  if (h < 14) return '中午好'
+  if (h < 18) return '下午好'
+  return '晚上好'
+}
 
-export default function Home() {
+function todayLabel() {
+  return new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
+}
+
+export default function Home({ user }) {
   const navigate = useNavigate()
+  const stats = useHomeStats(user)
+
+  // Mark today as an active day
+  useEffect(() => {
+    if (user?.uid) trackDailyVisit(user.uid)
+  }, [user?.uid])
+
+  const name = user?.nickname || '同学'
+  const hasKVData = !stats.loading
 
   return (
     <div className="home">
-      <section className="home-hero">
-        <div className="home-hero-copy">
-          <div className="home-hero-badge">Kids Learning Platform</div>
-          <h1 className="home-title">把每天的学习，变成一段更舒服的探索旅程。</h1>
-          <p className="home-subtitle">
-            这里不是把内容堆在一起，而是把孩子常用的学习入口、讨论空间和 AI 创作工具，整理成更清楚、更好看的学习桌面。
-          </p>
-          <div className="home-hero-actions">
-            <button className="home-primary-btn" onClick={() => navigate('/coding')}>先去 AI 编程</button>
-            <button className="home-secondary-btn" onClick={() => navigate('/english')}>继续学科内容</button>
+      {/* Greeting bar */}
+      <div className="home-greeting">
+        <div>
+          <span className="home-greeting-text">{getGreeting()}，{name}！</span>
+          <span className="home-greeting-date">{todayLabel()}</span>
+        </div>
+      </div>
+
+      {/* ── 今日学习状态 ── */}
+      <section className="home-section home-section--stats">
+        <div className="home-section-head">
+          <div>
+            <h2 className="home-section-title">今日学习状态</h2>
+            <p className="home-section-subtitle">打开相关模块，数字会自动更新。</p>
           </div>
         </div>
 
-        <div className="home-hero-panel">
-          <div className="home-hero-card home-hero-card--primary">
-            <div className="home-hero-card-label">今日推荐</div>
-            <div className="home-hero-card-title">AI 编程创作屋</div>
-            <div className="home-hero-card-text">从启蒙走向项目制作，用更强的反馈感把孩子带进创作状态。</div>
-          </div>
-          <div className="home-hero-card-row">
-            <div className="home-hero-card">
-              <div className="home-hero-mini-label">学习节奏</div>
-              <div className="home-hero-mini-value">短时、高频、可展示</div>
+        <div className="home-stats-grid">
+          {/* Card 1: 错题本 */}
+          <button className="home-stat-card" onClick={() => navigate('/mistakes')}>
+            <div className="home-stat-icon">📕</div>
+            <div className="home-stat-body">
+              <div className="home-stat-label">错题本</div>
+              <div className="home-stat-value">
+                {stats.loading ? '—' : stats.mistakesCount}
+              </div>
+              <div className="home-stat-sub">道待复习</div>
             </div>
-            <div className="home-hero-card">
-              <div className="home-hero-mini-label">推荐设备</div>
-              <div className="home-hero-mini-value">手机 / iPad / 电脑</div>
+          </button>
+
+          {/* Card 2: 问题讨论 */}
+          <button className="home-stat-card" onClick={() => navigate('/notebook')}>
+            <div className="home-stat-icon">💬</div>
+            <div className="home-stat-body">
+              <div className="home-stat-label">问题讨论</div>
+              {stats.notebookUnread.length > 0
+                ? <div className="home-stat-value home-stat-value--highlight">{stats.notebookUnread.length}</div>
+                : <div className="home-stat-value">{stats.todayDiscussions}</div>
+              }
+              <div className="home-stat-sub">
+                {stats.notebookUnread.length > 0
+                  ? `${stats.notebookUnread.slice(0, 2).join('/')} 有新回复`
+                  : stats.todayDiscussions > 0 ? '今日提问' : '暂无新回复'}
+              </div>
             </div>
-          </div>
+          </button>
+
+          {/* Card 3: 单词记忆 */}
+          <button className="home-stat-card" onClick={() => navigate('/english')}>
+            <div className="home-stat-icon">📖</div>
+            <div className="home-stat-body">
+              <div className="home-stat-label">单词记忆</div>
+              <div className="home-stat-value">{stats.srsWordsToday}</div>
+              <div className="home-stat-sub">今日已背（词）</div>
+            </div>
+          </button>
+
+          {/* Card 4: AI练习 / 写作 */}
+          <button className="home-stat-card" onClick={() => navigate('/english')}>
+            <div className="home-stat-icon">🧠</div>
+            <div className="home-stat-body">
+              <div className="home-stat-label">AI 练习</div>
+              <div className="home-stat-value">{stats.exercisesToday + stats.writingToday}</div>
+              <div className="home-stat-sub">今日完成（题/篇）</div>
+            </div>
+          </button>
         </div>
       </section>
 
+      {/* ── 成就入口 ── */}
+      <section className="home-section home-section--achievements">
+        <div className="home-ach-row">
+          <div className="home-ach-info">
+            <div className="home-ach-title">🏆 成就</div>
+            <div className="home-ach-streak">
+              {stats.streak.currentStreak > 0
+                ? `连续打卡 ${stats.streak.currentStreak} 天`
+                : '今天还没打卡，快来学习吧！'}
+            </div>
+          </div>
+          <button className="home-ach-link" onClick={() => navigate('/achievements')}>
+            查看全部 →
+          </button>
+        </div>
+      </section>
+
+      {/* ── 从哪里开始 ── */}
       <section className="home-section">
         <div className="home-section-head">
           <div>
             <h2 className="home-section-title">从哪里开始</h2>
-            <p className="home-section-subtitle">把最重要的学习入口放在最前面，减少孩子每次打开时的犹豫。</p>
+            <p className="home-section-subtitle">把最重要的学习入口放在最前面，减少每次打开时的犹豫。</p>
           </div>
         </div>
 
@@ -147,6 +222,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── 学习工具 ── */}
       <section className="home-section">
         <div className="home-section-head">
           <div>
@@ -168,6 +244,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── 按学科继续 ── */}
       <section className="home-section">
         <div className="home-section-head">
           <div>
@@ -184,7 +261,7 @@ export default function Home() {
                 <div className="home-subject-subtitle">{group.subtitle}</div>
               </div>
 
-      <div className="home-subject-grid">
+              <div className="home-subject-grid">
                 {group.items.map((item) => (
                   <button key={item.label} className="home-subject-card" onClick={() => navigate(item.path)}>
                     <img
@@ -198,17 +275,6 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="home-section home-section--note">
-        <div className="home-note-card">
-          <div className="home-note-title">多设备使用建议</div>
-          <div className="home-note-grid">
-            {HOME_NOTES.map((note) => (
-              <div key={note} className="home-note-item">{note}</div>
-            ))}
-          </div>
         </div>
       </section>
     </div>

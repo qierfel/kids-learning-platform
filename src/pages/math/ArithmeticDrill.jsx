@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 function getToken() { return localStorage.getItem('session_token') }
 import './ArithmeticDrill.css'
+import { logActivity } from '../../utils/activityLogger'
 
 // ── 题目生成器 ──────────────────────────────────────────────
 const CONFIGS = {
@@ -174,6 +175,7 @@ export default function ArithmeticDrill({ user, onBack }) {
       clearInterval(timerRef.current)
       setElapsed(Math.floor((Date.now() - startTime) / 1000))
       setPhase('result')
+      logActivity(user?.uid, { type: 'arithmetic_drill', subject: '数学', moduleKey: 'arithmetic', count: TOTAL })
       // 把错题存入 KV
       const wrong = newResults.filter(r => !r.correct)
       if (wrong.length > 0 && user) {

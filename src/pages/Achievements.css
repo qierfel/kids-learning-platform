@@ -1,0 +1,170 @@
+.achievements {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+.ach-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ach-back-btn {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(49, 79, 71, 0.08);
+  color: #314f47;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ach-back-btn:hover {
+  background: rgba(49, 79, 71, 0.14);
+}
+
+.ach-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+  color: #25352e;
+  letter-spacing: -0.03em;
+}
+
+.ach-section {
+  margin-bottom: 20px;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 251, 245, 0.92);
+  border: 1px solid rgba(96, 77, 56, 0.10);
+  box-shadow: 0 6px 24px rgba(73, 54, 36, 0.06);
+}
+
+.ach-section-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #273530;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.ach-coming-soon {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9b8f7f;
+}
+
+/* Calendar */
+.ach-calendar {
+  margin-bottom: 18px;
+}
+
+.ach-cal-month {
+  font-size: 15px;
+  font-weight: 800;
+  color: #3d4a44;
+  margin-bottom: 10px;
+}
+
+.ach-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.ach-cal-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #9b8f7f;
+  padding: 4px 0;
+  letter-spacing: 0.03em;
+}
+
+.ach-cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b6358;
+  background: rgba(0,0,0,0.03);
+}
+
+.ach-cal-cell--empty {
+  background: transparent;
+}
+
+.ach-cal-cell--active {
+  background: #314f47;
+  color: #fff;
+  font-weight: 800;
+}
+
+.ach-cal-cell--today {
+  outline: 2px solid #ee843a;
+  outline-offset: 1px;
+}
+
+.ach-cal-cell--active.ach-cal-cell--today {
+  background: #ee843a;
+  outline: none;
+}
+
+/* Streak cards */
+.ach-streak-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ach-streak-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(49, 79, 71, 0.07);
+  text-align: center;
+}
+
+.ach-streak-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: #314f47;
+  line-height: 1;
+}
+
+.ach-streak-label {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6d7469;
+  font-weight: 600;
+}
+
+/* Badge placeholder */
+.ach-badge-placeholder {
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.03);
+  color: #9b8f7f;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .achievements {
+    padding: 16px 12px 60px;
+  }
+  .ach-streak-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .ach-streak-num {
+    font-size: 22px;
+  }
+}

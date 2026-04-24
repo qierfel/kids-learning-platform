@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { CHARACTER_LISTS } from '../../data/characterLists'
 import { vocabList } from '../../data/vocabList'
 import { ttsSpeak } from '../../utils/tts'
+import { logActivity } from '../../utils/activityLogger'
 
 const HISTORY_KEY = 'dictation_history'
 
@@ -267,6 +268,8 @@ export default function Dictation({ onBack }) {
     const nextIdx = current + 1
     if (nextIdx >= queue.length) {
       setPhase('result')
+      // userId falls back to user_uid stored in localStorage by App.jsx
+      logActivity(null, { type: 'dictation_session', subject: '语文', moduleKey: 'dictation', count: newResults.length })
     } else {
       setCurrent(nextIdx)
       setRevealed(false)

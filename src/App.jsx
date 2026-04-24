@@ -13,6 +13,7 @@ import Notebook from './pages/Notebook'
 import Mistakes from './pages/Mistakes'
 import Admin from './pages/Admin'
 import Coding from './pages/Coding'
+import Achievements from './pages/Achievements'
 import Layout from './components/Layout'
 
 function getToken() { return localStorage.getItem('session_token') }
@@ -64,6 +65,12 @@ export default function App() {
     return () => clearInterval(pollRef.current)
   }, [user?.status])
 
+  // Persist user uid so modules without user prop (e.g. Dictation) can log activities
+  useEffect(() => {
+    if (user?.uid) localStorage.setItem('user_uid', user.uid)
+    else if (user === null) localStorage.removeItem('user_uid')
+  }, [user?.uid])
+
   function handleLogin(userData) { setUser(userData) }
 
   function handleLogout() {
@@ -76,6 +83,7 @@ export default function App() {
       }).catch(() => {})
       localStorage.removeItem('session_token')
     }
+    localStorage.removeItem('user_uid')
     setUser(null)
   }
 
@@ -138,6 +146,7 @@ export default function App() {
           <Route path="/coding" element={user ? <Coding user={user} /> : <Navigate to="/login" />} />
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
+          <Route path="/achievements" element={user ? <Achievements user={user} /> : <Navigate to="/login" />} />
           <Route path="/admin" element={
             !user ? <Navigate to="/login" /> :
             isAdmin ? <Admin onBack={() => window.history.back()} /> :

@@ -19,6 +19,7 @@ const JUNIOR_NAV = [
 const TOOL_NAV = [
   { to: '/mistakes', label: '错题本' },
   { to: '/notebook', label: '问题讨论' },
+  { to: '/achievements', label: '🏆 成就' },
 ]
 
 export default function Layout({ user, profile, onLogout }) {

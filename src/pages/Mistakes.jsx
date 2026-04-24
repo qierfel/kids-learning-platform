@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { logActivity } from '../utils/activityLogger'
 import './Mistakes.css'
 
 function getToken() { return localStorage.getItem('session_token') }
@@ -515,6 +516,10 @@ function MistakeDetail({ mistake, user, onBack, onUpdate }) {
     const updated = { ...data, status: next }
     setData(updated)
     onUpdate(updated)
+    // Log when the user actually reviews (any status change counts as interaction)
+    if (data.status !== 'mastered') {
+      logActivity(user?.uid, { type: 'mistake_review', subject: data.subject, moduleKey: 'mistakes', count: 1 })
+    }
   }
 
   // 进入详情时自动加载解释
