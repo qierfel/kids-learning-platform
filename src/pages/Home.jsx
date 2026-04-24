@@ -60,10 +60,10 @@ const SUBJECT_GROUPS = [
     title: '初中拓展',
     subtitle: '适合更高年级或想继续探索的内容',
     items: [
-      { path: '/physics', label: '物理', icon: '/icons/extracted_named/physics_icon_sheet.png' },
-      { path: '/chemistry', label: '化学', icon: '/icons/extracted_named/chemistry_icon_sheet.png' },
-      { path: '/history', label: '历史', icon: '/icons/extracted_named/history_icon_sheet.png' },
-      { path: '/geography', label: '地理', icon: '/icons/extracted_named/geography_icon_sheet.png' },
+      { path: '/physics', label: '物理', icon: '/icons/generated/physics-icon.png' },
+      { path: '/chemistry', label: '化学', icon: '/icons/generated/chemistry-icon.png' },
+      { path: '/history', label: '历史', icon: '/icons/generated/history-icon.png' },
+      { path: '/geography', label: '地理', icon: '/icons/generated/geography-icon.png' },
     ],
   },
 ]
