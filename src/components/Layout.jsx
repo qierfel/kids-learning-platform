@@ -6,6 +6,7 @@ const PRIMARY_NAV = [
   { to: '/chinese', label: '语文' },
   { to: '/math', label: '数学' },
   { to: '/english', label: '英语' },
+  { to: '/coding', label: 'AI编程' },
 ]
 
 const JUNIOR_NAV = [

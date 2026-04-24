@@ -30,6 +30,15 @@ const PRIMARY_SUBJECTS = [
     tagColor: '#2563eb',
     bg: 'linear-gradient(145deg, #ffffff 0%, #deeeff 100%)',
   },
+  {
+    path: '/coding',
+    tag: 'AI编程',
+    label: 'AI编程',
+    icon: '/icons/extracted_named/robot_mascot_icon.png',
+    desc: 'AI启蒙 · 机器学习 · 6节互动课',
+    tagColor: '#7c3aed',
+    bg: 'linear-gradient(145deg, #ffffff 0%, #ede9fe 100%)',
+  },
 ]
 
 const JUNIOR_SUBJECTS = [
