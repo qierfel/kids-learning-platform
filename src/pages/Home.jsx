@@ -7,6 +7,7 @@ const GRID_ITEMS = [
   { path: '/math', label: '数学', icon: '/icons/extracted_named/math_icon_sheet.png' },
   { path: '/chinese', label: '语文', icon: '/icons/extracted_named/chinese_icon_sheet.png' },
   { path: '/english', label: '英语', icon: '/icons/extracted_named/english_icon_sheet.png' },
+  { path: '/coding', label: 'AI编程', icon: '/icons/extracted_named/robot_mascot_icon.png' },
   { path: '/physics', label: '物理', icon: '/icons/extracted_named/physics_icon_sheet.png' },
   { path: '/chemistry', label: '化学', icon: '/icons/extracted_named/chemistry_icon_sheet.png' },
   { path: '/history', label: '历史', icon: '/icons/extracted_named/history_icon_sheet.png' },

@@ -12,6 +12,7 @@ import Geography from './pages/Geography'
 import Notebook from './pages/Notebook'
 import Mistakes from './pages/Mistakes'
 import Admin from './pages/Admin'
+import Coding from './pages/Coding'
 import Layout from './components/Layout'
 
 function getToken() { return localStorage.getItem('session_token') }
@@ -134,6 +135,7 @@ export default function App() {
           <Route path="/chemistry" element={user ? <Chemistry user={user} /> : <Navigate to="/login" />} />
           <Route path="/history" element={user ? <History user={user} /> : <Navigate to="/login" />} />
           <Route path="/geography" element={user ? <Geography user={user} /> : <Navigate to="/login" />} />
+          <Route path="/coding" element={user ? <Coding user={user} /> : <Navigate to="/login" />} />
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
           <Route path="/admin" element={
