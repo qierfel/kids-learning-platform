@@ -128,10 +128,10 @@ ${genName ? `作品名称：${genName}` : ''}
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz'].map(t => (
+        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: '#14b8a6', color: '#14b8a6' } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : '测一测'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '本课作品'}
           </button>
         ))}
       </div>
@@ -361,6 +361,35 @@ ${genName ? `作品名称：${genName}` : ''}
               <p style={{ color: '#64748b', fontSize: 14 }}>第 12 课：完成我的小作品 →</p>
             </div>
           )}
+        </div>
+      )}
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-work-card">
+            <div className="lesson-work-title">🏅 本课作品：我的 AI 提问卡</div>
+            {generated ? (
+              <div className="l11-template-card">
+                <div className="l11-template-header">📋 {genName || genType + ' · ' + genStyle}</div>
+                <pre className="l11-template-body">{promptText}</pre>
+              </div>
+            ) : (
+              <div className="lesson-tip-box">
+                💡 先去"做一做"生成你的提问模板，再来这里查看你的 AI 提问卡！
+              </div>
+            )}
+            <div className="lesson-work-recap">
+              <div className="lesson-work-recap-title">✅ 本课学到了</div>
+              <ul>
+                <li>好提问包含：做什么、有什么功能、什么风格</li>
+                <li>把大任务拆成小步骤，一步一步问 AI</li>
+                <li>AI 给错了不要放弃，告诉它哪里不对继续修正</li>
+              </ul>
+            </div>
+          </div>
+          <div className="lesson-next-preview">
+            <div className="lesson-next-title">👉 第 12 课预告：完成我的小作品</div>
+            <p>最后一课！你将把 7–11 课学到的所有技能融合在一起，做出一个完整的小作品，并学会向别人展示它！</p>
+          </div>
         </div>
       )}
     </div>

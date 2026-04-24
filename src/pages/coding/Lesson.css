@@ -1487,3 +1487,59 @@
 .coding-module-header { padding: 0 16px 12px; }
 .coding-module-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 6px; }
 .coding-module-desc { font-size: 13px; color: #888; margin: 4px 0 0; }
+
+/* ── 本课作品 & 下一课预告 ── */
+.lesson-work-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 2px solid #e8edf2;
+  margin-bottom: 14px;
+}
+.lesson-work-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+.lesson-work-recap {
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+.lesson-work-recap-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.lesson-work-recap ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.lesson-work-recap li { font-size: 13px; color: #333; line-height: 1.5; }
+.lesson-next-preview {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #6ee7b7;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.lesson-next-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 6px;
+}
+.lesson-next-preview p {
+  font-size: 13px;
+  color: #047857;
+  margin: 0;
+  line-height: 1.6;
+}

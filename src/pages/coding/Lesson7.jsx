@@ -100,16 +100,19 @@ export default function Lesson7({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz'].map(t => (
+        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: '#f97316', color: '#f97316' } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : '测一测'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '本课作品'}
           </button>
         ))}
       </div>
 
       {tab === 'learn' && (
         <div className="lesson-content">
+          <div className="lesson-tip-box" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)', borderLeft: '3px solid #f97316', color: '#92400e', marginBottom: 20 }}>
+            前面 6 课，你已经认识了 AI 是什么、它怎么学习。<strong>从这一课开始</strong>，我们要把这些知识变成行动——用 AI 帮我们做真正的网页和小工具！🎉
+          </div>
           <div className="lesson-section">
             <h2 className="lesson-section-title">🌐 网页就像一个房间</h2>
             <p className="lesson-text">
@@ -312,6 +315,37 @@ export default function Lesson7({ onBack }) {
               <p style={{ color: '#64748b', fontSize: 14 }}>第 8 课：做我的第一个网页 👉</p>
             </div>
           )}
+        </div>
+      )}
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-work-card">
+            <div className="lesson-work-title">🏅 本课作品：我的网页拆解图</div>
+            {checked ? (
+              <>
+                <div className="lesson-result-box" style={{ marginTop: 0 }}>
+                  <div className="lesson-result-score">{score}/{ELEMENTS.length} 正确 {score >= 7 ? '🎉' : '👍'}</div>
+                  <p>你已经能认出网页的三大区域，并把 {score} 个元素放到了正确的位置！</p>
+                </div>
+              </>
+            ) : (
+              <div className="lesson-tip-box">
+                💡 先去"做一做"完成网页拆解挑战，再来这里查看你的本课作品！
+              </div>
+            )}
+            <div className="lesson-work-recap">
+              <div className="lesson-work-recap-title">✅ 本课学到了</div>
+              <ul>
+                <li>网页由顶部（导航/Logo）、内容区、底部三大区域组成</li>
+                <li>浏览器（Chrome、Safari）是运行和显示网页的地方</li>
+                <li>标题、图片、按钮、链接、文字都是网页的基本零件</li>
+              </ul>
+            </div>
+          </div>
+          <div className="lesson-next-preview">
+            <div className="lesson-next-title">👉 第 8 课预告：做我的第一个网页</div>
+            <p>下一课你将正式动手！填入你的名字、爱好、梦想和颜色，生成属于你自己的第一个网页预览——真正的作品！</p>
+          </div>
         </div>
       )}
     </div>

@@ -423,6 +423,11 @@ export default function Lesson12({ onBack }) {
                   🎤 把这段话读给家人或朋友听——你就完成了你的第一次"作品展示"！
                 </div>
               </div>
+
+              <div className="lesson-next-preview" style={{ marginTop: 16 }}>
+                <div className="lesson-next-title">🚀 下一阶段预告：模块 C · AI 项目实践</div>
+                <p>你已经完成了模块 B 的全部 12 课！下一阶段，你将学习做更完整的小项目——输入/输出工具、问答小程序、兴趣展示网站……继续用 AI 创作，越做越厉害！</p>
+              </div>
             </>
           ) : (
             <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>

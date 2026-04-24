@@ -97,10 +97,10 @@ export default function Lesson10({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz'].map(t => (
+        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: '#ef4444', color: '#ef4444' } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : '测一测'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '本课作品'}
           </button>
         ))}
       </div>
@@ -332,6 +332,45 @@ export default function Lesson10({ onBack }) {
               <p style={{ color: '#64748b', fontSize: 14 }}>第 11 课：请AI帮我一起做 →</p>
             </div>
           )}
+        </div>
+      )}
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-work-card">
+            <div className="lesson-work-title">🏅 本课作品：会动的小页面</div>
+            {chosen.length > 0 ? (
+              <>
+                <p className="lesson-text" style={{ marginBottom: 12 }}>你的小页面包含了这些交互按钮：</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {BUTTON_DEMOS.filter(b => chosen.includes(b.id)).map(b => (
+                    <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 10, border: '1.5px solid #fca5a5' }}>
+                      <span style={{ fontSize: 20 }}>{b.icon}</span>
+                      <div>
+                        <strong style={{ fontSize: 13, color: '#b91c1c' }}>{b.title}</strong>
+                        <p style={{ fontSize: 11, color: '#888', margin: '2px 0 0' }}>{b.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="lesson-tip-box">
+                💡 先去"做一做"选择你的按钮并搭建小页面，再来这里查看本课作品！
+              </div>
+            )}
+            <div className="lesson-work-recap">
+              <div className="lesson-work-recap-title">✅ 本课学到了</div>
+              <ul>
+                <li>点击事件：用户点一下，网页就"听"到并执行动作</li>
+                <li>Toggle（切换）：在两种状态之间反复切换</li>
+                <li>网页不只是展示，更能和用户互动</li>
+              </ul>
+            </div>
+          </div>
+          <div className="lesson-next-preview">
+            <div className="lesson-next-title">👉 第 11 课预告：请AI帮我一起做</div>
+            <p>下一课你将学会如何向 AI 说清楚你想要什么——好提问 vs 坏提问，还能生成属于你自己的 AI 提问模板！</p>
+          </div>
         </div>
       )}
     </div>

@@ -90,10 +90,10 @@ export default function Lesson9({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz'].map(t => (
+        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: '#a855f7', color: '#a855f7' } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : '测一测'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '本课作品'}
           </button>
         ))}
       </div>
@@ -324,6 +324,39 @@ export default function Lesson9({ onBack }) {
               <p style={{ color: '#64748b', fontSize: 14 }}>第 10 课：让按钮有反应 →</p>
             </div>
           )}
+        </div>
+      )}
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-work-card">
+            <div className="lesson-work-title">🏅 本课作品：网页 2.0 美化版</div>
+            <p className="lesson-text" style={{ marginBottom: 12 }}>你选择的样式方案：</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { label: '颜色主题', value: THEMES.find(x => x.id === theme)?.label },
+                { label: '字体大小', value: FONT_SIZES.find(x => x.id === fontSize)?.label },
+                { label: '卡片圆角', value: RADIUS_OPTIONS.find(x => x.id === radius)?.label },
+                { label: '阴影效果', value: hasShadow ? '有阴影' : '无阴影' },
+              ].map(row => (
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '8px 12px', background: '#f8f9fc', borderRadius: 8 }}>
+                  <span style={{ color: '#888' }}>{row.label}</span>
+                  <strong style={{ color: THEMES.find(x => x.id === theme)?.primary }}>{row.value}</strong>
+                </div>
+              ))}
+            </div>
+            <div className="lesson-work-recap">
+              <div className="lesson-work-recap-title">✅ 本课学到了</div>
+              <ul>
+                <li>颜色传递情绪：蓝色冷静、橙色活力、粉色可爱</li>
+                <li>一个页面用 1-3 种主色，颜色统一才专业</li>
+                <li>圆角更亲切，留白让阅读更舒适</li>
+              </ul>
+            </div>
+          </div>
+          <div className="lesson-next-preview">
+            <div className="lesson-next-title">👉 第 10 课预告：让按钮有反应</div>
+            <p>下一课你将给网页加上"互动"！学会让按钮点一下就有变化——计数、显示隐藏、切换内容，让网页真正"活"起来。</p>
+          </div>
         </div>
       )}
     </div>

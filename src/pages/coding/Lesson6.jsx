@@ -386,6 +386,13 @@ export default function Lesson6({ onBack }) {
           </div>
 
           <div className="lesson-section">
+            <div style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', borderRadius: 14, padding: 16, marginBottom: 16, border: '2px solid #fde68a' }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#b45309', marginBottom: 6 }}>🚀 下一阶段：模块 B · AI 创作入门</div>
+              <p style={{ fontSize: 13, color: '#78350f', margin: 0, lineHeight: 1.7 }}>
+                你已经认识了 AI 是什么、它怎么工作。<br />
+                从第 7 课开始，我们要真正动手——用 AI 帮我们做网页和小工具，把想法变成看得见的作品！
+              </p>
+            </div>
             <button className="quiz-next-btn" style={{ background: '#8b5cf6' }} onClick={onBack}>
               返回课程列表 →
             </button>

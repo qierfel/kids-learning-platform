@@ -90,10 +90,10 @@ export default function Lesson8({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz'].map(t => (
+        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: '#06b6d4', color: '#06b6d4' } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : '测一测'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '本课作品'}
           </button>
         ))}
       </div>
@@ -315,6 +315,63 @@ export default function Lesson8({ onBack }) {
               <p style={{ color: '#64748b', fontSize: 14 }}>第 9 课：让网页变好看 →</p>
             </div>
           )}
+        </div>
+      )}
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-work-card">
+            <div className="lesson-work-title">🏅 本课作品：网页 1.0</div>
+            {generated ? (
+              <div className="l8-preview" style={{ borderColor: selectedColor.bg, marginTop: 0 }}>
+                <div className="l8-preview-header" style={{ background: selectedColor.bg, color: selectedColor.text }}>
+                  <div className="l8-preview-nav">
+                    <span>🏠 首页</span><span>关于我</span><span>我的作品</span>
+                  </div>
+                </div>
+                <div className="l8-preview-hero" style={{ background: `${selectedColor.bg}20` }}>
+                  <div className="l8-preview-avatar" style={{ background: selectedColor.bg, color: '#fff' }}>
+                    {name[0]?.toUpperCase()}
+                  </div>
+                  <h2 className="l8-preview-name" style={{ color: selectedColor.bg }}>Hi，我是{name}！</h2>
+                  {intro && <p className="l8-preview-intro">{intro}</p>}
+                </div>
+                <div className="l8-preview-body">
+                  {hobbies.length > 0 && (
+                    <div className="l8-preview-section">
+                      <h3>❤️ 我喜欢</h3>
+                      <div className="l8-preview-tags">
+                        {hobbies.map(h => (
+                          <span key={h} className="l8-preview-tag" style={{ background: `${selectedColor.bg}25`, color: selectedColor.bg }}>{h}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {dream && (
+                    <div className="l8-preview-section">
+                      <h3>🌟 我的目标</h3>
+                      <p className="l8-preview-dream">{dream}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="lesson-tip-box">
+                💡 先去"做一做"填入你的信息并生成网页，再来这里查看你的 1.0 作品！
+              </div>
+            )}
+            <div className="lesson-work-recap">
+              <div className="lesson-work-recap-title">✅ 本课学到了</div>
+              <ul>
+                <li>做网页前先规划：主题、内容、颜色</li>
+                <li>好的个人介绍包含名字、爱好、梦想和个性签名</li>
+                <li>先完成最小版本，再慢慢改进</li>
+              </ul>
+            </div>
+          </div>
+          <div className="lesson-next-preview">
+            <div className="lesson-next-title">👉 第 9 课预告：让网页变好看</div>
+            <p>下一课你将学习颜色、字体、圆角、留白这四个设计秘诀，把网页 1.0 升级成更漂亮的 2.0！</p>
+          </div>
         </div>
       )}
     </div>
