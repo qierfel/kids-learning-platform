@@ -243,7 +243,7 @@ export default function Lesson6({ onBack }) {
               🔄 重新开始，换个答案试试
             </button>
             <div style={{ marginTop: '12px', padding: '10px', background: '#faf5ff', borderRadius: '10px', fontSize: '12px', color: '#6d28d9', lineHeight: '1.6', border: '1.5px solid #ddd6fe' }}>
-              💡 这个决策树有 3 层问题，可以做出 6 种不同的推荐。真实的AI决策树可能有数千层！
+              💡 这个决策树有 3 层问题，可以做出 7 种不同的推荐。真实的AI决策树可能有数千层！
             </div>
           </div>
         </div>
