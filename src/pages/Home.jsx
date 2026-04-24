@@ -7,7 +7,7 @@ const FEATURED_TRACKS = [
     title: '小学学习馆',
     subtitle: '语文、数学、英语一起学',
     description: '更适合日常学习和基础打牢，像一张温暖的学习地图。',
-    icon: '/icons/extracted_named/elementary_icon_sheet.png',
+    icon: '/icons/generated/elementary-icon.png',
     tone: 'elementary',
     tag: '日常学习',
   },
@@ -16,7 +16,7 @@ const FEATURED_TRACKS = [
     title: 'AI 编程创作屋',
     subtitle: '做网页、做小工具、做自己的作品',
     description: '把 AI 当成创作搭档，让孩子更快进入“我做出来了”的状态。',
-    icon: '/icons/extracted_named/robot_mascot_icon.png',
+    icon: '/icons/generated/ai-coding-icon.png',
     tone: 'coding',
     tag: '项目制作',
   },
@@ -25,7 +25,7 @@ const FEATURED_TRACKS = [
     title: '初中探索站',
     subtitle: '物理、化学、历史、地理',
     description: '适合更强的阅读和理解任务，也适合系统梳理知识点。',
-    icon: '/icons/extracted_named/junior_icon_sheet.png',
+    icon: '/icons/generated/junior-icon.png',
     tone: 'junior',
     tag: '进阶探索',
   },
@@ -36,13 +36,13 @@ const QUICK_TOOLS = [
     path: '/mistakes',
     label: '错题本',
     description: '把做错的内容留下来，之后更容易查漏补缺。',
-    icon: '/icons/extracted_named/wrong_book_card_sheet.png',
+    icon: '/icons/generated/mistakes-icon.png',
   },
   {
     path: '/notebook',
     label: '问题讨论',
     description: '随时记录问题、继续追问，也能当学习对话本。',
-    icon: '/icons/extracted_named/problem_discussion_card_sheet.png',
+    icon: '/icons/generated/discussion-icon.png',
   },
 ]
 
@@ -51,9 +51,9 @@ const SUBJECT_GROUPS = [
     title: '小学基础',
     subtitle: '更适合每天打开就继续学一点',
     items: [
-      { path: '/chinese', label: '语文', icon: '/icons/extracted_named/chinese_icon_sheet.png' },
-      { path: '/math', label: '数学', icon: '/icons/extracted_named/math_icon_sheet.png' },
-      { path: '/english', label: '英语', icon: '/icons/extracted_named/english_icon_sheet.png' },
+      { path: '/chinese', label: '语文', icon: '/icons/generated/chinese-icon.png' },
+      { path: '/math', label: '数学', icon: '/icons/generated/math-icon.png' },
+      { path: '/english', label: '英语', icon: '/icons/generated/english-icon.png' },
     ],
   },
   {
@@ -184,10 +184,14 @@ export default function Home() {
                 <div className="home-subject-subtitle">{group.subtitle}</div>
               </div>
 
-              <div className="home-subject-grid">
+      <div className="home-subject-grid">
                 {group.items.map((item) => (
                   <button key={item.label} className="home-subject-card" onClick={() => navigate(item.path)}>
-                    <img src={item.icon} alt={item.label} className="home-subject-icon home-subject-icon--sheet" />
+                    <img
+                      src={item.icon}
+                      alt={item.label}
+                      className={`home-subject-icon${item.icon.includes('_sheet') ? ' home-subject-icon--sheet' : ''}`}
+                    />
                     <span className="home-subject-label">{item.label}</span>
                   </button>
                 ))}

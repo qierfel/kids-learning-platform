@@ -147,8 +147,26 @@ export default function Chemistry({ user }) {
   }
 
   return (
-    <div className="junior-subject">
-      <h2 className="subject-title">化学 <span className="edition">山西中考 · 人教版</span></h2>
+    <div className="junior-subject junior-subject--chemistry">
+      <section className="junior-hero">
+        <div>
+          <div className="junior-kicker">Chemistry Lab</div>
+          <h1 className="junior-title">化学 <span className="junior-edition">山西中考 · 人教版</span></h1>
+          <p className="junior-lead">
+            用更清楚的模块把实验操作、物质结构、酸碱盐和化学方程式串起来，让孩子更容易从“看不懂”过渡到“知道先复习哪一块”。
+          </p>
+        </div>
+        <div className="junior-meta-grid">
+          <div className="junior-meta-card">
+            <div className="junior-meta-label">推荐方式</div>
+            <div className="junior-meta-value">先按知识块定位，再展开方程式和考点</div>
+          </div>
+          <div className="junior-meta-card junior-meta-card--accent">
+            <div className="junior-meta-label">内容重点</div>
+            <div className="junior-meta-value">实验规范 + 方程式 + 常见题型</div>
+          </div>
+        </div>
+      </section>
 
       <div className="chapter-tabs">
         {CHAPTERS.map(c => (

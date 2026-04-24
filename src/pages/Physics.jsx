@@ -185,8 +185,26 @@ export default function Physics({ user }) {
   }
 
   return (
-    <div className="junior-subject">
-      <h2 className="subject-title">物理 <span className="edition">山西中考 · 人教版</span></h2>
+    <div className="junior-subject junior-subject--physics">
+      <section className="junior-hero">
+        <div>
+          <div className="junior-kicker">Physics Explorer</div>
+          <h1 className="junior-title">物理 <span className="junior-edition">山西中考 · 人教版</span></h1>
+          <p className="junior-lead">
+            把力学、光学、热学和电学整理成一条更适合复习和查漏补缺的学习路径，既能按章节浏览，也能按考点快速定位。
+          </p>
+        </div>
+        <div className="junior-meta-grid">
+          <div className="junior-meta-card">
+            <div className="junior-meta-label">推荐方式</div>
+            <div className="junior-meta-value">按章节刷重点，再展开单个考点</div>
+          </div>
+          <div className="junior-meta-card junior-meta-card--accent">
+            <div className="junior-meta-label">适合设备</div>
+            <div className="junior-meta-value">iPad / 电脑更适合长内容复习</div>
+          </div>
+        </div>
+      </section>
 
       <div className="chapter-tabs">
         {CHAPTERS.map(c => (

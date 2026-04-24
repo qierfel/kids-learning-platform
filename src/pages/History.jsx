@@ -158,8 +158,26 @@ export default function History({ user }) {
   }
 
   return (
-    <div className="junior-subject">
-      <h2 className="subject-title">历史 <span className="edition">山西中考 · 人教版</span></h2>
+    <div className="junior-subject junior-subject--history">
+      <section className="junior-hero">
+        <div>
+          <div className="junior-kicker">History Atlas</div>
+          <h1 className="junior-title">历史 <span className="junior-edition">山西中考 · 人教版</span></h1>
+          <p className="junior-lead">
+            把古代史、近代史和世界史整理成更好浏览的时间线入口，孩子可以先选时代，再展开关键事件和高频考点。
+          </p>
+        </div>
+        <div className="junior-meta-grid">
+          <div className="junior-meta-card">
+            <div className="junior-meta-label">推荐方式</div>
+            <div className="junior-meta-value">先看时代地图，再逐条展开事件</div>
+          </div>
+          <div className="junior-meta-card junior-meta-card--accent">
+            <div className="junior-meta-label">记忆重点</div>
+            <div className="junior-meta-value">时间线、人物、意义要一起记</div>
+          </div>
+        </div>
+      </section>
 
       <div className="chapter-tabs">
         {CHAPTERS.map(c => (

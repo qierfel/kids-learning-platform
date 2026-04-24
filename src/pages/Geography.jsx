@@ -147,8 +147,26 @@ export default function Geography({ user }) {
   }
 
   return (
-    <div className="junior-subject">
-      <h2 className="subject-title">地理 <span className="edition">山西中考 · 人教版</span></h2>
+    <div className="junior-subject junior-subject--geography">
+      <section className="junior-hero">
+        <div>
+          <div className="junior-kicker">Geography Route</div>
+          <h1 className="junior-title">地理 <span className="junior-edition">山西中考 · 人教版</span></h1>
+          <p className="junior-lead">
+            把地球与地图、世界地理、中国地理和区域专题放到同一张路径图里，查资料和复习时都会更顺手。
+          </p>
+        </div>
+        <div className="junior-meta-grid">
+          <div className="junior-meta-card">
+            <div className="junior-meta-label">推荐方式</div>
+            <div className="junior-meta-value">先分世界 / 中国，再补区域专题</div>
+          </div>
+          <div className="junior-meta-card junior-meta-card--accent">
+            <div className="junior-meta-label">学习重点</div>
+            <div className="junior-meta-value">地图、气候、区域差异一起看</div>
+          </div>
+        </div>
+      </section>
 
       <div className="chapter-tabs">
         {CHAPTERS.map(c => (
