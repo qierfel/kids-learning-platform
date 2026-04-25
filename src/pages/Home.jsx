@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useHomeStats } from '../hooks/useHomeStats'
+import { usePlan } from '../hooks/usePlan'
 import { trackDailyVisit } from '../utils/sessionTracker'
+import { ACHIEVEMENTS } from '../data/achievements'
 import './Home.css'
 
 const FEATURED_TRACKS = [
@@ -71,7 +73,6 @@ const SUBJECT_GROUPS = [
   },
 ]
 
-// Greeting based on time of day
 function getGreeting() {
   const h = new Date().getHours()
   if (h < 6)  return '夜深了，注意休息 🌙'
@@ -86,26 +87,72 @@ function todayLabel() {
 }
 
 const STAT_CARDS = [
-  { key: 'mistakes', path: '/mistakes', label: '错题本', icon: '/icons/generated/mistakes-icon.png', sub: '道待复习' },
+  { key: 'mistakes', path: '/mistakes', label: '错题本',   icon: '/icons/generated/mistakes-icon.png',   sub: '道待复习' },
   { key: 'notebook', path: '/notebook', label: '问题讨论', icon: '/icons/generated/discussion-icon.png' },
-  { key: 'words', path: '/english', label: '单词记忆', icon: '/icons/generated/english-icon.png', sub: '今日已背（词）' },
-  { key: 'ai', path: '/coding', label: 'AI 练习', icon: '/icons/generated/ai-coding-icon.png', sub: '今日完成（题/篇）' },
+  { key: 'words',    path: '/english',  label: '单词记忆', icon: '/icons/generated/english-icon.png',    sub: '今日已背（词）' },
+  { key: 'ai',       path: '/coding',   label: 'AI 练习',  icon: '/icons/generated/ai-coding-icon.png',  sub: '今日完成（题/篇）' },
 ]
+
+function PlanProgressRow({ label, plan, onClick }) {
+  return (
+    <button className="home-plan-row" onClick={onClick}>
+      <span className="home-plan-row-label">{label}</span>
+      <div className="home-plan-bar-wrap">
+        <div className="home-plan-bar-fill" style={{ width: `${plan.pct}%` }} />
+      </div>
+      <span className="home-plan-pct">{plan.pct}%</span>
+      <span className="home-plan-count">{plan.doneCount}/{plan.totalCount} 项</span>
+    </button>
+  )
+}
 
 export default function Home({ user }) {
   const navigate = useNavigate()
   const stats = useHomeStats(user)
+  const plan = usePlan(user)
 
-  // Mark today as an active day
+  // Celebration modal state — show first pending notification
+  const [modalBadge, setModalBadge] = useState(null)
+
   useEffect(() => {
     if (user?.uid) trackDailyVisit(user.uid)
   }, [user?.uid])
 
+  // Pop up the first pending notification once stats load
+  useEffect(() => {
+    if (!stats.loading && stats.pendingNotifications?.length > 0 && !modalBadge) {
+      const id = stats.pendingNotifications[0]
+      const badge = ACHIEVEMENTS.find(a => a.id === id)
+      if (badge) setModalBadge(badge)
+    }
+  }, [stats.loading, stats.pendingNotifications])
+
+  function closeModal() {
+    if (modalBadge) {
+      stats.markNotified([modalBadge.id])
+      setModalBadge(null)
+    }
+  }
+
   const name = user?.nickname || '同学'
-  const hasKVData = !stats.loading
+  const hasPlan = plan.todayPlan || plan.weekPlan
 
   return (
     <div className="home">
+      {/* Achievement unlock modal */}
+      {modalBadge && (
+        <div className="home-ach-modal-overlay" onClick={closeModal}>
+          <div className="home-ach-modal" onClick={e => e.stopPropagation()}>
+            <div className="home-ach-modal-shine" />
+            <div className="home-ach-modal-icon">{modalBadge.icon}</div>
+            <div className="home-ach-modal-kicker">成就解锁！</div>
+            <div className="home-ach-modal-name">{modalBadge.label}</div>
+            <div className="home-ach-modal-desc">{modalBadge.desc}</div>
+            <button className="home-ach-modal-btn" onClick={closeModal}>太棒了！</button>
+          </div>
+        </div>
+      )}
+
       {/* Greeting bar */}
       <div className="home-greeting">
         <div>
@@ -113,6 +160,36 @@ export default function Home({ user }) {
           <span className="home-greeting-date">{todayLabel()}</span>
         </div>
       </div>
+
+      {/* ── 学习计划 ── */}
+      <section className="home-section home-section--plan">
+        <div className="home-section-head">
+          <div>
+            <h2 className="home-section-title">学习计划</h2>
+            <p className="home-section-subtitle">
+              {hasPlan ? '点击进入计划详情或修改。' : '制定今日或本周计划，轻松追踪进度。'}
+            </p>
+          </div>
+          <button className="home-plan-edit-btn" onClick={() => navigate('/plan')}>
+            {hasPlan ? '修改 →' : '制定计划 →'}
+          </button>
+        </div>
+
+        {hasPlan ? (
+          <div className="home-plan-rows">
+            {plan.todayPlan && (
+              <PlanProgressRow label="今日" plan={plan.todayPlan} onClick={() => navigate('/plan')} />
+            )}
+            {plan.weekPlan && (
+              <PlanProgressRow label="本周" plan={plan.weekPlan} onClick={() => navigate('/plan')} />
+            )}
+          </div>
+        ) : (
+          <div className="home-plan-empty">
+            还没有学习计划 — 点击「制定计划」设定今天想完成的内容。
+          </div>
+        )}
+      </section>
 
       {/* ── 今日学习状态 ── */}
       <section className="home-section home-section--stats">
@@ -190,12 +267,26 @@ export default function Home({ user }) {
             </div>
           </div>
           <div className="home-ach-side">
-            <div className="home-ach-badge">{stats.streak.currentStreak > 0 ? `${stats.streak.currentStreak} Day Streak` : 'Start Today'}</div>
+            <div className="home-ach-badge">
+              {stats.streak.currentStreak > 0 ? `${stats.streak.currentStreak} Day Streak` : 'Start Today'}
+            </div>
             <button className="home-ach-link" onClick={() => navigate('/achievements')}>
               查看全部 →
             </button>
           </div>
         </div>
+
+        {/* Recent unlocked badges */}
+        {stats.recentBadges.length > 0 && (
+          <div className="home-recent-badges">
+            {stats.recentBadges.map(badge => (
+              <div key={badge.id} className="home-recent-badge">
+                <span className="home-recent-badge-icon">{badge.icon}</span>
+                <span className="home-recent-badge-label">{badge.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ── 从哪里开始 ── */}

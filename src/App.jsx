@@ -14,7 +14,9 @@ import Mistakes from './pages/Mistakes'
 import Admin from './pages/Admin'
 import Coding from './pages/Coding'
 import Achievements from './pages/Achievements'
+import PlanEditor from './pages/PlanEditor'
 import Layout from './components/Layout'
+import { initTimeTracking, cleanupTimeTracking } from './utils/sessionTracker'
 
 function getToken() { return localStorage.getItem('session_token') }
 
@@ -69,6 +71,14 @@ export default function App() {
   useEffect(() => {
     if (user?.uid) localStorage.setItem('user_uid', user.uid)
     else if (user === null) localStorage.removeItem('user_uid')
+  }, [user?.uid])
+
+  // Interaction-based time tracking — starts when user is logged in
+  useEffect(() => {
+    if (user?.uid) {
+      initTimeTracking(user.uid)
+      return cleanupTimeTracking
+    }
   }, [user?.uid])
 
   function handleLogin(userData) { setUser(userData) }
@@ -147,6 +157,7 @@ export default function App() {
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
           <Route path="/achievements" element={user ? <Achievements user={user} /> : <Navigate to="/login" />} />
+          <Route path="/plan" element={user ? <PlanEditor user={user} /> : <Navigate to="/login" />} />
           <Route path="/admin" element={
             !user ? <Navigate to="/login" /> :
             isAdmin ? <Admin onBack={() => window.history.back()} /> :
