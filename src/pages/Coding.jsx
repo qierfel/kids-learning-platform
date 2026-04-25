@@ -25,10 +25,16 @@ import JuniorLesson9 from './coding-kids/JuniorLesson9'
 import JuniorLesson10 from './coding-kids/JuniorLesson10'
 import JuniorLesson11 from './coding-kids/JuniorLesson11'
 import JuniorLesson12 from './coding-kids/JuniorLesson12'
+import JuniorLesson13 from './coding-kids/JuniorLesson13'
+import JuniorLesson14 from './coding-kids/JuniorLesson14'
+import JuniorLesson15 from './coding-kids/JuniorLesson15'
+import JuniorLesson16 from './coding-kids/JuniorLesson16'
+import JuniorLesson17 from './coding-kids/JuniorLesson17'
+import JuniorLesson18 from './coding-kids/JuniorLesson18'
 import './Coding.css'
 
 const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12]
-const JUNIOR_LESSON_COMPONENTS = [null, JuniorLesson1, JuniorLesson2, JuniorLesson3, JuniorLesson4, JuniorLesson5, JuniorLesson6, JuniorLesson7, JuniorLesson8, JuniorLesson9, JuniorLesson10, JuniorLesson11, JuniorLesson12]
+const JUNIOR_LESSON_COMPONENTS = [null, JuniorLesson1, JuniorLesson2, JuniorLesson3, JuniorLesson4, JuniorLesson5, JuniorLesson6, JuniorLesson7, JuniorLesson8, JuniorLesson9, JuniorLesson10, JuniorLesson11, JuniorLesson12, JuniorLesson13, JuniorLesson14, JuniorLesson15, JuniorLesson16, JuniorLesson17, JuniorLesson18]
 
 const CODING_NOTES = [
   '启蒙部分负责让孩子不再怕 AI，创作部分负责让孩子真正入坑。',
@@ -135,6 +141,12 @@ export default function Coding({ user }) {
                 <div className="coding-track-title">会展示</div>
                 <p className="coding-track-desc">后半段开始做按钮变化、表情切换、双场景故事，再把作品整理出来。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(7)}>从第 7 课开始</button>
+              </div>
+              <div className="coding-track-card coding-track-card--build">
+                <div className="coding-track-tag">第四段</div>
+                <div className="coding-track-title">做小工具</div>
+                <p className="coding-track-desc">继续往后会认识输入框、欢迎语、小工具和毕业作品升级，形成完整 18 课。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(13)}>从第 13 课开始</button>
               </div>
             </>
           ) : (
