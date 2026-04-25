@@ -12,6 +12,12 @@ import Lesson9 from './coding/Lesson9'
 import Lesson10 from './coding/Lesson10'
 import Lesson11 from './coding/Lesson11'
 import Lesson12 from './coding/Lesson12'
+import Lesson13 from './coding/Lesson13'
+import Lesson14 from './coding/Lesson14'
+import Lesson15 from './coding/Lesson15'
+import Lesson16 from './coding/Lesson16'
+import Lesson17 from './coding/Lesson17'
+import Lesson18 from './coding/Lesson18'
 import codingJuniorLessons from '../data/codingJuniorLessons'
 import JuniorLesson1 from './coding-kids/JuniorLesson1'
 import JuniorLesson2 from './coding-kids/JuniorLesson2'
@@ -33,12 +39,12 @@ import JuniorLesson17 from './coding-kids/JuniorLesson17'
 import JuniorLesson18 from './coding-kids/JuniorLesson18'
 import './Coding.css'
 
-const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12]
+const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12, Lesson13, Lesson14, Lesson15, Lesson16, Lesson17, Lesson18]
 const JUNIOR_LESSON_COMPONENTS = [null, JuniorLesson1, JuniorLesson2, JuniorLesson3, JuniorLesson4, JuniorLesson5, JuniorLesson6, JuniorLesson7, JuniorLesson8, JuniorLesson9, JuniorLesson10, JuniorLesson11, JuniorLesson12, JuniorLesson13, JuniorLesson14, JuniorLesson15, JuniorLesson16, JuniorLesson17, JuniorLesson18]
 
 const CODING_NOTES = [
   '启蒙部分负责让孩子不再怕 AI，创作部分负责让孩子真正入坑。',
-  '课程页要更像“闯关做作品”，而不是一组单独知识点。',
+  '课程页要更像"闯关做作品"，而不是一组单独知识点。',
   '手机适合快速继续进度，iPad 更适合完整做一课，电脑更适合作品展示与家长陪学。',
 ]
 
@@ -62,7 +68,7 @@ export default function Coding({ user }) {
           <h1 className="coding-hero-title">{isKids ? 'AI 小创作乐园' : 'AI 编程创作屋'}</h1>
           <p className="coding-hero-sub">
             {isKids
-              ? '给 7-10 岁孩子的 AI 创作入口。少一点字，多一点图、多一点动手，先把“会玩”变成“会做”。'
+              ? '给 7-10 岁孩子的 AI 创作入口。少一点字，多一点图、多一点动手，先把"会玩"变成"会做"。'
               : '这里不是只认识 AI，而是一步步把想法做成网页、小工具和可以展示的作品。'}
           </p>
 
@@ -127,7 +133,7 @@ export default function Coding({ user }) {
               <div className="coding-track-card coding-track-card--intro">
                 <div className="coding-track-tag">第一段</div>
                 <div className="coding-track-title">先会玩</div>
-                <p className="coding-track-desc">机器人、颜色、如果就会怎样，这几课先把“程序会回应我”变得很直观。</p>
+                <p className="coding-track-desc">机器人、颜色、如果就会怎样，这几课先把"程序会回应我"变得很直观。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(1)}>从第 1 课开始</button>
               </div>
               <div className="coding-track-card coding-track-card--build">
@@ -161,8 +167,15 @@ export default function Coding({ user }) {
               <div className="coding-track-card coding-track-card--build">
                 <div className="coding-track-tag">模块 B</div>
                 <div className="coding-track-title">AI 创作入门</div>
-                <p className="coding-track-desc">开始做网页、做交互、请 AI 帮忙，把“我学了”变成“我做出来了”。</p>
+                <p className="coding-track-desc">开始做网页、做交互、请 AI 帮忙，把"我学了"变成"我做出来了"。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(7)}>从第 7 课开始</button>
+              </div>
+
+              <div className="coding-track-card coding-track-card--advanced">
+                <div className="coding-track-tag">模块 C</div>
+                <div className="coding-track-title">AI 项目实践</div>
+                <p className="coding-track-desc">输入输出、问答工具、展示网站、改Bug、升级作品——真正完成一个完整项目。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(13)}>从第 13 课开始</button>
               </div>
             </>
           )}
@@ -219,7 +232,7 @@ export default function Coding({ user }) {
           <div className="coding-note-grid">
             {(isKids ? [
               '7-10 岁先不压太多文字，优先让孩子点一下就看见变化。',
-              '页面更像“故事和小游戏工厂”，而不是一节节技术说明。',
+              '页面更像"故事和小游戏工厂"，而不是一节节技术说明。',
               '手机和平板上都要舒服，家长陪着看时也能一眼懂在做什么。',
             ] : CODING_NOTES).map((note) => (
               <div key={note} className="coding-note-item">{note}</div>
