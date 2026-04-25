@@ -229,6 +229,12 @@
     linear-gradient(160deg, #f8fdff 0%, #e8f7ff 52%, #fff4e2 100%);
 }
 
+.coding-track-card--advanced {
+  background:
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.18), transparent 28%),
+    linear-gradient(160deg, #faf5ff 0%, #ede9fe 52%, #f0fdf4 100%);
+}
+
 .coding-track-tag {
   width: fit-content;
   padding: 6px 10px;
