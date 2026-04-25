@@ -693,6 +693,220 @@
   }
 }
 
+/* ── Achievement unlock modal ── */
+.home-ach-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(20, 16, 10, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.home-ach-modal {
+  position: relative;
+  max-width: 340px;
+  width: 100%;
+  padding: 36px 28px 28px;
+  border-radius: 28px;
+  background: linear-gradient(160deg, #fff9f2, #fff3e2);
+  border: 1px solid rgba(190, 130, 60, 0.18);
+  box-shadow: 0 30px 80px rgba(60, 38, 12, 0.25);
+  text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0 }
+  to   { transform: scale(1);   opacity: 1 }
+}
+
+.home-ach-modal-shine {
+  position: absolute;
+  top: -40px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238,180,60,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.home-ach-modal-icon {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 8px 18px rgba(200, 120, 20, 0.3));
+}
+
+.home-ach-modal-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bd6b38;
+  margin-bottom: 6px;
+}
+
+.home-ach-modal-name {
+  font-size: 26px;
+  font-weight: 900;
+  color: #25342e;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.home-ach-modal-desc {
+  font-size: 14px;
+  color: #6b6358;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.home-ach-modal-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #314f47, #bd6b49);
+  color: #fff9f1;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(73, 54, 36, 0.18);
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.home-ach-modal-btn:hover { transform: translateY(-1px); opacity: 0.93; }
+
+/* ── Plan section ── */
+.home-section--plan {
+  background: linear-gradient(140deg, rgba(255, 252, 247, 0.96) 0%, rgba(248, 242, 233, 0.92) 100%);
+}
+
+.home-plan-edit-btn {
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: rgba(49, 79, 71, 0.09);
+  color: #314f47;
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.home-plan-edit-btn:hover { background: rgba(49, 79, 71, 0.15); }
+
+.home-plan-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.9);
+  border: 1px solid rgba(96, 77, 56, 0.08);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.home-plan-row:hover { background: rgba(250, 246, 238, 0.98); }
+
+.home-plan-row-label {
+  width: 32px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #6d7469;
+  flex-shrink: 0;
+}
+
+.home-plan-bar-wrap {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(96, 77, 56, 0.10);
+  overflow: hidden;
+}
+
+.home-plan-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #314f47, #5a9e80);
+  transition: width 0.5s ease;
+}
+
+.home-plan-pct {
+  font-size: 13px;
+  font-weight: 800;
+  color: #314f47;
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.home-plan-count {
+  font-size: 12px;
+  color: #9b8f7f;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.home-plan-empty {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 253, 249, 0.7);
+  border: 1px dashed rgba(96, 77, 56, 0.16);
+  color: #9b8f7f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ── Recent badges strip ── */
+.home-recent-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(96, 77, 56, 0.08);
+}
+
+.home-recent-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(190, 130, 60, 0.18);
+}
+
+.home-recent-badge-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.home-recent-badge-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a3820;
+}
+
 @media (max-width: 560px) {
   .home {
     padding: 12px 10px 60px;

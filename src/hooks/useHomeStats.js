@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { calcTodayStats } from '../utils/activityLogger'
 import { getStreakInfo } from '../utils/sessionTracker'
+import { checkAndUpdateAchievements, getAchievementState, markNotified as _markNotified } from '../utils/checkAchievements'
+import { ACHIEVEMENTS } from '../data/achievements'
 
 const READ_MARKS_KEY = uid => `notebook_read_marks_${uid}`
 const WRITING_KEY = 'essay_correct_history'
@@ -12,12 +14,14 @@ export function useHomeStats(user) {
   const [stats, setStats] = useState({
     loading: true,
     mistakesCount: 0,
-    notebookUnread: [],   // subjects with unread AI replies
+    notebookUnread: [],
     todayDiscussions: 0,
     srsWordsToday: 0,
     exercisesToday: 0,
     writingToday: 0,
     streak: { currentStreak: 0, longestStreak: 0 },
+    pendingNotifications: [],  // unlocked IDs not yet shown as modal
+    recentBadges: [],          // last 1-3 unlocked badge objects
   })
 
   useEffect(() => {
@@ -29,17 +33,27 @@ export function useHomeStats(user) {
     // 1. Local activity log stats (synchronous)
     const act = calcTodayStats(userId)
 
-    // 2. Writing history — read directly for accuracy (key predates activityLog)
+    // 2. Writing history — read directly for accuracy
     let writingToday = act.writingSubmits
     try {
       const hist = JSON.parse(localStorage.getItem(WRITING_KEY)) || []
-      const zhToday = new Date().toLocaleDateString('zh-CN') // "2026/4/24"
+      const zhToday = new Date().toLocaleDateString('zh-CN')
       writingToday = Math.max(writingToday, hist.filter(h => h.date === zhToday).length)
     } catch {}
 
     const streak = getStreakInfo(userId)
 
-    // Set local data immediately, then update with KV data below
+    // 3. Check achievements and compute pending notifications
+    checkAndUpdateAchievements(userId)
+    const achState = getAchievementState(userId)
+    const notifiedSet = new Set(achState.notifiedIds || [])
+    const pendingNotifications = (achState.unlockedIds || []).filter(id => !notifiedSet.has(id))
+    const recentBadges = (achState.recentlyUnlocked || [])
+      .sort((a, b) => b.unlockedAt - a.unlockedAt)
+      .slice(0, 3)
+      .map(r => ACHIEVEMENTS.find(a => a.id === r.id))
+      .filter(Boolean)
+
     setStats({
       loading: false,
       mistakesCount: 0,
@@ -49,12 +63,14 @@ export function useHomeStats(user) {
       exercisesToday: act.exercises,
       writingToday,
       streak,
+      pendingNotifications,
+      recentBadges,
     })
 
     const token = getToken()
     if (!token) return
 
-    // 3. Mistakes from KV — pending count (new + reviewing)
+    // 4. Mistakes from KV
     fetch('/api/mistakes-api', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -63,11 +79,16 @@ export function useHomeStats(user) {
       .then(r => r.json())
       .then(data => {
         const pending = (data.mistakes || []).filter(m => m.status !== 'mastered').length
+        const mastered = (data.mistakes || []).filter(m => m.status === 'mastered').length
+        // Cache mastered count for achievement checks
+        try {
+          localStorage.setItem(`mistakes_stats_${userId}`, JSON.stringify({ mastered }))
+        } catch {}
         setStats(s => ({ ...s, mistakesCount: pending }))
       })
       .catch(() => {})
 
-    // 4. Notebook threads — find unread AI replies and today's discussion count
+    // 5. Notebook threads — unread AI replies + today's discussions
     fetch('/api/threads', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -80,17 +101,14 @@ export function useHomeStats(user) {
         try { readMarks = JSON.parse(localStorage.getItem(READ_MARKS_KEY(userId))) || {} } catch {}
 
         const today = new Date().toISOString().slice(0, 10)
-        // Start with what activityLog already counted (from sendMessage hooks)
         let todayDiscussions = act.discussionAsks
         const unreadSubjects = new Set()
 
         for (const thread of threads) {
-          // Count threads created today that weren't yet logged
           if (thread.createdAt) {
             const d = new Date(thread.createdAt).toISOString().slice(0, 10)
             if (d === today) todayDiscussions++
           }
-          // Find threads where last message is AI and user hasn't read it yet
           const msgs = thread.messages || []
           const last = msgs[msgs.length - 1]
           if (!last || last.role !== 'ai') continue
@@ -103,12 +121,20 @@ export function useHomeStats(user) {
         setStats(s => ({
           ...s,
           notebookUnread: [...unreadSubjects],
-          // Only use KV count if it's larger (avoids double-counting with activityLog)
           todayDiscussions: Math.max(s.todayDiscussions, todayDiscussions),
         }))
       })
       .catch(() => {})
   }
 
-  return stats
+  const markNotified = useCallback((ids) => {
+    if (!uid || !ids.length) return
+    _markNotified(uid, ids)
+    setStats(s => ({
+      ...s,
+      pendingNotifications: s.pendingNotifications.filter(id => !ids.includes(id)),
+    }))
+  }, [uid])
+
+  return { ...stats, markNotified }
 }
