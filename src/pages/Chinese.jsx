@@ -9,18 +9,18 @@ import TextbookLink from '../components/TextbookLink'
 import './Subject.css'
 
 const PRIMARY_TOOLS = [
-  { id: 'confusables',    img: '/icons/generated/chinese/confusables.png',      label: '同音/形近字', desc: '对比 · 组词 · 练习',        ready: true  },
-  { id: 'poems',          img: '/icons/generated/chinese/poems.png',            label: '古诗词',      desc: '朗读 · 背诵打卡 · 1-6年级', ready: true  },
-  { id: 'dictionary',     img: '/icons/generated/chinese/dictionary.png',       label: '查词 · 生词本', desc: '汉字词语 · 拼音 · 例句', ready: true  },
-  { id: 'character_list', img: '/icons/generated/chinese/character-list.png',   label: '生字表',      desc: '一类字 · 二类字 · 点击发音', ready: true  },
-  { id: 'dictation',      img: '/icons/generated/chinese/dictation.png',        label: '听写练习',    desc: '听写 · 错字本 · 历史记录',  ready: true  },
-  { id: 'idioms',         img: '/icons/generated/chinese/idioms.png',           label: '成语故事',    desc: '图文解释 · 例句 · 小测验',  ready: false },
+  { id: 'confusables',    img: '/icons/generated/chinese/confusables.png',      label: '同音/形近字', desc: '对比练习', ready: true  },
+  { id: 'poems',          img: '/icons/generated/chinese/poems.png',            label: '古诗词',      desc: '朗读背诵', ready: true  },
+  { id: 'dictionary',     img: '/icons/generated/chinese/dictionary.png',       label: '查词 · 生词本', desc: '拼音例句', ready: true  },
+  { id: 'character_list', img: '/icons/generated/chinese/character-list.png',   label: '生字表',      desc: '点字发音', ready: true  },
+  { id: 'dictation',      img: '/icons/generated/chinese/dictation.png',        label: '听写练习',    desc: '听写复习', ready: true  },
+  { id: 'idioms',         img: '/icons/generated/chinese/idioms.png',           label: '成语故事',    desc: '故事小测', ready: false },
 ]
 
 const JUNIOR_TOOLS = [
-  { id: 'junior_poems',     img: '/icons/generated/chinese/junior-poems.png',      label: '古诗文',     desc: '7-9年级必背篇目 · 文言文', ready: true  },
-  { id: 'junior_knowledge', img: '/icons/generated/chinese/junior-knowledge.png',  label: '语文知识点', desc: '修辞 · 文体 · 语法 · 考点', ready: true  },
-  { id: 'junior_reading',   img: '/icons/generated/chinese/junior-reading.png',    label: '阅读理解',   desc: '现代文 · AI分析',           ready: false },
+  { id: 'junior_poems',     img: '/icons/generated/chinese/junior-poems.png',      label: '古诗文',     desc: '必背篇目', ready: true  },
+  { id: 'junior_knowledge', img: '/icons/generated/chinese/junior-knowledge.png',  label: '语文知识点', desc: '修辞文体', ready: true  },
+  { id: 'junior_reading',   img: '/icons/generated/chinese/junior-reading.png',    label: '阅读理解',   desc: '现代文阅读', ready: false },
 ]
 
 export default function Chinese() {
@@ -84,7 +84,7 @@ export default function Chinese() {
         <div className="subject-eyebrow">Chinese Language Hall</div>
         <h2 className="subject-title">趣味语文 <span className="edition">人教版</span></h2>
         <p className="subject-lead">
-          把生字、古诗词、词典、听写和初中拓展整理成更清楚的入口，让孩子更容易找到自己现在要继续学的内容。
+          生字、古诗词、词典、听写和初中拓展，都放在这里继续学。
         </p>
       </div>
 

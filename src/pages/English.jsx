@@ -13,17 +13,17 @@ import TextbookVocab from './english/TextbookVocab'
 import './English.css'
 
 const CARDS = [
-  { id: 'listening',      img: '/icons/generated/english/listening.png',       label: '听力练习',      desc: 'TTS朗读 · 分级故事',                ready: true  },
-  { id: 'history',        img: '/icons/generated/english/history.png',         label: '人类大历史',    desc: '中英双语 · 98讲 · TTS朗读',          ready: true  },
-  { id: 'phonics',        img: '/icons/generated/english/phonics.png',         label: '自然拼读',      desc: '尼尔森体系 · 148集视频',              ready: true  },
-  { id: 'speaking',       img: '/icons/generated/english/speaking.png',        label: '口语对话',      desc: 'AI外教 Emma · 实时纠错',             ready: true  },
-  { id: 'reading_hub',    img: '/icons/generated/english/reading-hub.png',     label: '阅读中心',      desc: '分级 · 绘本 · 章节书 · 考试阅读',    ready: true  },
-  { id: 'writing',        img: '/icons/generated/english/writing.png',         label: '写作练习',      desc: 'AI批改 · 自动录入错题本',             ready: true  },
-  { id: 'grammar',        img: '/icons/generated/english/grammar.png',         label: '语法讲解',      desc: '14章65个知识点 · AI练习题',           ready: true  },
-  { id: 'srs',            img: '/icons/generated/english/srs.png',             label: '词汇记忆',      desc: '记忆曲线 · 每日任务 · KET/PET/FCE',  ready: true  },
-  { id: 'words',          img: '/icons/generated/english/words.png',           label: '单词速练',      desc: '沪教版 · KET · PET · FCE 闪卡',      ready: true  },
-  { id: 'textbook_vocab', img: '/icons/generated/english/textbook-vocab.png',  label: '教材词汇',      desc: '沪教版 · 单词句型 · 听写练习',        ready: true  },
-  { id: 'dictionary',     img: '/icons/generated/english/dictionary.png',      label: '查词 · 生词本', desc: '即查即存 · 闪音 · 例句 · 闪卡复习',  ready: true  },
+  { id: 'listening',      img: '/icons/generated/english/listening.png',       label: '听力练习',      desc: '听故事',   ready: true  },
+  { id: 'history',        img: '/icons/generated/english/history.png',         label: '人类大历史',    desc: '双语学习', ready: true  },
+  { id: 'phonics',        img: '/icons/generated/english/phonics.png',         label: '自然拼读',      desc: '发音规则', ready: true  },
+  { id: 'speaking',       img: '/icons/generated/english/speaking.png',        label: '口语对话',      desc: '开口练习', ready: true  },
+  { id: 'reading_hub',    img: '/icons/generated/english/reading-hub.png',     label: '阅读中心',      desc: '分级阅读', ready: true  },
+  { id: 'writing',        img: '/icons/generated/english/writing.png',         label: '写作练习',      desc: '写句写文', ready: true  },
+  { id: 'grammar',        img: '/icons/generated/english/grammar.png',         label: '语法讲解',      desc: '知识讲解', ready: true  },
+  { id: 'srs',            img: '/icons/generated/english/srs.png',             label: '词汇记忆',      desc: '每日背词', ready: true  },
+  { id: 'words',          img: '/icons/generated/english/words.png',           label: '单词速练',      desc: '闪卡速练', ready: true  },
+  { id: 'textbook_vocab', img: '/icons/generated/english/textbook-vocab.png',  label: '教材词汇',      desc: '课本单词', ready: true  },
+  { id: 'dictionary',     img: '/icons/generated/english/dictionary.png',      label: '查词 · 生词本', desc: '查词复习', ready: true  },
 ]
 
 export default function English({ user }) {
@@ -56,7 +56,7 @@ export default function English({ user }) {
         <h1 className="en-hero-title">趣味英语</h1>
         <p className="en-hero-sub">听说读写 · 词汇 · 查词 · 全方位英语学习</p>
         <p className="en-hero-desc">
-          从听力、口语、阅读到写作，把最常用的英语学习工具整理成一张更清楚的学习桌面。
+          听说读写、词汇和查词入口，都放在这里继续学。
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export default function English({ user }) {
       <div className="en-section-head">
         <div>
           <h2 className="en-section-title">开始学习</h2>
-          <p className="en-section-subtitle">入口更稳定、层次更清楚，孩子更容易直接找到自己熟悉的学习方式。</p>
+          <p className="en-section-subtitle">选一个入口，直接继续。</p>
         </div>
       </div>
 

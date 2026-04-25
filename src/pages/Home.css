@@ -293,6 +293,7 @@
   color: #726f65;
   font-size: 13px;
   line-height: 1.7;
+  max-width: 32ch;
 }
 
 .home-tool-grid {
@@ -331,6 +332,7 @@
   color: #726b60;
   font-size: 13px;
   line-height: 1.7;
+  max-width: 28ch;
 }
 
 .home-subject-groups {
@@ -747,11 +749,17 @@
   }
 
   .home-feature-icon {
-    width: 120px;
+    width: 92px;
   }
 
   .home-tool-icon {
-    width: 120px;
+    width: 84px;
+  }
+
+  .home-feature-sub,
+  .home-feature-desc,
+  .home-tool-desc {
+    display: none;
   }
 
   .home-feature-copy,
@@ -765,6 +773,10 @@
 
   .home-subject-card {
     padding: 10px 8px 8px;
+  }
+
+  .home-subject-icon {
+    max-width: 78px;
   }
 
   .home-subject-label {

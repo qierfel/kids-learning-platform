@@ -9,7 +9,7 @@ const FEATURED_TRACKS = [
     path: '/chinese',
     title: '小学学习馆',
     subtitle: '语文、数学、英语一起学',
-    description: '更适合日常学习和基础打牢，像一张温暖的学习地图。',
+    description: '语文、数学、英语的常用入口。',
     icon: '/icons/generated/elementary-icon.png',
     tone: 'elementary',
     tag: '日常学习',
@@ -18,7 +18,7 @@ const FEATURED_TRACKS = [
     path: '/coding',
     title: 'AI 编程创作屋',
     subtitle: '做网页、做小工具、做自己的作品',
-    description: '把 AI 当成创作搭档，让孩子更快进入"我做出来了"的状态。',
+    description: '做网页、做小工具、继续你的项目。',
     icon: '/icons/generated/ai-coding-icon.png',
     tone: 'coding',
     tag: '项目制作',
@@ -27,7 +27,7 @@ const FEATURED_TRACKS = [
     path: '/physics',
     title: '初中探索站',
     subtitle: '物理、化学、历史、地理',
-    description: '适合更强的阅读和理解任务，也适合系统梳理知识点。',
+    description: '适合进阶阅读和学科探索。',
     icon: '/icons/generated/junior-icon.png',
     tone: 'junior',
     tag: '进阶探索',
@@ -38,13 +38,13 @@ const QUICK_TOOLS = [
   {
     path: '/mistakes',
     label: '错题本',
-    description: '把做错的内容留下来，之后更容易查漏补缺。',
+    description: '把错题留下来，回头复习更方便。',
     icon: '/icons/generated/mistakes-icon.png',
   },
   {
     path: '/notebook',
     label: '问题讨论',
-    description: '随时记录问题、继续追问，也能当学习对话本。',
+    description: '把问题记下来，继续追问和讨论。',
     icon: '/icons/generated/discussion-icon.png',
   },
 ]
@@ -119,7 +119,7 @@ export default function Home({ user }) {
         <div className="home-section-head">
           <div>
             <h2 className="home-section-title">今日学习状态</h2>
-            <p className="home-section-subtitle">打开相关模块，数字会自动更新。</p>
+            <p className="home-section-subtitle">看看今天已经完成了多少。</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function Home({ user }) {
         <div className="home-section-head">
           <div>
             <h2 className="home-section-title">从哪里开始</h2>
-            <p className="home-section-subtitle">把最重要的学习入口放在最前面，减少每次打开时的犹豫。</p>
+            <p className="home-section-subtitle">选一个入口，直接继续。</p>
           </div>
         </div>
 
@@ -240,7 +240,7 @@ export default function Home({ user }) {
         <div className="home-section-head">
           <div>
             <h2 className="home-section-title">学习工具</h2>
-            <p className="home-section-subtitle">把容易反复使用的工具放成稳定入口，减少页面切换的成本。</p>
+            <p className="home-section-subtitle">常用工具放在这里，打开就能用。</p>
           </div>
         </div>
 
