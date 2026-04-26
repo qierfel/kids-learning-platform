@@ -1,86 +1,107 @@
 import { useState } from 'react'
 import './Lesson.css'
 
-const TOPICS = [
-  { id: 'animal', label: '🦁 动物世界', desc: '关于动物的有趣知识', systemHint: '你是一个友善的动物知识专家，专门回答10-12岁孩子关于动物的问题。用简单有趣的语言，每次回答保持在100字以内，可以加表情符号。' },
-  { id: 'space', label: '🚀 宇宙太空', desc: '关于星球和宇宙的秘密', systemHint: '你是一个生动的太空科普专家，专门回答10-12岁孩子关于宇宙和天文的问题。用简单有趣的语言，每次回答保持在100字以内，可以加表情符号。' },
-  { id: 'science', label: '🔬 科学小秘密', desc: '日常生活中的科学原理', systemHint: '你是一个活泼的科学知识专家，专门回答10-12岁孩子关于日常科学原理的问题。用简单有趣的语言，每次回答保持在100字以内，可以加表情符号。' },
-  { id: 'history', label: '🏛️ 历史故事', desc: '古今中外的历史故事', systemHint: '你是一个有趣的历史故事专家，专门回答10-12岁孩子关于历史的问题。用故事化的语言，每次回答保持在100字以内，可以加表情符号。' },
+const DEVICE_BADGE = (
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0 4px' }}>
+    {['📱 手机', '📱 iPad', '💻 电脑'].map(d => (
+      <span key={d} style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, padding: '4px 12px', fontSize: 13, color: '#475569' }}>{d}</span>
+    ))}
+    <span style={{ fontSize: 12, color: '#94a3b8', alignSelf: 'center' }}>· 有浏览器就能用</span>
+  </div>
+)
+
+const FORTUNE_TYPES = [
+  { id: 'school', label: '📚 学习运', prompt: '请给一个孩子关于"学习运"的有趣占卜结果，语气神秘有趣，加一条学习小建议，不超过60字。', color: '#6366f1' },
+  { id: 'friend', label: '👫 友情运', prompt: '请给一个孩子关于"友情运"的有趣占卜结果，语气温暖神秘，加一条交友小建议，不超过60字。', color: '#ec4899' },
+  { id: 'luck', label: '🍀 今日幸运', prompt: '请给一个孩子关于"今日幸运"的有趣占卜结果，包括幸运颜色和幸运数字，语气活泼神秘，不超过60字。', color: '#f59e0b' },
+  { id: 'dream', label: '🌟 梦想运', prompt: '请给一个孩子关于"梦想运"的有趣占卜结果，语气鼓励且神秘，给一条追梦小建议，不超过60字。', color: '#10b981' },
 ]
 
-const SAMPLE_QUESTIONS = {
-  animal: ['猫为什么爱睡觉？', '鲸鱼是鱼吗？', '变色龙怎么变色的？'],
-  space: ['月亮为什么有阴晴圆缺？', '黑洞是什么？', '宇宙有多大？'],
-  science: ['彩虹是怎么形成的？', '为什么天空是蓝色的？', '冰为什么会融化？'],
-  history: ['长城是谁修建的？', '古埃及金字塔有什么用？', '为什么恐龙会灭绝？'],
-}
+const UPGRADES = [
+  { version: 'v1.0', title: '基础占卜机', desc: '只有一个按钮，随机给你一句话', icon: '🎱' },
+  { version: 'v1.5', title: '加上名字', desc: '输入你的名字，占卜结果更个性化', icon: '👤' },
+  { version: 'v2.0', title: '选类别', desc: '可以选"学习运"、"友情运"等不同类别', icon: '📂' },
+  { version: 'v2.5', title: '加音效朗读', desc: '点击后自动朗读占卜结果', icon: '🔊' },
+]
 
 const QUIZ = [
   {
-    q: '做一个好的问答工具，最重要的第一步是什么？',
-    options: ['让它支持所有话题', '明确它回答什么范围的问题', '让它看起来很漂亮', '让它能说话'],
-    correct: 1,
-    explain: '好的工具要"专而精"。先定好话题范围，AI才能给出更准确、更有用的回答。这叫"聚焦"。',
-  },
-  {
-    q: '向AI提问时，下面哪种提问方式更好？',
-    options: ['问什么？', '猫为什么会发出呼噜声，这代表什么意思？', '猫', '动物很有趣'],
-    correct: 1,
-    explain: '越具体的问题，AI给的答案越有帮助。"猫为什么会发出呼噜声"比"猫"或"问什么"具体得多。',
-  },
-  {
-    q: '如果AI回答的内容让你看不懂，你应该怎么做？',
-    options: ['放弃，不再问了', '换一个问题继续问', '问AI"可以说得更简单一点吗？"', '认为AI坏了'],
+    q: '"迭代升级"是什么意思？',
+    options: ['把作品删掉重新做', '一次加完所有功能', '先做基础版，发现问题再一步步改进', '等到完美了再开始'],
     correct: 2,
-    explain: '你可以直接告诉AI你不懂，让它用更简单的语言解释。这叫"追问"，是使用AI工具的重要技巧！',
+    explain: '迭代就是小步前进：先做能用的基础版，再逐步加功能。专业程序员都这样做！',
+  },
+  {
+    q: '做占卜机 v2.0 时，最应该先问的是？',
+    options: ['代码要写多少行？', '用户用起来感觉怎么样？哪里不够好？', '要加多少个功能？', '会不会出Bug？'],
+    correct: 1,
+    explain: '升级前要先想"用户体验哪里不够好"。用户反馈是升级方向最好的指南针！',
+  },
+  {
+    q: '占卜机的"输出"是什么？',
+    options: ['你选的运势类别', '你的名字', 'AI给出的占卜结果文字', '点击的按钮'],
+    correct: 2,
+    explain: '记住：输入→处理→输出。占卜结果文字是AI处理之后给你的"输出"。',
   },
 ]
 
 export default function Lesson14({ onBack }) {
   const [tab, setTab] = useState('learn')
-  const [selectedTopic, setSelectedTopic] = useState(null)
-  const [question, setQuestion] = useState('')
-  const [messages, setMessages] = useState([])
+
+  // Fortune teller state
+  const [userName, setUserName] = useState('')
+  const [selectedType, setSelectedType] = useState(null)
+  const [fortuneResult, setFortuneResult] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [speaking, setSpeaking] = useState(false)
+  const [fortuneCount, setFortuneCount] = useState(0)
+
+  // Quiz
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
 
-  const accentColor = '#0ea5e9'
-  const topic = TOPICS.find(t => t.id === selectedTopic)
+  const accentColor = '#8b5cf6'
 
-  async function handleAsk() {
-    if (!question.trim() || !selectedTopic || loading) return
-    const userQ = question.trim()
-    setQuestion('')
-    setError('')
-    const newMessages = [...messages, { role: 'user', content: userQ }]
-    setMessages(newMessages)
+  function speak(text) {
+    if (!window.speechSynthesis || !text) return
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'zh-CN'
+    u.rate = 0.85
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(u)
+  }
+
+  async function handleFortune() {
+    if (!selectedType) return
     setLoading(true)
-
+    setError('')
+    setFortuneResult('')
+    const ft = FORTUNE_TYPES.find(f => f.id === selectedType)
+    const namePrefix = userName.trim() ? `为${userName.trim()}` : ''
+    const prompt = `${namePrefix}${ft.prompt}`
     try {
-      const apiMessages = [
-        { role: 'user', content: `[系统设定：${topic.systemHint}]\n\n我的问题：${userQ}` },
-      ]
-      if (messages.length > 0) {
-        // Build conversation context (last 4 exchanges)
-        const recent = messages.slice(-4)
-        const contextStr = recent.map(m => `${m.role === 'user' ? '孩子问' : 'AI答'}：${m.content}`).join('\n')
-        apiMessages[0].content = `[系统设定：${topic.systemHint}]\n\n之前的对话：\n${contextStr}\n\n现在新的问题：${userQ}`
-      }
       const res = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: apiMessages, subject: topic.label } }),
+        body: JSON.stringify({
+          type: 'chat',
+          payload: { messages: [{ role: 'user', content: prompt }], subject: '占卜机' },
+        }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      setMessages([...newMessages, { role: 'ai', content: data.text || '' }])
+      const result = data.text || ''
+      setFortuneResult(result)
+      setFortuneCount(c => c + 1)
+      speak(result)
     } catch {
-      setError('AI暂时没有响应，请稍后再试。')
-      setMessages(newMessages)
+      setError('占卜师暂时外出，请稍后再试。')
     } finally {
       setLoading(false)
     }
@@ -98,23 +119,26 @@ export default function Lesson14({ onBack }) {
     else { setQuizIdx(i => i + 1); setQuizAnswer(null) }
   }
 
+  const ft = FORTUNE_TYPES.find(f => f.id === selectedType)
+
   return (
     <div className="lesson-page">
       <button className="lesson-back" onClick={onBack}>← 返回课程列表</button>
 
-      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
-        <span className="lesson-hero-badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>第 14 课 · 模块 C</span>
-        <span className="lesson-hero-emoji">❓</span>
-        <h1 className="lesson-hero-title">做一个问答小工具</h1>
-        <p className="lesson-hero-sub">Q&A Mini Tool</p>
+      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%)' }}>
+        <span className="lesson-hero-badge" style={{ background: '#ede9fe', color: '#6d28d9' }}>第 14 课 · 模块 C</span>
+        <span className="lesson-hero-emoji">🔮</span>
+        <h1 className="lesson-hero-title">占卜机 + 作品升级</h1>
+        <p className="lesson-hero-sub">Fortune Teller & Upgrade</p>
+        {DEVICE_BADGE}
       </div>
 
       <div className="lesson-objectives">
         <div className="lesson-objectives-title">本课目标</div>
         <ul className="lesson-objectives-list">
-          <li>学会向AI提出清晰的问题</li>
-          <li>理解AI问答工具的工作原理</li>
-          <li>完成一个主题问答小程序</li>
+          <li>用AI做一个有趣的占卜机</li>
+          <li>学会把已有作品加上新功能</li>
+          <li>理解"迭代升级"的思路</li>
         </ul>
       </div>
 
@@ -130,36 +154,24 @@ export default function Lesson14({ onBack }) {
       {tab === 'learn' && (
         <div className="lesson-content">
           <div className="lesson-section">
-            <h2 className="lesson-section-title">❓ 什么是问答工具？</h2>
-            <p className="lesson-text">问答工具就是：你<strong>提问</strong>，它给出<strong>答案</strong>。最常见的例子是搜索引擎，而现在AI让问答工具变得更智能——它不只返回链接，而是直接给你一个人性化的回答。</p>
-            <div className="lesson-tip-box" style={{ marginTop: 12 }}>
-              🔑 <strong>关键区别：</strong>搜索引擎给你一堆网页链接；AI问答工具直接给你一个整理好的答案。
+            <h2 className="lesson-section-title">🔮 什么是占卜机？</h2>
+            <p className="lesson-text">占卜机是一种"输入你的问题，AI给你有趣的答案"的小工具。它不是真的能预测未来，但能用AI生成有创意的回答，非常好玩！</p>
+            <div className="lesson-tip-box">
+              🔑 <strong>今天的双重任务：</strong>①先做一个能用的基础占卜机；②再一步步给它加功能，体验"迭代升级"！
             </div>
           </div>
 
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🎯 怎么问出好问题？</h2>
-            <div className="lesson-step-list">
-              {[
-                { step: '1', title: '说清楚话题', desc: '不要只说"动物"，要说"猫为什么..."——越具体越好' },
-                { step: '2', title: '说清楚你想要什么', desc: '问"是什么"还是"为什么"还是"怎么做"？目的不同，答案不同' },
-                { step: '3', title: '学会追问', desc: '如果第一个回答没看懂，说"能说得更简单一点吗？"' },
-              ].map(s => (
-                <div key={s.step} className="lesson-step-item">
-                  <span className="lesson-step-num" style={{ background: accentColor }}>{s.step}</span>
-                  <div><strong>{s.title}</strong><p>{s.desc}</p></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="lesson-section">
-            <h2 className="lesson-section-title">🛠️ 今天要做什么？</h2>
-            <p className="lesson-text">我们要搭一个<strong>专题问答工具</strong>：先选一个话题，然后你可以一直问关于这个话题的问题，AI专门回答。</p>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
-              {TOPICS.map(t => (
-                <div key={t.id} style={{ background: `${accentColor}10`, border: `1.5px solid ${accentColor}30`, borderRadius: 10, padding: '8px 14px', fontSize: 14 }}>
-                  {t.label}
+            <h2 className="lesson-section-title">📈 什么是"迭代升级"？</h2>
+            <p className="lesson-text">迭代 = 先做出能用的版本，再慢慢加功能，越做越好。看看占卜机是怎么一步步升级的：</p>
+            <div style={{ marginTop: 12 }}>
+              {UPGRADES.map((u, i) => (
+                <div key={u.version} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div style={{ background: accentColor, color: '#fff', borderRadius: 8, padding: '4px 8px', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', marginTop: 2 }}>{u.version}</div>
+                  <div style={{ flex: 1, background: `${accentColor}${i === 3 ? '20' : '10'}`, borderRadius: 10, padding: '10px 12px', border: `1.5px solid ${accentColor}${i === 3 ? '50' : '20'}` }}>
+                    <div style={{ fontWeight: 700, color: '#1e293b', fontSize: 14 }}>{u.icon} {u.title}</div>
+                    <div style={{ color: '#64748b', fontSize: 13, marginTop: 2 }}>{u.desc}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -169,115 +181,90 @@ export default function Lesson14({ onBack }) {
 
       {tab === 'do' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🛠️ 你的问答小工具</h2>
+          <h2 className="lesson-section-title">🔮 你的 AI 占卜机（v2.0）</h2>
+          <p className="lesson-text">这已经是升级后的版本——有名字输入 + 四种运势类别！</p>
 
-          {!selectedTopic ? (
-            <>
-              <p className="lesson-text">第一步：选择你的问答话题</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginTop: 12 }}>
-                {TOPICS.map(t => (
-                  <button key={t.id} onClick={() => { setSelectedTopic(t.id); setMessages([]) }}
-                    style={{ border: '2px solid #e2e8f0', borderRadius: 14, padding: '16px 12px', textAlign: 'center', background: '#fff', cursor: 'pointer', transition: 'all 0.2s' }}>
-                    <div style={{ fontSize: 28, marginBottom: 6 }}>{t.label.split(' ')[0]}</div>
-                    <div style={{ fontWeight: 700, color: '#1e293b', fontSize: 14 }}>{t.label.split(' ').slice(1).join(' ')}</div>
-                    <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{t.desc}</div>
-                  </button>
-                ))}
+          <div className="l8-field">
+            <label className="l8-label">👤 你的名字（可选，让占卜更个性化）</label>
+            <input className="l8-input" value={userName} onChange={e => setUserName(e.target.value)}
+              placeholder="比如：小明" maxLength={8} />
+          </div>
+
+          <div className="l8-field">
+            <label className="l8-label">🌟 选择你想占卜的运势</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 8 }}>
+              {FORTUNE_TYPES.map(ft => (
+                <button key={ft.id} onClick={() => setSelectedType(ft.id)}
+                  style={{ border: `2px solid ${selectedType === ft.id ? ft.color : '#e2e8f0'}`, borderRadius: 12, padding: '14px 10px', background: selectedType === ft.id ? `${ft.color}12` : '#fff', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>{ft.label.split(' ')[0]}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: selectedType === ft.id ? ft.color : '#475569' }}>{ft.label.split(' ').slice(1).join(' ')}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button className="lesson-btn"
+            style={{ background: selectedType && !loading ? accentColor : '#e2e8f0', color: selectedType && !loading ? '#fff' : '#94a3b8' }}
+            disabled={!selectedType || loading} onClick={handleFortune}>
+            {loading ? '🔮 占卜师正在推算...' : '✨ 开始占卜！'}
+          </button>
+
+          {error && <div style={{ color: '#ef4444', fontSize: 14, marginTop: 12, padding: '10px 14px', background: '#fff5f5', borderRadius: 8 }}>{error}</div>}
+
+          {fortuneResult && (
+            <div style={{ marginTop: 16, padding: '20px', background: 'linear-gradient(135deg, #faf5ff, #ede9fe)', border: `2px solid ${ft?.color || accentColor}40`, borderRadius: 14, textAlign: 'center' }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>🔮</div>
+              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 10 }}>
+                {ft?.label} {userName && `· ${userName}的专属占卜`}
               </div>
-            </>
-          ) : (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                <div style={{ background: `${accentColor}15`, border: `2px solid ${accentColor}40`, borderRadius: 10, padding: '6px 14px', fontWeight: 700, color: accentColor, fontSize: 14 }}>
-                  {topic.label}
-                </div>
-                <button onClick={() => { setSelectedTopic(null); setMessages([]) }}
-                  style={{ fontSize: 12, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                  换话题
+              <div style={{ fontSize: 15, color: '#1e293b', lineHeight: 1.8, fontStyle: 'italic' }}>{fortuneResult}</div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 14 }}>
+                <button onClick={() => speak(fortuneResult)} disabled={speaking}
+                  style={{ background: speaking ? '#e2e8f0' : accentColor, color: speaking ? '#94a3b8' : '#fff', border: 'none', borderRadius: 20, padding: '6px 16px', fontSize: 13, cursor: speaking ? 'default' : 'pointer' }}>
+                  {speaking ? '🔊 朗读中...' : '🔊 朗读'}
+                </button>
+                <button onClick={handleFortune}
+                  style={{ background: 'none', border: `1.5px solid ${accentColor}`, color: accentColor, borderRadius: 20, padding: '6px 16px', fontSize: 13, cursor: 'pointer' }}>
+                  🎲 再占一次
                 </button>
               </div>
+            </div>
+          )}
 
-              <div style={{ fontSize: 13, color: '#64748b', marginBottom: 8 }}>试试这些问题：</div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
-                {SAMPLE_QUESTIONS[selectedTopic].map(q => (
-                  <button key={q} onClick={() => setQuestion(q)}
-                    style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 20, padding: '6px 12px', fontSize: 13, cursor: 'pointer', color: '#475569' }}>
-                    {q}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, minHeight: 200, maxHeight: 360, overflowY: 'auto', padding: 12, marginBottom: 12 }}>
-                {messages.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14, paddingTop: 40 }}>
-                    <div style={{ fontSize: 32, marginBottom: 8 }}>❓</div>
-                    在下方输入你的第一个问题！
-                  </div>
-                ) : (
-                  messages.map((m, i) => (
-                    <div key={i} style={{ marginBottom: 12, display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                      <div style={{
-                        maxWidth: '80%', padding: '10px 14px', borderRadius: 12, fontSize: 14, lineHeight: 1.6,
-                        background: m.role === 'user' ? accentColor : '#fff',
-                        color: m.role === 'user' ? '#fff' : '#1e293b',
-                        border: m.role === 'ai' ? '1px solid #e2e8f0' : 'none',
-                      }}>
-                        {m.content}
-                      </div>
-                    </div>
-                  ))
-                )}
-                {loading && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 8 }}>
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '10px 14px', color: '#94a3b8', fontSize: 14 }}>
-                      AI正在思考中...
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {error && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 8, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{error}</div>}
-
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input
-                  style={{ flex: 1, border: '2px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', fontSize: 14, outline: 'none' }}
-                  value={question}
-                  onChange={e => setQuestion(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleAsk()}
-                  placeholder={`问关于${topic.label.split(' ').slice(1).join(' ')}的问题...`}
-                  maxLength={100}
-                  disabled={loading}
-                />
-                <button className="lesson-btn" style={{ background: question.trim() && !loading ? accentColor : '#e2e8f0', color: question.trim() && !loading ? '#fff' : '#94a3b8', padding: '10px 20px', margin: 0 }}
-                  disabled={!question.trim() || loading} onClick={handleAsk}>
-                  问！
-                </button>
-              </div>
-            </>
+          {fortuneCount > 0 && (
+            <div style={{ marginTop: 12, fontSize: 13, color: '#94a3b8', textAlign: 'center' }}>
+              你已经占卜了 {fortuneCount} 次 ✨
+            </div>
           )}
         </div>
       )}
 
       {tab === 'ai' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🤖 用AI设计你的问答工具</h2>
-          <p className="lesson-text">在"做一做"你已经用了AI问答功能！这里学一个进阶技巧——如何让AI变成更专业的顾问：</p>
+          <h2 className="lesson-section-title">🤖 用AI继续升级你的占卜机</h2>
+          <p className="lesson-text">在"做一做"你体验了 v2.0。想做 v3.0 吗？用这个提示词让AI帮你设计下一步升级：</p>
 
           <div className="ai-prompt-card">
-            <div className="ai-prompt-title">📋 设计专题AI助手的提示词模板</div>
+            <div className="ai-prompt-title">📋 作品升级提示词模板</div>
             <div className="ai-prompt-body">
-              我想做一个关于[话题]的问答工具。<br /><br />
-              请你扮演一个专门研究[话题]的专家，设定如下：<br />
-              - 受众：10-12岁的小学生<br />
-              - 回答长度：每次不超过100字<br />
-              - 语言风格：友善、生动、可以加表情<br />
-              - 擅长话题：[具体说明擅长什么方面]<br /><br />
-              现在开始！我的第一个问题是：[你的问题]
+              我做了一个AI占卜机，现在的功能是：<br />
+              - 可以输入名字<br />
+              - 可以选4种运势（学习/友情/幸运/梦想）<br />
+              - AI给出占卜结果，还能朗读<br /><br />
+              我想升级它，请帮我设计下一个版本（v3.0）：<br />
+              1. 可以加什么新功能？（给3个建议）<br />
+              2. 哪个功能最容易实现？先从哪个开始？<br />
+              3. 用什么样的提示词让AI生成更好的占卜内容？
             </div>
           </div>
 
           <div className="lesson-tip-box" style={{ marginTop: 16 }}>
-            <strong>小技巧：</strong>告诉AI它是谁（角色）、说给谁听（受众）、怎么说（风格），AI的回答质量会大幅提升！这就是<strong>提示词工程</strong>的核心思路。
+            <strong>升级的黄金法则：</strong>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20 }}>
+              <li>一次只升级一个功能，测试没问题再加下一个</li>
+              <li>先问"用户最想要什么"，再决定加什么功能</li>
+              <li>v1.0 能用就发布，收到反馈再继续改</li>
+            </ul>
           </div>
         </div>
       )}
@@ -310,7 +297,7 @@ export default function Lesson14({ onBack }) {
             <div className="quiz-done">
               <div className="quiz-done-score">{quizScore}/{QUIZ.length}</div>
               <div className="quiz-done-msg">
-                {quizScore === 3 ? '🎉 全对！你已经是提问小达人了！' : quizScore === 2 ? '👍 答对两题，继续加油！' : '💪 回去"学一学"看看提问技巧，再来挑战！'}
+                {quizScore === 3 ? '🎉 全对！你已经掌握了迭代思维！' : quizScore === 2 ? '👍 答对两题，继续！' : '💪 回去"学一学"复习一下，再来！'}
               </div>
             </div>
           )}
@@ -320,32 +307,29 @@ export default function Lesson14({ onBack }) {
       {tab === 'work' && (
         <div className="lesson-content">
           <div className="certificate">
-            <div className="certificate-title">❓ 问答小工具 · 完成！</div>
-            <div className="certificate-name">{topic ? topic.label : '主题问答工具'}</div>
-            <div className="certificate-sub">第 14 课 · 模块 C · AI 项目实践</div>
+            <div className="certificate-title">🔮 占卜机 · 完成！</div>
+            <div className="certificate-name">
+              {fortuneCount > 0 ? `共占卜 ${fortuneCount} 次` : '去"做一做"体验占卜机吧！'}
+            </div>
+            <div className="certificate-sub">第 14 课 · 模块 C · 过渡实践</div>
             <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
               你学会了：<br />
-              <strong style={{ color: '#bfdbfe' }}>选好话题 → 问清楚问题 → 追问追到懂</strong><br />
-              你已经自己做了一个AI问答工具！<br />
-              {messages.length > 0 && `你一共问了 ${messages.filter(m => m.role === 'user').length} 个问题。`}
+              <strong style={{ color: '#bfdbfe' }}>v1.0 → v2.0 → 持续迭代升级</strong><br />
+              占卜机只是开始——用同样的思路，你可以升级任何作品！
             </div>
             <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
           </div>
 
-          {messages.length > 0 && (
-            <div style={{ marginTop: 20 }}>
-              <div style={{ fontWeight: 600, color: '#475569', marginBottom: 10 }}>📋 我的问答记录：</div>
-              {messages.filter(m => m.role === 'user').map((m, i) => (
-                <div key={i} style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 10, padding: '8px 14px', marginBottom: 6, fontSize: 13 }}>
-                  <strong style={{ color: '#0369a1' }}>Q{i + 1}：</strong>{m.content}
-                </div>
-              ))}
+          {fortuneResult && (
+            <div style={{ marginTop: 16, background: '#faf5ff', border: '1.5px solid #c4b5fd', borderRadius: 12, padding: '14px 16px' }}>
+              <div style={{ fontWeight: 600, color: accentColor, marginBottom: 6 }}>🔮 你的最新占卜结果：</div>
+              <div style={{ fontSize: 14, color: '#1e293b', fontStyle: 'italic', lineHeight: 1.7 }}>{fortuneResult}</div>
             </div>
           )}
 
           <div className="lesson-next-preview" style={{ marginTop: 16 }}>
-            <div className="lesson-next-title">🚀 下一课预告：第 15 课 · 做一个兴趣展示网站</div>
-            <p>你将亲手规划一个展示自己兴趣的页面，用AI帮你生成自我介绍文字，完成一个"属于你自己"的作品！</p>
+            <div className="lesson-next-title">🚀 下一课预告：第 15 课 · Bug 修复 + 作品集</div>
+            <p>别怕报错！下一课你将学会读懂错误，用AI修复Bug，然后把所有作品整理成一个漂亮的作品集！</p>
           </div>
         </div>
       )}
