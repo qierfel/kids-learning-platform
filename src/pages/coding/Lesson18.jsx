@@ -1,97 +1,164 @@
 import { useState } from 'react'
 import './Lesson.css'
 
-const ALL_MODULES = [
-  { module: 'A', title: 'AI 素养启蒙', range: '第 1-6 课', color: '#6366f1', skills: ['认识AI', '数据', '机器学习', '自然语言', '图像识别', '决策树'] },
-  { module: 'B', title: 'AI 创作入门', range: '第 7-12 课', color: '#f59e0b', skills: ['网页结构', '内容规划', '视觉设计', '按钮交互', 'AI提问', '完成作品'] },
-  { module: 'C', title: 'AI 项目实践', range: '第 13-18 课', color: '#8b5cf6', skills: ['输入输出', '问答工具', '展示网站', '改Bug', '迭代升级', '发布展示'] },
+const DEVICE_BADGE = (
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+    <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>📱 手机</span>
+    <span style={{ background: '#e0e7ff', color: '#4338ca', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>🖥️ iPad</span>
+    <span style={{ background: '#dcfce7', color: '#15803d', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>💻 电脑</span>
+    <span style={{ background: '#f1f5f9', color: '#475569', fontSize: 11, padding: '4px 10px', borderRadius: 999 }}>📍 三种设备都可以完成本课</span>
+  </div>
+)
+
+const AI_TOOLS = [
+  {
+    id: 'doubaob',
+    name: '豆包',
+    maker: '字节跳动（国内）',
+    emoji: '🫘',
+    color: '#6366f1',
+    bg: '#eef2ff',
+    tag: '国内 · 无需翻墙',
+    tagColor: '#4338ca',
+    strengths: ['中文理解极强', '对话自然流畅', '手机端体验好', '支持语音输入'],
+    weakness: '国内工具中较新，某些专业任务不如Claude/GPT强',
+    bestFor: '日常聊天、写作、解答问题、朗读',
+    access: '简单',
+    accessColor: '#10b981',
+  },
+  {
+    id: 'kimi',
+    name: 'Kimi',
+    maker: '月之暗面（国内）',
+    emoji: '🌙',
+    color: '#8b5cf6',
+    bg: '#faf5ff',
+    tag: '国内 · 无需翻墙',
+    tagColor: '#7c3aed',
+    strengths: ['超长文本处理（读PDF/长文章）', '信息提取准确', '总结归纳能力强', '联网搜索'],
+    weakness: '创意写作能力相比稍弱',
+    bestFor: '读长文档、信息整理、联网查资料',
+    access: '简单',
+    accessColor: '#10b981',
+  },
+  {
+    id: 'tongyi',
+    name: '通义千问',
+    maker: '阿里巴巴（国内）',
+    emoji: '☁️',
+    color: '#f97316',
+    bg: '#fff7ed',
+    tag: '国内 · 无需翻墙',
+    tagColor: '#c2410c',
+    strengths: ['多模态（图文音视频）', '与阿里生态联动', '代码辅助', '数学推理'],
+    weakness: '功能全但各项不算最顶尖',
+    bestFor: '图片理解、代码、有阿里账号的用户',
+    access: '简单',
+    accessColor: '#10b981',
+  },
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    maker: 'OpenAI（国际）',
+    emoji: '🤖',
+    color: '#10b981',
+    bg: '#f0fdf4',
+    tag: '国际 · 需要网络条件',
+    tagColor: '#047857',
+    strengths: ['全球用户最多', '插件生态丰富', '代码能力强', '支持GPT-4多模态'],
+    weakness: '需要网络条件，免费版有限制',
+    bestFor: '编程、专业问答、英文任务',
+    access: '需要条件',
+    accessColor: '#f59e0b',
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    maker: 'Anthropic（国际）',
+    emoji: '🌿',
+    color: '#f59e0b',
+    bg: '#fffbeb',
+    tag: '国际 · 需要网络条件',
+    tagColor: '#b45309',
+    strengths: ['创意写作极强', '代码质量高', '逻辑分析准确', '长文本理解出色'],
+    weakness: '需要网络条件，无搜索功能',
+    bestFor: '创作、编程、分析、复杂推理',
+    access: '需要条件',
+    accessColor: '#f59e0b',
+  },
 ]
 
-const PRESENT_TIPS = [
-  { step: '1', title: '说"是什么"', desc: '我做了一个______，它可以______。', tip: '一句话让听众秒懂你的作品' },
-  { step: '2', title: '说"怎么做的"', desc: '我用了______技术，最难的地方是______，我用______方法解决了。', tip: '展示你解决问题的能力' },
-  { step: '3', title: '说"我学到了什么"', desc: '做这个作品我学会了______，下次我想改进______。', tip: '学习者的成长反思让人印象深刻' },
+const PROMPT_TEMPLATES = [
+  { label: '让AI介绍自己', prompt: '你好！用100字内自我介绍，说说你能帮我做什么，语气活泼一点。' },
+  { label: '让AI帮我写一段话', prompt: '帮我写一段关于"努力学习"的励志短句，要好听且适合10岁孩子，不超过50字。' },
+  { label: '让AI讲个笑话', prompt: '给我讲一个适合小学生的关于猫咪的笑话，要让人真的笑出来！' },
+  { label: '让AI帮我解释概念', prompt: '用小学生能懂的语言，解释一下"人工智能"是什么，不超过80字。' },
 ]
 
 const QUIZ = [
   {
-    q: '介绍自己的作品时，最重要的第一句话是？',
-    options: ['这个作品有多少行代码', '用一句话说清楚这个作品是什么、能做什么', '我花了多少时间做这个', '介绍你用的编程语言'],
+    q: '想用AI帮你整理一份10页的阅读材料，哪个工具最合适？',
+    options: ['ChatGPT（担心超字数）', 'Kimi（长文本处理超强）', '豆包（语音更好）', 'Claude（创意更好）'],
     correct: 1,
-    explain: '第一句话要让听众马上知道这是什么作品、有什么用。其他细节再慢慢补充。',
+    explain: 'Kimi专门擅长处理超长文本！读PDF、整理长文章是它最强的技能之一。',
   },
   {
-    q: '"发布"一个作品意味着什么？',
-    options: ['把代码删掉', '让别人也可以看到、使用你的作品', '自己保留，不给别人看', '打印出来'],
+    q: '国内聊天AI（豆包/Kimi等）最大的优点是？',
+    options: ['功能最强大', '无需特殊网络条件、中文体验好', '价格最便宜', '可以生成图片'],
     correct: 1,
-    explain: '发布就是让作品"走出"你的电脑，让更多人能看到和使用。可以是分享链接、展示给朋友、上传到平台等。',
+    explain: '国内工具最大优势：无需科学上网，中文理解自然，注册简单，适合所有家庭！',
   },
   {
-    q: '完成了18节课的学习，接下来最好的行动是？',
-    options: ['停下来休息，不用再做了', '继续做新项目，把技能用起来', '把所有代码删掉重来一遍', '等到学会更多才开始做'],
+    q: '向AI提问时，哪种方式更容易得到好答案？',
+    options: ['说"帮我写东西"', '说"帮我写一段关于友谊的50字短句，语气温暖"', '"AI你好厉害，随便写点吧"', '"我想要一些文字"'],
     correct: 1,
-    explain: '学会了就要用！继续做新项目才能让技能变得更熟练。每一个你做的作品，都会让你进步一大步。',
+    explain: '描述越具体（主题、字数、语气），AI给出的结果越符合你的需求！含糊的问题得到含糊的答案。',
   },
 ]
 
 export default function Lesson18({ onBack }) {
   const [tab, setTab] = useState('learn')
-
-  // Showcase form
-  const [workName, setWorkName] = useState('')
-  const [workDesc, setWorkDesc] = useState('')
-  const [proudPoint, setProudPoint] = useState('')
-  const [nextPlan, setNextPlan] = useState('')
-  const [learnedThing, setLearnedThing] = useState('')
-
-  // AI speech
-  const [aiSpeech, setAiSpeech] = useState('')
-  const [loadingAi, setLoadingAi] = useState(false)
-  const [aiError, setAiError] = useState('')
-
-  // Certificate
-  const [yourName, setYourName] = useState('')
-  const [showCert, setShowCert] = useState(false)
-
-  // Quiz
+  const [selectedTool, setSelectedTool] = useState(null)
+  const [chatInput, setChatInput] = useState('')
+  const [chatResult, setChatResult] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatError, setChatError] = useState('')
+  const [usedTemplate, setUsedTemplate] = useState(null)
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
+  const [favoriteTool, setFavoriteTool] = useState(null)
 
-  const accentColor = '#8b5cf6'
+  const accentColor = '#6366f1'
+  const toolDetail = AI_TOOLS.find(t => t.id === selectedTool)
 
-  async function handleGenerateSpeech() {
-    if (!workName.trim()) return
-    setLoadingAi(true)
-    setAiError('')
-    setAiSpeech('')
-
-    const prompt = `请帮我写一段作品展示演讲稿，用第一人称，语气自信又可爱，不超过120字。
-
-我的信息：
-- 作品名称：${workName.trim()}
-- 作品功能：${workDesc.trim() || '一个AI编程学习项目'}
-- 最自豪的地方：${proudPoint.trim() || '完成了整个作品'}
-- 我学到的：${learnedThing.trim() || '很多编程和AI的知识'}
-- 下一步计划：${nextPlan.trim() || '继续做更多项目'}
-
-请直接给出演讲稿文字，分3段：第一段说作品是什么，第二段说最自豪的地方，第三段说学到了什么和下一步打算。`
-
+  async function handleChat() {
+    if (!chatInput.trim()) return
+    setChatLoading(true)
+    setChatError('')
+    setChatResult('')
     try {
       const res = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: '作品展示演讲' } }),
+        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: chatInput.trim() }], subject: '聊天AI体验' } }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      setAiSpeech(data.text || '')
+      setChatResult(data.text || '')
     } catch {
-      setAiError('AI暂时没有响应，请稍后再试。')
+      setChatError('AI暂时没有响应，请稍后再试。')
     } finally {
-      setLoadingAi(false)
+      setChatLoading(false)
     }
+  }
+
+  function handleTemplate(t) {
+    setChatInput(t.prompt)
+    setUsedTemplate(t.label)
+    setChatResult('')
+    setChatError('')
   }
 
   function handleQuizAnswer(optIdx) {
@@ -110,177 +177,183 @@ export default function Lesson18({ onBack }) {
     <div className="lesson-page">
       <button className="lesson-back" onClick={onBack}>← 返回课程列表</button>
 
-      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%)' }}>
-        <span className="lesson-hero-badge" style={{ background: '#ede9fe', color: '#6d28d9' }}>第 18 课 · 模块 C · 最终课</span>
-        <span className="lesson-hero-emoji">🎓</span>
-        <h1 className="lesson-hero-title">发布与展示</h1>
-        <p className="lesson-hero-sub">Publish & Present</p>
+      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' }}>
+        <span className="lesson-hero-badge" style={{ background: '#e0e7ff', color: '#3730a3' }}>第 18 课 · 模块 E · 工具大全</span>
+        <span className="lesson-hero-emoji">💬</span>
+        <h1 className="lesson-hero-title">会聊天的 AI</h1>
+        <p className="lesson-hero-sub">Conversational AI — 认识最强聊天AI，亲手试一试</p>
       </div>
 
       <div className="lesson-objectives">
         <div className="lesson-objectives-title">本课目标</div>
         <ul className="lesson-objectives-list">
-          <li>学会向别人介绍自己的作品</li>
-          <li>用AI生成作品展示演讲稿</li>
-          <li>完成18课全部学习，获得结业证书</li>
+          <li>认识豆包、Kimi、通义、ChatGPT、Claude五大聊天AI</li>
+          <li>知道每个AI最擅长做什么，怎么选</li>
+          <li>亲手用嵌入式Claude对话，感受AI的能力</li>
         </ul>
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
+        {['learn', 'compare', 'try', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '结业证书'}
+            {t === 'learn' ? '学一学' : t === 'compare' ? '对比工具' : t === 'try' ? '亲手试' : t === 'quiz' ? '测一测' : '我的最爱'}
           </button>
         ))}
       </div>
 
       {tab === 'learn' && (
         <div className="lesson-content">
+          {DEVICE_BADGE}
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🎓 什么是"发布"？</h2>
-            <p className="lesson-text">发布就是让你的作品走出你的电脑，让别人也能看到和使用。可以是：把链接发给朋友、在课堂上展示、上传到平台……哪怕只是给家人看一看，也算发布！</p>
-            <div className="lesson-tip-box">
-              💡 <strong>重要心态：</strong>作品不需要"完美"才能发布。先发布出去，收集反馈，再继续改进——这才是真正的发布精神！
-            </div>
+            <h2 className="lesson-section-title">💬 什么是聊天AI？</h2>
+            <p className="lesson-text">聊天AI（也叫"大语言模型"）就是能和你对话的人工智能。你问它问题，它给你回答。你让它写文章，它帮你写。你跟它聊天，它也会陪你聊！现在全世界有很多这样的AI，各有各的本领。</p>
           </div>
 
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🎤 怎么展示你的作品？</h2>
-            <div className="lesson-step-list">
-              {PRESENT_TIPS.map(s => (
-                <div key={s.step} className="lesson-step-item">
-                  <span className="lesson-step-num" style={{ background: accentColor }}>{s.step}</span>
+            <h2 className="lesson-section-title">🏆 认识五大聊天AI</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+              {AI_TOOLS.map(t => (
+                <div key={t.id} style={{ background: t.bg, border: `1.5px solid ${t.color}30`, borderRadius: 14, padding: '12px 14px', display: 'flex', gap: 12 }}>
+                  <span style={{ fontSize: 26, flexShrink: 0 }}>{t.emoji}</span>
                   <div>
-                    <strong>{s.title}</strong>
-                    <p style={{ fontStyle: 'italic', color: '#475569' }}>{s.desc}</p>
-                    <p style={{ fontSize: 12, color: '#94a3b8' }}>👉 {s.tip}</p>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 800, color: t.color, fontSize: 15 }}>{t.name}</span>
+                      <span style={{ background: t.tagColor + '20', color: t.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{t.tag}</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.6 }}>
+                      <strong>最适合：</strong>{t.bestFor}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="lesson-section">
-            <h2 className="lesson-section-title">🏆 你走过的 18 课旅程</h2>
-            {ALL_MODULES.map(m => (
-              <div key={m.module} style={{ background: `${m.color}10`, border: `1.5px solid ${m.color}30`, borderRadius: 12, padding: '12px 14px', marginBottom: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontWeight: 700, color: m.color }}>模块 {m.module}：{m.title}</span>
-                  <span style={{ fontSize: 12, color: '#94a3b8' }}>{m.range}</span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {m.skills.map(s => (
-                    <span key={s} style={{ background: `${m.color}20`, color: m.color, borderRadius: 6, padding: '3px 8px', fontSize: 12 }}>✓ {s}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="lesson-tip-box">
+            💡 <strong>核心策略：</strong>国内AI随时用（豆包/Kimi都很好）；有国际网络条件的再加上ChatGPT和Claude，双线组合最强！
           </div>
         </div>
       )}
 
-      {tab === 'do' && (
+      {tab === 'compare' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">📋 填写你的作品展示卡</h2>
-          <p className="lesson-text">认真填写，之后AI会帮你把这些信息变成一段完整的展示演讲稿！</p>
+          <h2 className="lesson-section-title">🔍 点击工具，查看详细对比</h2>
 
-          <div className="l8-field">
-            <label className="l8-label">🏷️ 你的作品名称 *</label>
-            <input className="l8-input" value={workName} onChange={e => setWorkName(e.target.value)} placeholder={'比如：我的兴趣展示网站'} maxLength={30} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {AI_TOOLS.map(t => (
+              <button key={t.id} onClick={() => setSelectedTool(t.id === selectedTool ? null : t.id)}
+                style={{ padding: '8px 14px', borderRadius: 999, border: `2px solid ${selectedTool === t.id ? t.color : '#e2e8f0'}`, background: selectedTool === t.id ? t.bg : '#fff', color: t.color, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                {t.emoji} {t.name}
+              </button>
+            ))}
           </div>
 
-          <div className="l8-field">
-            <label className="l8-label">📖 这个作品能做什么？</label>
-            <input className="l8-input" value={workDesc} onChange={e => setWorkDesc(e.target.value)} placeholder={'比如：展示我的名字、爱好和AI生成的自我介绍'} maxLength={60} />
-          </div>
-
-          <div className="l8-field">
-            <label className="l8-label">🌟 你最自豪的一点</label>
-            <input className="l8-input" value={proudPoint} onChange={e => setProudPoint(e.target.value)} placeholder={'比如：第一次让AI真正帮我生成了有用的文字'} maxLength={60} />
-          </div>
-
-          <div className="l8-field">
-            <label className="l8-label">📚 你在这次学习中学到了什么？</label>
-            <input className="l8-input" value={learnedThing} onChange={e => setLearnedThing(e.target.value)} placeholder={'比如：学会了输入输出、怎么向AI提问、如何改Bug'} maxLength={60} />
-          </div>
-
-          <div className="l8-field">
-            <label className="l8-label">🚀 你的下一步计划</label>
-            <input className="l8-input" value={nextPlan} onChange={e => setNextPlan(e.target.value)} placeholder={'比如：给网站加上更多功能，或者学真正的HTML/CSS'} maxLength={60} />
-          </div>
-
-          {workName.trim() && (
-            <div style={{ marginTop: 16, background: `${accentColor}08`, border: `2px solid ${accentColor}30`, borderRadius: 14, padding: '16px' }}>
-              <div style={{ fontWeight: 700, color: accentColor, marginBottom: 12 }}>📋 你的展示卡预览</div>
-              <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 2 }}>
-                <div><strong>作品名：</strong>{workName}</div>
-                {workDesc && <div><strong>功能：</strong>{workDesc}</div>}
-                {proudPoint && <div><strong>最自豪：</strong>{proudPoint}</div>}
-                {learnedThing && <div><strong>学到了：</strong>{learnedThing}</div>}
-                {nextPlan && <div><strong>下一步：</strong>{nextPlan}</div>}
+          {toolDetail && (
+            <div style={{ background: toolDetail.bg, border: `2px solid ${toolDetail.color}40`, borderRadius: 16, padding: '18px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 30 }}>{toolDetail.emoji}</span>
+                <div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontWeight: 900, color: toolDetail.color, fontSize: 20 }}>{toolDetail.name}</span>
+                    <span style={{ background: toolDetail.tagColor + '20', color: toolDetail.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{toolDetail.tag}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>{toolDetail.maker}</div>
+                </div>
               </div>
-              <div className="lesson-tip-box" style={{ marginTop: 12 }}>
-                🎤 去"用AI帮忙"，把这些信息变成一段漂亮的演讲稿！
+
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 14 }}>✅ 四大强项：</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {toolDetail.strengths.map((s, i) => (
+                    <div key={i} style={{ background: '#fff', border: `1px solid ${toolDetail.color}30`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: '#1e293b' }}>
+                      <span style={{ color: toolDetail.color }}>● </span>{s}
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 12px', fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+                <strong>相对不足：</strong>{toolDetail.weakness}
+              </div>
+
+              <div style={{ background: '#fff', borderRadius: 10, padding: '10px 12px', fontSize: 13, marginBottom: 10 }}>
+                <strong style={{ color: toolDetail.color }}>🎯 最适合：</strong> {toolDetail.bestFor}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 13, color: '#64748b' }}>访问难度：</span>
+                <span style={{ background: toolDetail.accessColor + '20', color: toolDetail.accessColor, fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 999 }}>{toolDetail.access}</span>
+              </div>
+            </div>
+          )}
+
+          {!selectedTool && (
+            <div style={{ textAlign: 'center', padding: '30px 20px', color: '#94a3b8', fontSize: 14 }}>
+              ↑ 点击工具名称，查看详细对比
             </div>
           )}
         </div>
       )}
 
-      {tab === 'ai' && (
+      {tab === 'try' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🤖 让AI帮你写展示演讲稿</h2>
-          <p className="lesson-text">
-            {!workName.trim()
-              ? '先去"做一做"填写你的作品信息，再回来生成演讲稿！'
-              : '你的作品信息已经填好了！点击按钮，AI帮你生成一段演讲稿。'}
-          </p>
+          <h2 className="lesson-section-title">🌿 亲手和AI对话！</h2>
+          <p className="lesson-text">下面接入的是 Claude AI。选一个模板快速开始，或者直接写你想问的！</p>
 
-          {workName.trim() && (
-            <>
-              <div style={{ background: '#faf5ff', border: '1.5px solid #d8b4fe', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
-                <div style={{ fontSize: 13, color: '#7c3aed', fontWeight: 600, marginBottom: 6 }}>将为这个作品生成演讲稿：</div>
-                <div style={{ fontSize: 14, color: '#1e293b' }}>
-                  {workName}{workDesc && ` — ${workDesc}`}
-                </div>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 8 }}>📋 快速模板（点击填入）：</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {PROMPT_TEMPLATES.map(t => (
+                <button key={t.label} onClick={() => handleTemplate(t)}
+                  style={{ padding: '7px 12px', borderRadius: 999, border: `1.5px solid ${usedTemplate === t.label ? accentColor : '#e2e8f0'}`, background: usedTemplate === t.label ? '#eef2ff' : '#f8fafc', color: usedTemplate === t.label ? accentColor : '#64748b', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="l8-field">
+            <label className="l8-label">✏️ 你想对AI说什么？</label>
+            <textarea
+              style={{ width: '100%', border: `2px solid ${chatInput ? accentColor + '60' : '#e2e8f0'}`, borderRadius: 10, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', minHeight: 90, resize: 'vertical', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }}
+              value={chatInput}
+              onChange={e => { setChatInput(e.target.value); setUsedTemplate(null) }}
+              placeholder="随便问它什么！比如：帮我讲个笑话，或者你能做什么？"
+              maxLength={300}
+            />
+          </div>
+
+          <button className="lesson-btn" style={{ background: chatInput.trim() ? accentColor : '#e2e8f0', color: chatInput.trim() ? '#fff' : '#94a3b8' }}
+            disabled={!chatInput.trim() || chatLoading} onClick={handleChat}>
+            {chatLoading ? '💬 AI正在回复...' : '🚀 发送给AI！'}
+          </button>
+
+          {chatError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{chatError}</div>}
+
+          {chatResult && (
+            <div style={{ marginTop: 14, padding: '16px', background: '#eef2ff', border: '2px solid #c7d2fe', borderRadius: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <span style={{ fontSize: 18 }}>🌿</span>
+                <span style={{ fontSize: 13, color: accentColor, fontWeight: 700 }}>Claude 的回复：</span>
               </div>
-
-              <button className="lesson-btn" style={{ background: accentColor }} disabled={loadingAi} onClick={handleGenerateSpeech}>
-                {loadingAi ? '✍️ AI正在创作...' : '🎤 生成展示演讲稿！'}
+              <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{chatResult}</div>
+              <button onClick={() => { setChatResult(''); setChatInput('') }} style={{ marginTop: 10, fontSize: 12, color: '#94a3b8', background: 'none', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+                再问一次
               </button>
-
-              {aiError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{aiError}</div>}
-
-              {aiSpeech && (
-                <div style={{ marginTop: 16, padding: '18px', background: '#faf5ff', border: '2px solid #c4b5fd', borderRadius: 14 }}>
-                  <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 10 }}>🎤 你的展示演讲稿：</div>
-                  <div style={{ fontSize: 15, color: '#1e293b', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{aiSpeech}</div>
-                  <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                    <button onClick={handleGenerateSpeech} style={{ fontSize: 12, color: accentColor, background: 'none', border: `1px solid ${accentColor}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
-                      重新生成
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {aiSpeech && (
-                <div className="lesson-tip-box" style={{ marginTop: 12 }}>
-                  🎤 把这段话大声读给家人或同学听——你就完成了第一次正式的作品展示！
-                </div>
-              )}
-            </>
+            </div>
           )}
 
           <div className="ai-prompt-card" style={{ marginTop: 20 }}>
-            <div className="ai-prompt-title">📋 更多展示场景的提示词</div>
+            <div className="ai-prompt-title">💡 让AI回答得更好的小技巧</div>
             <div className="ai-prompt-body">
-              场景1：给父母介绍<br />
-              "帮我把这段演讲稿改成向父母介绍的版本，更口语化，强调我学到了什么"<br /><br />
-              场景2：给老师展示<br />
-              "帮我改成更正式的版本，适合在课堂上向老师展示"<br /><br />
-              场景3：写简短的作品介绍<br />
-              "帮我用30字以内总结这个作品，用于发朋友圈"
+              <strong>说清楚你想要什么：</strong><br />
+              ✗ 帮我写东西<br />
+              ✓ 帮我写一段关于"友情"的50字短句，温暖一点<br /><br />
+              <strong>告诉AI你的情况：</strong><br />
+              ✓ 我是小学生，用简单的话解释...<br /><br />
+              <strong>限定长度和格式：</strong><br />
+              ✓ 不超过100字 / 用列表方式 / 给3个例子
             </div>
           </div>
         </div>
@@ -288,7 +361,7 @@ export default function Lesson18({ onBack }) {
 
       {tab === 'quiz' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🎯 最终测验</h2>
+          <h2 className="lesson-section-title">🎯 测一测</h2>
           {!quizDone ? (
             <div className="quiz-wrap">
               <div className="quiz-progress">第 {quizIdx + 1} / {QUIZ.length} 题</div>
@@ -306,7 +379,7 @@ export default function Lesson18({ onBack }) {
               {quizAnswer && <div className="quiz-explain">{quizAnswer.correct ? '✅ 正确！' : '❌ 再想想'} {QUIZ[quizIdx].explain}</div>}
               {quizAnswer && (
                 <button className="lesson-btn" style={{ background: accentColor }} onClick={nextQuestion}>
-                  {quizIdx + 1 < QUIZ.length ? '下一题 →' : '🎓 完成测验，领取结业证书！'}
+                  {quizIdx + 1 < QUIZ.length ? '下一题 →' : '查看结果'}
                 </button>
               )}
             </div>
@@ -314,11 +387,8 @@ export default function Lesson18({ onBack }) {
             <div className="quiz-done">
               <div className="quiz-done-score">{quizScore}/{QUIZ.length}</div>
               <div className="quiz-done-msg">
-                {quizScore === 3 ? '🎉 满分！去"结业证书"领取你的专属证书！' : quizScore === 2 ? '👍 答对两题！快去领取结业证书！' : '💪 没关系，学到了就是赚到了！去领证书吧！'}
+                {quizScore === 3 ? '🎉 全对！你是聊天AI专家！' : quizScore === 2 ? '👍 不错！继续探索更多AI！' : '💪 回去"对比工具"看一看，再来！'}
               </div>
-              <button className="lesson-btn" style={{ background: accentColor, marginTop: 16 }} onClick={() => setTab('work')}>
-                🎓 去领取结业证书！
-              </button>
             </div>
           )}
         </div>
@@ -326,70 +396,49 @@ export default function Lesson18({ onBack }) {
 
       {tab === 'work' && (
         <div className="lesson-content">
-          {!showCert ? (
-            <>
-              <h2 className="lesson-section-title">🎓 领取你的结业证书</h2>
-              <p className="lesson-text">最后一步！输入你的名字，生成专属结业证书。</p>
-              <div className="l8-field">
-                <label className="l8-label">👤 你的名字</label>
-                <input className="l8-input" value={yourName} onChange={e => setYourName(e.target.value)} placeholder={'你叫什么名字？'} maxLength={10} />
-              </div>
-              <button className="lesson-btn" style={{ background: yourName.trim() ? accentColor : '#e2e8f0', color: yourName.trim() ? '#fff' : '#94a3b8' }}
-                disabled={!yourName.trim()} onClick={() => setShowCert(true)}>
-                🎓 生成我的结业证书！
+          <h2 className="lesson-section-title">⭐ 我最喜欢的聊天AI</h2>
+          <p className="lesson-text">今天认识了5个聊天AI，你最喜欢哪个？</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+            {AI_TOOLS.map(t => (
+              <button key={t.id} onClick={() => setFavoriteTool(t.id)}
+                style={{ border: `2.5px solid ${favoriteTool === t.id ? t.color : '#e2e8f0'}`, borderRadius: 14, padding: '12px 14px', textAlign: 'left', background: favoriteTool === t.id ? t.bg : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 22 }}>{t.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontWeight: 700, color: t.color }}>{t.name}</span>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>最适合：{t.bestFor.slice(0, 20)}...</div>
+                </div>
+                {favoriteTool === t.id && <span style={{ color: t.color, fontWeight: 700, fontSize: 18 }}>♥</span>}
               </button>
-            </>
-          ) : (
-            <>
-              <div style={{ background: 'linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #1e40af 100%)', borderRadius: 20, padding: '30px 24px', textAlign: 'center', color: '#fff', marginBottom: 20, boxShadow: '0 8px 32px rgba(109,40,217,0.4)' }}>
-                <div style={{ fontSize: 48, marginBottom: 8 }}>🎓</div>
-                <div style={{ fontSize: 13, color: '#c4b5fd', letterSpacing: 3, marginBottom: 12 }}>AI 编程创作屋 · 结业证书</div>
-                <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 4 }}>{yourName}</div>
-                <div style={{ fontSize: 14, color: '#ddd6fe', marginBottom: 20 }}>已完成 18 课 · 模块 A + B + C 全部课程</div>
+            ))}
+          </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-                  {ALL_MODULES.map(m => (
-                    <div key={m.module} style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '10px 8px' }}>
-                      <div style={{ fontSize: 12, color: '#c4b5fd', marginBottom: 4 }}>模块 {m.module}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>{m.title}</div>
-                      <div style={{ fontSize: 11, color: '#ddd6fe', marginTop: 2 }}>{m.range}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ fontSize: 13, color: '#ddd6fe', lineHeight: 1.8, marginBottom: 16 }}>
-                  你已经从"认识AI"走到了"发布展示作品"，<br />
-                  从不懂输入输出，到亲手做问答工具、展示网站，<br />
-                  学会改Bug、迭代升级，最终站在台前介绍自己的作品。<br />
-                  <strong style={{ color: '#fff' }}>这只是你创作之路的开始！</strong>
-                </div>
-
-                <div style={{ fontSize: 28, letterSpacing: 6 }}>⭐⭐⭐⭐⭐</div>
+          {favoriteTool && (
+            <div className="certificate">
+              <div className="certificate-title">💬 AI对话达人！</div>
+              <div className="certificate-name">
+                我最喜欢：{AI_TOOLS.find(t => t.id === favoriteTool)?.emoji} {AI_TOOLS.find(t => t.id === favoriteTool)?.name}
               </div>
-
-              {aiSpeech && (
-                <div style={{ background: '#faf5ff', border: '2px solid #c4b5fd', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
-                  <div style={{ fontWeight: 700, color: accentColor, marginBottom: 8 }}>🎤 你的作品展示演讲稿</div>
-                  <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{aiSpeech}</div>
-                </div>
-              )}
-
-              <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 14, padding: '16px' }}>
-                <div style={{ fontWeight: 700, color: '#15803d', marginBottom: 10 }}>🚀 接下来你可以做什么？</div>
-                {[
-                  { emoji: '💻', text: '学习真正的 HTML/CSS/JavaScript，让你的网页能真正上线' },
-                  { emoji: '🤖', text: '继续用 Claude、ChatGPT 等 AI 工具，做更复杂的项目' },
-                  { emoji: '🎮', text: '试试 Scratch 游戏编程，或者 Python 数据科学' },
-                  { emoji: '🌟', text: '把你的作品分享给朋友和家人，听取反馈，继续改进' },
-                ].map(item => (
-                  <div key={item.emoji} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8, fontSize: 14, color: '#1e293b' }}>
-                    <span style={{ fontSize: 18 }}>{item.emoji}</span>
-                    <span>{item.text}</span>
-                  </div>
-                ))}
+              <div className="certificate-sub">第 18 课 · 模块 E · 工具大全</div>
+              <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
+                今天认识了5个聊天AI，还亲手用了Claude！<br />
+                <strong style={{ color: '#bfdbfe' }}>会问问题的人，才是会用AI的人</strong>
               </div>
-            </>
+              <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
+            </div>
           )}
+
+          {chatResult && (
+            <div style={{ marginTop: 14, padding: '14px', background: '#eef2ff', border: '1.5px solid #c7d2fe', borderRadius: 12 }}>
+              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 6 }}>💬 你今天和AI聊了什么（来自"亲手试"）：</div>
+              <div style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{chatResult.slice(0, 200)}{chatResult.length > 200 ? '...' : ''}</div>
+            </div>
+          )}
+
+          <div className="lesson-next-preview" style={{ marginTop: 16 }}>
+            <div className="lesson-next-title">🚀 下一课预告：第 19 课 · 会画画的AI</div>
+            <p>聊天AI认识了，下一步认识会画画的AI！即梦、可灵、Midjourney——用一句话描述，就能让AI帮你画出来！</p>
+          </div>
         </div>
       )}
     </div>
