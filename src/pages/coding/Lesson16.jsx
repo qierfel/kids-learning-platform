@@ -1,136 +1,111 @@
 import { useState } from 'react'
 import './Lesson.css'
 
-const BUGGY_EXAMPLES = [
+const DEVICE_BADGE = (
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+    <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>📱 手机</span>
+    <span style={{ background: '#e0e7ff', color: '#4338ca', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>🖥️ iPad</span>
+    <span style={{ background: '#dcfce7', color: '#15803d', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>💻 电脑</span>
+    <span style={{ background: '#f1f5f9', color: '#475569', fontSize: 11, padding: '4px 10px', borderRadius: 999 }}>📍 三种设备都能完成本课</span>
+  </div>
+)
+
+const DEVICES = [
   {
-    id: 1,
-    title: '按钮点了没反应',
-    code: `<button onclick="sayHello()">打招呼</button>
-<script>
-  function sayHello {
-    alert("你好！")
-  }
-</script>`,
-    error: 'SyntaxError: Missing parentheses in call to function',
-    bugs: [
-      { line: 2, desc: '函数定义缺少括号', wrong: 'function sayHello {', right: 'function sayHello() {' },
+    id: 'phone',
+    name: '手机',
+    emoji: '📱',
+    color: '#3b82f6',
+    bg: '#eff6ff',
+    border: '#bfdbfe',
+    best: ['随时随地聊天AI', '语音对话', '图片识别拍照', '快速查AI问答'],
+    limited: ['写代码不方便（屏幕小）', '做PPT或网页体验差', '部分AI工具没有手机版'],
+    tools: [
+      { name: '豆包', tag: '国内', color: '#6366f1' },
+      { name: 'Kimi', tag: '国内', color: '#8b5cf6' },
+      { name: '通义', tag: '国内', color: '#f97316' },
+      { name: 'ChatGPT', tag: '国际', color: '#10b981' },
     ],
-    hint: '定义函数时，函数名后面必须有一对括号 ()，即使没有参数也不能省略。',
   },
   {
-    id: 2,
-    title: '颜色改不了',
-    code: `<div stile="color: red;">
-  这段文字应该是红色的
-</div>`,
-    error: '页面显示正常但文字颜色没变化，也没有报错',
-    bugs: [
-      { line: 0, desc: '属性名拼错了', wrong: 'stile=', right: 'style=' },
+    id: 'tablet',
+    name: 'iPad / 平板',
+    emoji: '🖥️',
+    color: '#8b5cf6',
+    bg: '#faf5ff',
+    border: '#d8b4fe',
+    best: ['手写笔记 + AI批改', '看图 + 画图AI', '做设计和排版', '聊天AI（屏幕舒适）'],
+    limited: ['部分专业工具不支持平板', '写复杂代码仍不如电脑方便'],
+    tools: [
+      { name: '豆包', tag: '国内', color: '#6366f1' },
+      { name: '即梦', tag: '国内', color: '#ec4899' },
+      { name: '可灵', tag: '国内', color: '#f59e0b' },
+      { name: 'ChatGPT', tag: '国际', color: '#10b981' },
     ],
-    hint: '这种错误叫"拼写错误"（typo），浏览器不认识 stile，就忽略了它。检查单词拼写！',
   },
   {
-    id: 3,
-    title: '图片显示不出来',
-    code: `<img src="my photo.jpg" alt="我的照片">`,
-    error: '图片区域显示错误图标，找不到图片',
-    bugs: [
-      { line: 0, desc: '文件名中间有空格', wrong: '"my photo.jpg"', right: '"my-photo.jpg" 或 "my_photo.jpg"' },
+    id: 'computer',
+    name: '电脑',
+    emoji: '💻',
+    color: '#10b981',
+    bg: '#f0fdf4',
+    border: '#86efac',
+    best: ['写代码 + AI辅助（最顺手）', '做PPT / 网页 / 小程序', '注册AI账号（最方便）', '同时开多个AI工具对比'],
+    limited: ['需要坐下来，不如手机随身'],
+    tools: [
+      { name: 'Claude', tag: '国际', color: '#f97316' },
+      { name: 'Cursor', tag: '国际', color: '#0ea5e9' },
+      { name: 'V0', tag: '国际', color: '#6366f1' },
+      { name: 'Gamma', tag: '国际', color: '#ec4899' },
+      { name: '美图PPT', tag: '国内', color: '#f59e0b' },
     ],
-    hint: '文件名中的空格会让浏览器找不到文件！给文件命名时，用连字符 - 或下划线 _ 代替空格。',
   },
 ]
 
-const BUG_TYPES = [
-  { id: 'syntax', label: '语法错误', emoji: '❌', desc: '代码写法不对，程序直接不能运行', example: '函数缺少括号、引号没关上' },
-  { id: 'typo', label: '拼写错误', emoji: '🔤', desc: '单词打错了，程序看不懂你在说什么', example: 'stile 写成 style、colur 写成 color' },
-  { id: 'logic', label: '逻辑错误', emoji: '🤔', desc: '代码能运行，但结果不是你想要的', example: '加法写成了减法，条件判断反了' },
-  { id: 'path', label: '路径错误', emoji: '🗺️', desc: '找不到文件或图片', example: '文件名拼错、路径写错了' },
+const SCENARIOS = [
+  { q: '想随时随地问AI一个问题', best: 'phone', hint: '手机最方便，随时随地！' },
+  { q: '想用AI帮你做一份PPT', best: 'computer', hint: '电脑屏幕大，操作最顺手' },
+  { q: '想用AI画一张好看的图', best: 'tablet', hint: 'iPad + Apple Pencil配合画图AI效果极佳！' },
+  { q: '想用AI写一个网页程序', best: 'computer', hint: '写代码用电脑，Cursor/V0这些工具都是为电脑设计的' },
+  { q: '想注册一个新的AI账号', best: 'computer', hint: '电脑注册更方便，表单操作更顺畅' },
 ]
 
 const QUIZ = [
   {
-    q: '遇到报错时，最正确的第一反应是？',
-    options: ['关掉电脑重来', '仔细读报错信息，找到提示的位置', '删掉所有代码', '换一个项目'],
+    q: '想在上学路上快速问AI问题，用哪个设备最合适？',
+    options: ['电脑', '手机', 'iPad', '都不合适'],
     correct: 1,
-    explain: '报错信息就是程序给你的"线索"！仔细读，找到文件名和行号，就能快速定位问题。',
+    explain: '手机随身携带，随时可以问AI！豆包、Kimi等都有很好的手机端体验。',
   },
   {
-    q: '下面哪种情况属于"逻辑错误"？',
-    options: ['程序直接报错崩溃', '程序能运行，但计算2+2得到了5', '找不到图片文件', '函数名写错了'],
-    correct: 1,
-    explain: '逻辑错误最难发现——程序能跑，但结果不对。需要你仔细想想"代码是不是做了正确的事"。',
-  },
-  {
-    q: '用AI帮你找Bug时，哪种描述最有帮助？',
-    options: ['"我的代码坏了"', '"这段代码有个Bug，不知道在哪"', '"这段代码报错：TypeError，第5行，请帮我找原因"', '"AI你最棒，帮我修好"'],
+    q: '用AI帮助写代码，哪个设备体验最好？',
+    options: ['手机', 'iPad', '电脑', '三个一样'],
     correct: 2,
-    explain: '给AI提供具体信息：错误类型、行号、你期望的结果。越具体，AI给的答案越有帮助！',
+    explain: '写代码需要大屏幕、键盘，电脑是最佳选择。Cursor等AI编程工具都是专为电脑设计的。',
+  },
+  {
+    q: '下面哪个说法是正确的？',
+    options: ['手机什么AI都不能用', '电脑才能用AI', '不同设备适合不同AI任务', '只有最新设备才能用AI'],
+    correct: 2,
+    explain: '三种设备都能用AI，只是适合的场景不同。了解各设备优势，才能发挥AI的最大价值！',
   },
 ]
 
 export default function Lesson16({ onBack }) {
   const [tab, setTab] = useState('learn')
-  const [selectedExample, setSelectedExample] = useState(null)
-  const [revealedBugs, setRevealedBugs] = useState({})
-  const [fixedExamples, setFixedExamples] = useState({})
-
-  // AI debug state
-  const [bugDesc, setBugDesc] = useState('')
-  const [bugCode, setBugCode] = useState('')
-  const [aiExplanation, setAiExplanation] = useState('')
-  const [loadingAi, setLoadingAi] = useState(false)
-  const [aiError, setAiError] = useState('')
-
-  // Quiz state
+  const [selectedDevice, setSelectedDevice] = useState(null)
+  const [myDevice, setMyDevice] = useState(null)
+  const [scenarioAnswers, setScenarioAnswers] = useState({})
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
 
-  const accentColor = '#f59e0b'
-  const fixedCount = Object.keys(fixedExamples).length
+  const accentColor = '#0ea5e9'
+  const device = DEVICES.find(d => d.id === selectedDevice)
 
-  function handleRevealBug(exId) {
-    setRevealedBugs(r => ({ ...r, [exId]: true }))
-  }
-
-  function handleMarkFixed(exId) {
-    setFixedExamples(f => ({ ...f, [exId]: true }))
-  }
-
-  async function handleAiDebug() {
-    if (!bugDesc.trim()) return
-    setLoadingAi(true)
-    setAiError('')
-    setAiExplanation('')
-
-    const prompt = `我是一个10-12岁的编程学习者，我的代码遇到了问题，请帮我分析。
-
-问题描述：${bugDesc.trim()}
-${bugCode.trim() ? `\n相关代码：\n\`\`\`\n${bugCode.trim()}\n\`\`\`` : ''}
-
-请帮我：
-1. 用简单语言解释这个错误可能是什么
-2. 最可能的原因是什么
-3. 如何修复（给出简单步骤）
-
-请用友善、鼓励的语气，不超过150字。`
-
-    try {
-      const res = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: 'Debug助手' } }),
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      setAiExplanation(data.text || '')
-    } catch {
-      setAiError('AI暂时没有响应，请稍后再试。')
-    } finally {
-      setLoadingAi(false)
-    }
+  function handleScenario(idx, answer) {
+    setScenarioAnswers(a => ({ ...a, [idx]: answer }))
   }
 
   function handleQuizAnswer(optIdx) {
@@ -145,74 +120,87 @@ ${bugCode.trim() ? `\n相关代码：\n\`\`\`\n${bugCode.trim()}\n\`\`\`` : ''}
     else { setQuizIdx(i => i + 1); setQuizAnswer(null) }
   }
 
-  const example = BUGGY_EXAMPLES.find(e => e.id === selectedExample)
+  const scenariosCompleted = Object.keys(scenarioAnswers).length
 
   return (
     <div className="lesson-page">
       <button className="lesson-back" onClick={onBack}>← 返回课程列表</button>
 
-      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
-        <span className="lesson-hero-badge" style={{ background: '#fef3c7', color: '#b45309' }}>第 16 课 · 模块 C</span>
-        <span className="lesson-hero-emoji">🐛</span>
-        <h1 className="lesson-hero-title">学会改 Bug</h1>
-        <p className="lesson-hero-sub">Debug Like a Pro</p>
+      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
+        <span className="lesson-hero-badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>第 16 课 · 模块 D · 工具基础</span>
+        <span className="lesson-hero-emoji">📱</span>
+        <h1 className="lesson-hero-title">你的设备能做什么</h1>
+        <p className="lesson-hero-sub">Device Capabilities — 认识你的AI学习搭档</p>
       </div>
 
       <div className="lesson-objectives">
         <div className="lesson-objectives-title">本课目标</div>
         <ul className="lesson-objectives-list">
-          <li>不再害怕程序报错</li>
-          <li>学会读懂常见错误信息</li>
-          <li>用AI帮你找到并修复Bug</li>
+          <li>了解手机、iPad、电脑各自能用哪些AI工具</li>
+          <li>知道不同设备做AI任务时的优缺点</li>
+          <li>选好你的主力学习设备，开始下一步</li>
         </ul>
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
+        {['learn', 'do', 'match', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '我的作品'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '设备对比' : t === 'match' ? '场景匹配' : t === 'quiz' ? '测一测' : '我的设备'}
           </button>
         ))}
       </div>
 
       {tab === 'learn' && (
         <div className="lesson-content">
+          {DEVICE_BADGE}
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🐛 Bug 是什么？</h2>
-            <p className="lesson-text">Bug 就是程序里的错误。就像一篇作文里有错别字，Bug 是代码里的"错误"。<strong>所有程序员</strong>——不管多厉害——都会写出 Bug。区别是：高手能快速找到并修复它。</p>
-            <div className="lesson-tip-box">
-              💪 <strong>重要心态：</strong>报错不是失败，是程序在告诉你"这里有问题，我帮你找到了！" 把报错当成朋友。
-            </div>
+            <h2 className="lesson-section-title">📱 三种设备，三种学习方式</h2>
+            <p className="lesson-text">用AI学习，不一定要有最新的设备——但要知道你手上的设备最适合做什么！手机、iPad、电脑各有擅长，找到你的最佳搭档很重要。</p>
           </div>
 
           <div className="lesson-section">
-            <h2 className="lesson-section-title">📚 常见的 Bug 类型</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
-              {BUG_TYPES.map(bt => (
-                <div key={bt.id} style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 12, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 22, marginBottom: 4 }}>{bt.emoji}</div>
-                  <div style={{ fontWeight: 700, color: '#b45309', fontSize: 14 }}>{bt.label}</div>
-                  <div style={{ color: '#78350f', fontSize: 12, margin: '4px 0' }}>{bt.desc}</div>
-                  <div style={{ fontSize: 11, color: '#92400e', background: '#fef3c7', borderRadius: 6, padding: '4px 8px' }}>例：{bt.example}</div>
+            <h2 className="lesson-section-title">🗂️ 快速认识三兄弟</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
+              {DEVICES.map(d => (
+                <div key={d.id} style={{ background: d.bg, border: `2px solid ${d.border}`, borderRadius: 14, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 24 }}>{d.emoji}</span>
+                    <span style={{ fontWeight: 800, color: d.color, fontSize: 16 }}>{d.name}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7 }}>
+                    <strong>最擅长：</strong>{d.best[0]}、{d.best[1]}<br />
+                    <strong>不太适合：</strong>{d.limited[0]}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🔍 Debug 的三步法</h2>
-            <div className="lesson-step-list">
-              {[
-                { step: '1', title: '读报错信息', desc: '找到"Error"后面的关键词和行号，这是最重要的线索' },
-                { step: '2', title: '找到出错的地方', desc: '根据行号，去那行代码看看有没有拼错、少写、多写的地方' },
-                { step: '3', title: '修复并测试', desc: '改完后重新运行，如果还有问题，重复前两步' },
-              ].map(s => (
-                <div key={s.step} className="lesson-step-item">
-                  <span className="lesson-step-num" style={{ background: accentColor }}>{s.step}</span>
-                  <div><strong>{s.title}</strong><p>{s.desc}</p></div>
+            <h2 className="lesson-section-title">💡 国内 vs 国际 AI 工具</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 10 }}>
+              <div style={{ background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 12, padding: '12px 14px' }}>
+                <div style={{ fontWeight: 700, color: '#1d4ed8', marginBottom: 8, fontSize: 14 }}>🇨🇳 国内工具</div>
+                <div style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7 }}>
+                  豆包 / Kimi / 通义 / 文心<br />
+                  ✓ 无需翻墙<br />
+                  ✓ 中文更流利<br />
+                  ✓ 手机端更完善
                 </div>
-              ))}
+              </div>
+              <div style={{ background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 12, padding: '12px 14px' }}>
+                <div style={{ fontWeight: 700, color: '#15803d', marginBottom: 8, fontSize: 14 }}>🌍 国际工具</div>
+                <div style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7 }}>
+                  ChatGPT / Claude / Gemini<br />
+                  ✓ 功能更强大<br />
+                  ✓ 编程辅助更专业<br />
+                  ⚠ 需要网络条件配合
+                </div>
+              </div>
+            </div>
+            <div className="lesson-tip-box" style={{ marginTop: 12 }}>
+              💡 <strong>建议：</strong>先用国内工具上手（无需注册麻烦），熟悉了再探索国际工具。两种都了解是最好的！
             </div>
           </div>
         </div>
@@ -220,135 +208,94 @@ ${bugCode.trim() ? `\n相关代码：\n\`\`\`\n${bugCode.trim()}\n\`\`\`` : ''}
 
       {tab === 'do' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🔍 Bug 侦探训练</h2>
-          <p className="lesson-text">下面有 3 段有 Bug 的代码，你能找到错误在哪吗？</p>
+          <h2 className="lesson-section-title">🔍 点击查看每个设备的详情</h2>
+          <p className="lesson-text">选择你感兴趣的设备，看看它能用哪些AI工具。</p>
 
-          {!selectedExample ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-              {BUGGY_EXAMPLES.map(ex => (
-                <button key={ex.id} onClick={() => setSelectedExample(ex.id)}
-                  style={{ border: `2px solid ${fixedExamples[ex.id] ? '#10b981' : '#fde68a'}`, borderRadius: 14, padding: '14px 16px', textAlign: 'left', background: fixedExamples[ex.id] ? '#f0fdf4' : '#fffbeb', cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>案例 {ex.id}：{ex.title}</span>
-                    </div>
-                    {fixedExamples[ex.id] ? <span style={{ color: '#10b981', fontSize: 13, fontWeight: 700 }}>✓ 已修复</span> : <span style={{ color: '#f59e0b', fontSize: 13 }}>→ 点击查看</span>}
-                  </div>
-                </button>
-              ))}
-              {fixedCount === BUGGY_EXAMPLES.length && (
-                <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '16px', textAlign: 'center', marginTop: 8 }}>
-                  <div style={{ fontSize: 24, marginBottom: 6 }}>🎉</div>
-                  <div style={{ fontWeight: 700, color: '#15803d' }}>全部 Bug 修复完成！你是 Bug 侦探！</div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-              <button onClick={() => setSelectedExample(null)} style={{ fontSize: 13, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12, textDecoration: 'underline' }}>← 返回案例列表</button>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+            {DEVICES.map(d => (
+              <button key={d.id} onClick={() => setSelectedDevice(d.id === selectedDevice ? null : d.id)}
+                style={{ flex: 1, minWidth: 100, padding: '10px 8px', borderRadius: 14, border: `2px solid ${selectedDevice === d.id ? d.color : '#e2e8f0'}`, background: selectedDevice === d.id ? d.bg : '#fff', cursor: 'pointer', fontWeight: 700, color: d.color, fontSize: 13 }}>
+                {d.emoji} {d.name}
+              </button>
+            ))}
+          </div>
 
-              <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 16 }}>案例 {example.id}：{example.title}</div>
+          {device && (
+            <div style={{ background: device.bg, border: `2px solid ${device.border}`, borderRadius: 16, padding: '18px 16px' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: device.color, marginBottom: 14 }}>{device.emoji} {device.name}</div>
 
-              <div style={{ background: '#1e293b', borderRadius: 10, padding: '14px 16px', fontFamily: 'monospace', fontSize: 13, color: '#e2e8f0', lineHeight: 1.8, marginBottom: 12, overflowX: 'auto' }}>
-                {example.code.split('\n').map((line, i) => (
-                  <div key={i} style={{ color: example.bugs.some(b => b.line === i) && revealedBugs[example.id] ? '#fbbf24' : '#e2e8f0' }}>
-                    <span style={{ color: '#475569', marginRight: 12, userSelect: 'none' }}>{i + 1}</span>{line}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 14 }}>✅ 最擅长的事：</div>
+                {device.best.map((b, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5, fontSize: 13, color: '#334155' }}>
+                    <span style={{ color: device.color, marginTop: 1 }}>●</span>{b}
                   </div>
                 ))}
               </div>
 
-              <div style={{ background: '#fff5f5', border: '1.5px solid #fca5a5', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#ef4444', marginBottom: 14 }}>
-                <strong>报错信息：</strong> {example.error}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontWeight: 700, color: '#475569', marginBottom: 8, fontSize: 14 }}>⚠️ 相对不便的地方：</div>
+                {device.limited.map((l, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5, fontSize: 13, color: '#64748b' }}>
+                    <span style={{ color: '#94a3b8', marginTop: 1 }}>●</span>{l}
+                  </div>
+                ))}
               </div>
 
-              {!revealedBugs[example.id] ? (
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button className="lesson-btn" style={{ background: accentColor, flex: 1 }} onClick={() => handleRevealBug(example.id)}>
-                    🔍 揭示 Bug！
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  {example.bugs.map((bug, i) => (
-                    <div key={i} style={{ background: '#fffbeb', border: '2px solid #fde68a', borderRadius: 12, padding: '14px 16px', marginBottom: 10 }}>
-                      <div style={{ fontWeight: 700, color: '#b45309', marginBottom: 8 }}>🐛 发现 Bug：{bug.desc}</div>
-                      <div style={{ fontSize: 13, fontFamily: 'monospace', marginBottom: 4 }}>
-                        <span style={{ color: '#ef4444' }}>✗ 错误：</span><code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>{bug.wrong}</code>
-                      </div>
-                      <div style={{ fontSize: 13, fontFamily: 'monospace', marginBottom: 8 }}>
-                        <span style={{ color: '#10b981' }}>✓ 正确：</span><code style={{ background: '#dcfce7', padding: '2px 6px', borderRadius: 4 }}>{bug.right}</code>
-                      </div>
-                      <div style={{ fontSize: 12, color: '#78350f', background: '#fef3c7', borderRadius: 8, padding: '8px 10px' }}>💡 {example.hint}</div>
-                    </div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 14 }}>🛠️ 推荐搭配的AI工具：</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {device.tools.map(t => (
+                    <span key={t.name} style={{ background: '#fff', border: `1.5px solid ${t.color}`, color: t.color, fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>
+                      {t.name} <span style={{ opacity: 0.7, fontWeight: 500 }}>({t.tag})</span>
+                    </span>
                   ))}
-                  {!fixedExamples[example.id] ? (
-                    <button className="lesson-btn" style={{ background: '#10b981' }} onClick={() => { handleMarkFixed(example.id); setSelectedExample(null) }}>
-                      ✅ 我明白了，标记为已修复！
-                    </button>
-                  ) : (
-                    <div style={{ color: '#10b981', fontWeight: 700, textAlign: 'center', padding: 10 }}>✓ 已修复！</div>
-                  )}
                 </div>
-              )}
+              </div>
+            </div>
+          )}
+
+          {!selectedDevice && (
+            <div style={{ textAlign: 'center', padding: '30px 20px', color: '#94a3b8', fontSize: 14 }}>
+              ↑ 点击上方按钮，查看各设备详情
             </div>
           )}
         </div>
       )}
 
-      {tab === 'ai' && (
+      {tab === 'match' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🤖 让AI帮你找Bug</h2>
-          <p className="lesson-text">遇到自己找不到的 Bug？告诉 AI！描述越具体，AI帮你越快。</p>
+          <h2 className="lesson-section-title">🎯 场景匹配练习</h2>
+          <p className="lesson-text">读下面的情景，选出最合适的设备！</p>
 
-          <div className="l8-field">
-            <label className="l8-label">📝 描述你遇到的问题 *</label>
-            <textarea
-              style={{ width: '100%', border: '2px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', minHeight: 80, resize: 'vertical', boxSizing: 'border-box', outline: 'none' }}
-              value={bugDesc}
-              onChange={e => setBugDesc(e.target.value)}
-              placeholder={'比如：我的按钮点了没有反应，控制台显示：TypeError: sayHello is not a function'}
-              maxLength={300}
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 14 }}>
+            {SCENARIOS.map((s, i) => (
+              <div key={i} style={{ background: scenarioAnswers[i] === s.best ? '#f0fdf4' : '#f8fafc', border: `1.5px solid ${scenarioAnswers[i] ? (scenarioAnswers[i] === s.best ? '#86efac' : '#fca5a5') : '#e2e8f0'}`, borderRadius: 14, padding: '14px 16px' }}>
+                <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: 10, fontSize: 14 }}>场景 {i + 1}：{s.q}</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {DEVICES.map(d => (
+                    <button key={d.id} onClick={() => handleScenario(i, d.id)}
+                      disabled={!!scenarioAnswers[i]}
+                      style={{ padding: '7px 14px', borderRadius: 999, border: `2px solid ${scenarioAnswers[i] === d.id ? (d.id === s.best ? '#10b981' : '#ef4444') : d.color}`, background: scenarioAnswers[i] === d.id ? (d.id === s.best ? '#f0fdf4' : '#fff5f5') : '#fff', color: d.color, fontSize: 13, fontWeight: 700, cursor: scenarioAnswers[i] ? 'default' : 'pointer' }}>
+                      {d.emoji} {d.name}
+                    </button>
+                  ))}
+                </div>
+                {scenarioAnswers[i] && (
+                  <div style={{ marginTop: 10, fontSize: 13, color: scenarioAnswers[i] === s.best ? '#15803d' : '#b91c1c', background: scenarioAnswers[i] === s.best ? '#dcfce7' : '#fee2e2', borderRadius: 8, padding: '8px 12px' }}>
+                    {scenarioAnswers[i] === s.best ? '✅ 正确！' : '❌ 再想想—'} {s.hint}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          <div className="l8-field">
-            <label className="l8-label">💻 粘贴出问题的代码（可选）</label>
-            <textarea
-              style={{ width: '100%', border: '2px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', fontSize: 13, fontFamily: 'monospace', minHeight: 80, resize: 'vertical', boxSizing: 'border-box', outline: 'none', background: '#f8fafc' }}
-              value={bugCode}
-              onChange={e => setBugCode(e.target.value)}
-              placeholder={'粘贴有问题的那段代码...'}
-              maxLength={500}
-            />
-          </div>
-
-          <button className="lesson-btn" style={{ background: bugDesc.trim() ? accentColor : '#e2e8f0', color: bugDesc.trim() ? '#fff' : '#94a3b8' }}
-            disabled={!bugDesc.trim() || loadingAi} onClick={handleAiDebug}>
-            {loadingAi ? '🔍 AI正在分析...' : '🐛 AI帮我找Bug！'}
-          </button>
-
-          {aiError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{aiError}</div>}
-
-          {aiExplanation && (
-            <div style={{ marginTop: 14, padding: '16px', background: '#fffbeb', border: '2px solid #fde68a', borderRadius: 12 }}>
-              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 8 }}>🤖 AI的分析：</div>
-              <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{aiExplanation}</div>
+          {scenariosCompleted === SCENARIOS.length && (
+            <div style={{ marginTop: 16, background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>🎉</div>
+              <div style={{ fontWeight: 700, color: '#15803d' }}>场景匹配完成！你对各设备的优势越来越了解了！</div>
             </div>
           )}
-
-          <div className="ai-prompt-card" style={{ marginTop: 20 }}>
-            <div className="ai-prompt-title">📋 高效Debug提问模板</div>
-            <div className="ai-prompt-body">
-              我的代码遇到了问题，请帮我分析：<br /><br />
-              <strong>报错信息：</strong>[粘贴错误提示]<br />
-              <strong>出错位置：</strong>第[X]行<br />
-              <strong>我期望的结果：</strong>[想要发生什么]<br />
-              <strong>实际发生的：</strong>[实际发生了什么]<br /><br />
-              代码：<br />
-              [粘贴出问题的代码]<br /><br />
-              请用简单语言告诉我错误原因和修复方法。
-            </div>
-          </div>
         </div>
       )}
 
@@ -380,7 +327,7 @@ ${bugCode.trim() ? `\n相关代码：\n\`\`\`\n${bugCode.trim()}\n\`\`\`` : ''}
             <div className="quiz-done">
               <div className="quiz-done-score">{quizScore}/{QUIZ.length}</div>
               <div className="quiz-done-msg">
-                {quizScore === 3 ? '🎉 全对！你已经是Debug高手了！' : quizScore === 2 ? '👍 答对两题，继续加油！' : '💪 回去"学一学"看看Debug技巧，再来！'}
+                {quizScore === 3 ? '🎉 全对！你是设备选择专家！' : quizScore === 2 ? '👍 不错！继续加油！' : '💪 回去设备对比看一看，再来！'}
               </div>
             </div>
           )}
@@ -389,35 +336,43 @@ ${bugCode.trim() ? `\n相关代码：\n\`\`\`\n${bugCode.trim()}\n\`\`\`` : ''}
 
       {tab === 'work' && (
         <div className="lesson-content">
-          <div className="certificate">
-            <div className="certificate-title">🐛 Bug 侦探 · 认证！</div>
-            <div className="certificate-name">
-              {fixedCount === 3 ? '完美！修复了全部 3 个 Bug' : `修复了 ${fixedCount} / 3 个 Bug`}
-            </div>
-            <div className="certificate-sub">第 16 课 · 模块 C · AI 项目实践</div>
-            <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
-              你学会了：<br />
-              <strong style={{ color: '#bfdbfe' }}>读报错 → 找位置 → 分析原因 → 修复</strong><br />
-              从今天开始，Bug 再也不会让你害怕了！
-            </div>
-            <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
-          </div>
+          <h2 className="lesson-section-title">📱 选择你的主力设备</h2>
+          <p className="lesson-text">根据今天学到的，选出最适合你现在学AI的主力设备：</p>
 
-          <div style={{ marginTop: 16 }}>
-            <div style={{ fontWeight: 600, color: '#475569', marginBottom: 10 }}>📋 修复记录：</div>
-            {BUGGY_EXAMPLES.map(ex => (
-              <div key={ex.id} style={{ background: fixedExamples[ex.id] ? '#f0fdf4' : '#f8fafc', border: `1px solid ${fixedExamples[ex.id] ? '#86efac' : '#e2e8f0'}`, borderRadius: 10, padding: '10px 14px', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 14, color: '#1e293b' }}>案例 {ex.id}：{ex.title}</span>
-                <span style={{ fontSize: 13, color: fixedExamples[ex.id] ? '#10b981' : '#94a3b8', fontWeight: 600 }}>
-                  {fixedExamples[ex.id] ? '✓ 已修复' : '○ 未完成'}
-                </span>
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+            {DEVICES.map(d => (
+              <button key={d.id} onClick={() => setMyDevice(d.id)}
+                style={{ border: `2.5px solid ${myDevice === d.id ? d.color : '#e2e8f0'}`, borderRadius: 16, padding: '14px 16px', textAlign: 'left', background: myDevice === d.id ? d.bg : '#fff', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 28 }}>{d.emoji}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, color: d.color, fontSize: 15 }}>{d.name}</div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>适合：{d.best[0]}</div>
+                  </div>
+                  {myDevice === d.id && <span style={{ marginLeft: 'auto', color: d.color, fontWeight: 700, fontSize: 20 }}>✓</span>}
+                </div>
+              </button>
             ))}
           </div>
 
+          {myDevice && (
+            <div className="certificate">
+              <div className="certificate-title">📱 设备就位！</div>
+              <div className="certificate-name">
+                我的主力设备：{DEVICES.find(d => d.id === myDevice)?.emoji} {DEVICES.find(d => d.id === myDevice)?.name}
+              </div>
+              <div className="certificate-sub">第 16 课 · 模块 D · 工具基础</div>
+              <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
+                我知道了：不同设备适合不同的AI任务<br />
+                <strong style={{ color: '#bfdbfe' }}>手机随时用 · iPad画图好 · 电脑做项目</strong>
+              </div>
+              <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
+            </div>
+          )}
+
           <div className="lesson-next-preview" style={{ marginTop: 16 }}>
-            <div className="lesson-next-title">🚀 下一课预告：第 17 课 · 让作品升级</div>
-            <p>你已经会做作品、会修Bug。下一步，学会给作品加新功能、一次次升级——这就是真正的迭代！</p>
+            <div className="lesson-next-title">🚀 下一课预告：第 17 课 · 开通你的AI账号</div>
+            <p>知道了用什么设备，下一步就是开通账号！我们会手把手教你注册主流AI工具，让你正式开始用AI创作。</p>
           </div>
         </div>
       )}
