@@ -235,6 +235,30 @@
     linear-gradient(160deg, #faf5ff 0%, #ede9fe 52%, #f0fdf4 100%);
 }
 
+.coding-track-card--tools {
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.18), transparent 28%),
+    linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 52%, #f0fdf4 100%);
+}
+
+.coding-track-card--survey {
+  background:
+    radial-gradient(circle at top right, rgba(236, 72, 153, 0.15), transparent 28%),
+    linear-gradient(160deg, #fdf2f8 0%, #fce7f3 52%, #fffbeb 100%);
+}
+
+.coding-track-card--hands {
+  background:
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 28%),
+    linear-gradient(160deg, #f0fdf4 0%, #dcfce7 52%, #f0f9ff 100%);
+}
+
+.coding-track-card--project {
+  background:
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.18), transparent 28%),
+    linear-gradient(160deg, #fff7ed 0%, #ffedd5 52%, #faf5ff 100%);
+}
+
 .coding-track-tag {
   width: fit-content;
   padding: 6px 10px;
