@@ -18,6 +18,17 @@ import Lesson15 from './coding/Lesson15'
 import Lesson16 from './coding/Lesson16'
 import Lesson17 from './coding/Lesson17'
 import Lesson18 from './coding/Lesson18'
+import Lesson19 from './coding/Lesson19'
+import Lesson20 from './coding/Lesson20'
+import Lesson21 from './coding/Lesson21'
+import Lesson22 from './coding/Lesson22'
+import Lesson23 from './coding/Lesson23'
+import Lesson24 from './coding/Lesson24'
+import Lesson25 from './coding/Lesson25'
+import Lesson26 from './coding/Lesson26'
+import Lesson27 from './coding/Lesson27'
+import Lesson28 from './coding/Lesson28'
+import Lesson29 from './coding/Lesson29'
 import codingJuniorLessons from '../data/codingJuniorLessons'
 import JuniorLesson1 from './coding-kids/JuniorLesson1'
 import JuniorLesson2 from './coding-kids/JuniorLesson2'
@@ -39,7 +50,7 @@ import JuniorLesson17 from './coding-kids/JuniorLesson17'
 import JuniorLesson18 from './coding-kids/JuniorLesson18'
 import './Coding.css'
 
-const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12, Lesson13, Lesson14, Lesson15, Lesson16, Lesson17, Lesson18]
+const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12, Lesson13, Lesson14, Lesson15, Lesson16, Lesson17, Lesson18, Lesson19, Lesson20, Lesson21, Lesson22, Lesson23, Lesson24, Lesson25, Lesson26, Lesson27, Lesson28, Lesson29]
 const JUNIOR_LESSON_COMPONENTS = [null, JuniorLesson1, JuniorLesson2, JuniorLesson3, JuniorLesson4, JuniorLesson5, JuniorLesson6, JuniorLesson7, JuniorLesson8, JuniorLesson9, JuniorLesson10, JuniorLesson11, JuniorLesson12, JuniorLesson13, JuniorLesson14, JuniorLesson15, JuniorLesson16, JuniorLesson17, JuniorLesson18]
 
 const CODING_NOTES = [
@@ -158,24 +169,52 @@ export default function Coding({ user }) {
           ) : (
             <>
               <div className="coding-track-card coding-track-card--intro">
-                <div className="coding-track-tag">模块 A</div>
+                <div className="coding-track-tag">模块 A · 第 1-6 课</div>
                 <div className="coding-track-title">AI 素养启蒙</div>
                 <p className="coding-track-desc">认识 AI、数据、训练、语言和视觉，先建立兴趣和基础理解。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(1)}>从第 1 课开始</button>
               </div>
 
               <div className="coding-track-card coding-track-card--build">
-                <div className="coding-track-tag">模块 B</div>
+                <div className="coding-track-tag">模块 B · 第 7-12 课</div>
                 <div className="coding-track-title">AI 创作入门</div>
-                <p className="coding-track-desc">开始做网页、做交互、请 AI 帮忙，把"我学了"变成"我做出来了"。</p>
+                <p className="coding-track-desc">做网页、做交互、请 AI 帮忙，把"我学了"变成"我做出来了"。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(7)}>从第 7 课开始</button>
               </div>
 
               <div className="coding-track-card coding-track-card--advanced">
-                <div className="coding-track-tag">模块 C</div>
-                <div className="coding-track-title">AI 项目实践</div>
-                <p className="coding-track-desc">输入输出、问答工具、展示网站、改Bug、升级作品——真正完成一个完整项目。</p>
+                <div className="coding-track-tag">模块 C · 第 13-15 课</div>
+                <div className="coding-track-title">过渡实践</div>
+                <p className="coding-track-desc">AI 变声器、占卜机、Bug 修复——用三课把前面学的都用起来。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(13)}>从第 13 课开始</button>
+              </div>
+
+              <div className="coding-track-card coding-track-card--tools">
+                <div className="coding-track-tag">模块 D · 第 16-17 课</div>
+                <div className="coding-track-title">工具基础</div>
+                <p className="coding-track-desc">搞清楚手机/iPad/电脑能用哪些 AI，注册好你的第一个账号。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(16)}>从第 16 课开始</button>
+              </div>
+
+              <div className="coding-track-card coding-track-card--survey">
+                <div className="coding-track-tag">模块 E · 第 18-20 课</div>
+                <div className="coding-track-title">工具大全</div>
+                <p className="coding-track-desc">聊天 AI、画画 AI、做工 AI——认识当下最强大的 AI 工具们。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(18)}>从第 18 课开始</button>
+              </div>
+
+              <div className="coding-track-card coding-track-card--hands">
+                <div className="coding-track-tag">模块 F · 第 21-23 课</div>
+                <div className="coding-track-title">动手体验</div>
+                <p className="coding-track-desc">用 AI 真正写一段话、画一张图、帮你完成一件事。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(21)}>从第 21 课开始</button>
+              </div>
+
+              <div className="coding-track-card coding-track-card--project">
+                <div className="coding-track-tag">模块 G · 第 24-29 课</div>
+                <div className="coding-track-title">真项目</div>
+                <p className="coding-track-desc">海报、PPT、网页、小程序、短视频——一课一个真实作品，结业汇报。</p>
+                <button className="coding-track-btn" onClick={() => setActiveLesson(24)}>从第 24 课开始</button>
               </div>
             </>
           )}
