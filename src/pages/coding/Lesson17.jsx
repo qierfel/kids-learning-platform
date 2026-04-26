@@ -1,123 +1,124 @@
 import { useState } from 'react'
 import './Lesson.css'
 
-const UPGRADES = [
-  {
-    id: 'counter',
-    label: '加一个点赞计数器',
-    emoji: '👍',
-    desc: '每次点击按钮，数字加一',
-    v1: '一个静态的按钮，点击没有反应',
-    v2: '按钮变成计数器，显示点击次数',
-  },
-  {
-    id: 'toggle',
-    label: '加一个显示/隐藏功能',
-    emoji: '👁️',
-    desc: '点击按钮展开或收起内容',
-    v1: '所有内容都显示在页面上',
-    v2: '有些内容可以折叠，点击展开',
-  },
-  {
-    id: 'theme',
-    label: '加一个深色/浅色切换',
-    emoji: '🌙',
-    desc: '切换页面的颜色主题',
-    v1: '只有一种颜色风格',
-    v2: '可以在浅色和深色之间切换',
-  },
-]
+const DEVICE_BADGE = (
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+    <span style={{ background: '#dcfce7', color: '#15803d', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>💻 推荐电脑</span>
+    <span style={{ background: '#e0e7ff', color: '#4338ca', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>🖥️ iPad也可以</span>
+    <span style={{ background: '#f1f5f9', color: '#475569', fontSize: 11, padding: '4px 10px', borderRadius: 999 }}>📍 注册账号推荐用电脑，操作更方便</span>
+  </div>
+)
 
-const VERSION_HISTORY = [
-  { v: 'v1.0', desc: '基础版——能运行，有基本功能' },
-  { v: 'v1.1', desc: '修复Bug——把发现的问题都修好' },
-  { v: 'v2.0', desc: '功能升级——加入新功能，体验更好' },
-  { v: 'v2.1', desc: '外观优化——让界面更好看' },
+const TOOLS = [
+  {
+    id: 'doubaob',
+    name: '豆包',
+    maker: '字节跳动',
+    emoji: '🫘',
+    color: '#6366f1',
+    bg: '#eef2ff',
+    tag: '国内',
+    tagColor: '#4338ca',
+    register: 'doubao.com',
+    steps: ['打开 doubao.com', '点击"立即体验"', '用手机号 / 微信快捷登录', '填写昵称，完成！'],
+    tip: '最推荐新手第一个注册，无需科学上网，中文很流畅',
+    need: ['手机号 或 微信账号'],
+  },
+  {
+    id: 'kimi',
+    name: 'Kimi',
+    maker: '月之暗面',
+    emoji: '🌙',
+    color: '#8b5cf6',
+    bg: '#faf5ff',
+    tag: '国内',
+    tagColor: '#7c3aed',
+    register: 'kimi.moonshot.cn',
+    steps: ['打开 kimi.moonshot.cn', '点击"注册"', '手机号接收验证码', '设置密码，完成！'],
+    tip: '长文本处理能力强，适合读长文章和整理笔记',
+    need: ['手机号'],
+  },
+  {
+    id: 'tongyi',
+    name: '通义千问',
+    maker: '阿里巴巴',
+    emoji: '☁️',
+    color: '#f97316',
+    bg: '#fff7ed',
+    tag: '国内',
+    tagColor: '#c2410c',
+    register: 'tongyi.aliyun.com',
+    steps: ['打开 tongyi.aliyun.com', '点击登录 / 注册', '用淘宝 / 支付宝快捷登录', '完成！（如已有阿里账号可直接用）'],
+    tip: '有阿里账号直接登录超方便，功能丰富',
+    need: ['阿里 / 淘宝 / 支付宝账号 或 手机号'],
+  },
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    maker: 'OpenAI',
+    emoji: '🤖',
+    color: '#10b981',
+    bg: '#f0fdf4',
+    tag: '国际',
+    tagColor: '#047857',
+    register: 'chat.openai.com',
+    steps: ['需要能访问国际网络', '打开 chat.openai.com', '点击"Sign up"', '用邮箱注册，接收验证码', '完成设置，开始使用！'],
+    tip: '全球最知名的AI聊天工具，需要能访问国际网络',
+    need: ['邮箱地址', '能访问国际网络'],
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    maker: 'Anthropic',
+    emoji: '🌿',
+    color: '#f59e0b',
+    bg: '#fffbeb',
+    tag: '国际',
+    tagColor: '#b45309',
+    register: 'claude.ai',
+    steps: ['需要能访问国际网络', '打开 claude.ai', '点击"Sign up"', '用邮箱注册，验证邮箱', '完成！即可开始使用'],
+    tip: '在创意写作和分析方面非常出色，本平台已内置Claude',
+    need: ['邮箱地址', '能访问国际网络'],
+  },
 ]
 
 const QUIZ = [
   {
-    q: '什么是"迭代"？',
-    options: ['把作品删掉重做', '一次次小步改进，让作品越来越好', '等到完美再发布', '让别人帮你做'],
+    q: '注册国内AI工具（如豆包、Kimi），通常需要什么？',
+    options: ['护照', '手机号或已有国内社交账号', '信用卡', '科学上网工具'],
     correct: 1,
-    explain: '"迭代"就是不断小步改进。先做出基础版，发现问题就修，想到新功能就加——这是专业开发者的工作方式。',
+    explain: '国内AI工具注册非常简单！用手机号或绑定的微信/支付宝账号就能直接登录，无需繁琐步骤。',
   },
   {
-    q: '给作品加新功能时，最好的做法是？',
-    options: ['把所有想到的功能一次全加进去', '一次只加一个功能，测试没问题再加下一个', '功能越多越好，越快越好', '不加功能，保持简单就好'],
+    q: '注册ChatGPT和Claude这类国际AI工具，额外需要什么？',
+    options: ['中国手机号', '能访问国际网络的网络环境', '高端设备', '年龄必须满18岁'],
     correct: 1,
-    explain: '一次只加一个功能！这样如果出了Bug，你知道是哪里出的问题。同时加很多功能，找Bug就很难了。',
+    explain: '国际AI工具需要在能访问国际网络的环境下注册和使用。如果暂时无法访问，先从国内工具开始！',
   },
   {
-    q: '版本号"v2.0"通常意味着什么？',
-    options: ['有2个Bug', '只做了2个改动', '有重大更新，通常是新功能或大改版', '上线了2次'],
+    q: '新手最应该先注册哪个AI工具？',
+    options: ['ChatGPT', 'Claude', '豆包或Kimi（国内工具）', 'Midjourney'],
     correct: 2,
-    explain: '版本号是给升级做记录的。v1.x 通常是小改动，v2.0 意味着有重大更新。这让大家一看就知道改了多少。',
+    explain: '国内工具（豆包/Kimi）注册最简单，无需科学上网，中文体验好，非常适合入门！',
   },
 ]
 
 export default function Lesson17({ onBack }) {
   const [tab, setTab] = useState('learn')
-  const [selectedUpgrade, setSelectedUpgrade] = useState(null)
-  const [completedUpgrades, setCompletedUpgrades] = useState([])
-
-  // Counter upgrade
-  const [count, setCount] = useState(0)
-  // Toggle upgrade
-  const [showSecret, setShowSecret] = useState(false)
-  // Theme upgrade
-  const [darkMode, setDarkMode] = useState(false)
-
-  // AI upgrade advisor
-  const [projectDesc, setProjectDesc] = useState('')
-  const [aiAdvice, setAiAdvice] = useState('')
-  const [loadingAi, setLoadingAi] = useState(false)
-  const [aiError, setAiError] = useState('')
-
-  // Quiz
+  const [selectedTool, setSelectedTool] = useState(null)
+  const [completedTools, setCompletedTools] = useState([])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
+  const [myFirstTool, setMyFirstTool] = useState(null)
 
-  const accentColor = '#ec4899'
+  const accentColor = '#10b981'
+  const tool = TOOLS.find(t => t.id === selectedTool)
 
-  async function handleGetAdvice() {
-    if (!projectDesc.trim()) return
-    setLoadingAi(true)
-    setAiError('')
-    setAiAdvice('')
-
-    const prompt = `我是一个10-12岁的编程学习者，我做了一个小项目，想升级它。请给我3个具体的升级建议。
-
-我的项目描述：${projectDesc.trim()}
-
-请给出3个具体的升级点，每个建议包括：
-- 升级内容（加什么功能）
-- 预期效果（用户会有什么更好的体验）
-- 难度评估（简单/中等/有挑战）
-
-每个建议不超过40字，语气轻松友好，鼓励孩子去尝试。`
-
-    try {
-      const res = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: '作品升级顾问' } }),
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      setAiAdvice(data.text || '')
-    } catch {
-      setAiError('AI暂时没有响应，请稍后再试。')
-    } finally {
-      setLoadingAi(false)
-    }
-  }
-
-  function handleCompleteUpgrade(id) {
-    setCompletedUpgrades(c => c.includes(id) ? c : [...c, id])
-    setSelectedUpgrade(null)
+  function handleMark(id) {
+    setCompletedTools(c => c.includes(id) ? c : [...c, id])
+    setSelectedTool(null)
   }
 
   function handleQuizAnswer(optIdx) {
@@ -132,61 +133,68 @@ export default function Lesson17({ onBack }) {
     else { setQuizIdx(i => i + 1); setQuizAnswer(null) }
   }
 
-  const upgrade = UPGRADES.find(u => u.id === selectedUpgrade)
-
   return (
     <div className="lesson-page">
       <button className="lesson-back" onClick={onBack}>← 返回课程列表</button>
 
-      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)' }}>
-        <span className="lesson-hero-badge" style={{ background: '#fce7f3', color: '#9d174d' }}>第 17 课 · 模块 C</span>
-        <span className="lesson-hero-emoji">⬆️</span>
-        <h1 className="lesson-hero-title">让作品升级</h1>
-        <p className="lesson-hero-sub">Level Up Your Work</p>
+      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
+        <span className="lesson-hero-badge" style={{ background: '#dcfce7', color: '#14532d' }}>第 17 课 · 模块 D · 工具基础</span>
+        <span className="lesson-hero-emoji">🔑</span>
+        <h1 className="lesson-hero-title">开通你的 AI 账号</h1>
+        <p className="lesson-hero-sub">Set Up AI Accounts — 开启你的AI创作之门</p>
       </div>
 
       <div className="lesson-objectives">
         <div className="lesson-objectives-title">本课目标</div>
         <ul className="lesson-objectives-list">
-          <li>理解什么是"迭代"和版本升级</li>
-          <li>学会给作品添加新功能</li>
-          <li>用AI获得升级建议并实施</li>
+          <li>认识主流AI工具的注册方式（国内 + 国际）</li>
+          <li>了解每个工具需要什么账号条件</li>
+          <li>至少成功登录一个AI工具，正式出发！</li>
         </ul>
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
+        {['learn', 'guide', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '我的作品'}
+            {t === 'learn' ? '学一学' : t === 'guide' ? '注册指南' : t === 'quiz' ? '测一测' : '我的账号'}
           </button>
         ))}
       </div>
 
       {tab === 'learn' && (
         <div className="lesson-content">
+          {DEVICE_BADGE}
           <div className="lesson-section">
-            <h2 className="lesson-section-title">⬆️ 什么是迭代？</h2>
-            <p className="lesson-text">迭代就是：先做一个基础版，用起来发现问题，改进它，再加新功能，再改进……这样一次次小步升级的过程。</p>
-            <div style={{ background: '#fdf2f8', border: '1.5px solid #f9a8d4', borderRadius: 12, padding: 14, marginTop: 12 }}>
-              <div style={{ fontWeight: 700, color: '#9d174d', marginBottom: 8 }}>软件版本的进化：</div>
-              {VERSION_HISTORY.map((v, i) => (
-                <div key={v.v} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: i < VERSION_HISTORY.length - 1 ? 10 : 0 }}>
-                  <div style={{ background: accentColor, color: '#fff', borderRadius: 6, padding: '3px 8px', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>{v.v}</div>
-                  <div style={{ color: '#1e293b', fontSize: 14 }}>{v.desc}</div>
-                  {i < VERSION_HISTORY.length - 1 && <div style={{ width: 0, borderLeft: '2px dashed #f9a8d4', height: 16, position: 'absolute', marginLeft: 26, marginTop: 26 }} />}
+            <h2 className="lesson-section-title">🔑 为什么要注册账号？</h2>
+            <p className="lesson-text">注册账号是使用AI的第一步。有了账号，AI才能记住你的对话历史，也才能持续帮你学习和创作。国内工具门槛低、注册简单；国际工具功能更强，但需要多一点准备。</p>
+          </div>
+
+          <div className="lesson-section">
+            <h2 className="lesson-section-title">🗂️ 5个你应该了解的AI工具</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+              {TOOLS.map(t => (
+                <div key={t.id} style={{ background: t.bg, border: `1.5px solid ${t.color}30`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 24 }}>{t.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 800, color: t.color, fontSize: 15 }}>{t.name}</span>
+                      <span style={{ background: t.tagColor + '20', color: t.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{t.tag}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#64748b' }}>{t.maker} · {t.tip.slice(0, 30)}...</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🛠️ 今天怎么升级？</h2>
+            <h2 className="lesson-section-title">⚡ 开始的最佳顺序</h2>
             <div className="lesson-step-list">
               {[
-                { step: '1', title: '选一个升级功能', desc: '从3个选项中选一个你想加的功能' },
-                { step: '2', title: '亲手体验升级前后的差别', desc: '看看加了功能后，用户体验有什么变化' },
-                { step: '3', title: '让AI给你的作品提建议', desc: '输入你的作品描述，AI给你3个具体升级方向' },
+                { step: '1', title: '先注册豆包或Kimi', desc: '国内工具，无需科学上网，手机号注册即可，5分钟搞定' },
+                { step: '2', title: '用起来！先感受AI', desc: '不要光注册不用，马上提一个问题试试看' },
+                { step: '3', title: '有条件的话注册ChatGPT/Claude', desc: '国际工具功能更强大，可以同时对比两者的差别' },
               ].map(s => (
                 <div key={s.step} className="lesson-step-item">
                   <span className="lesson-step-num" style={{ background: accentColor }}>{s.step}</span>
@@ -197,149 +205,90 @@ export default function Lesson17({ onBack }) {
           </div>
 
           <div className="lesson-tip-box">
-            💡 <strong>迭代原则：</strong>一次只加一个功能，测试没问题再加下一个。贪心一次加太多，Bug 就找不到了！
+            💡 <strong>关于国际工具：</strong>如果家里暂时无法访问国际网络，先把豆包/Kimi用好，功能已经非常强大！条件具备了再试国际工具。
           </div>
         </div>
       )}
 
-      {tab === 'do' && (
+      {tab === 'guide' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🚀 给作品加功能</h2>
-          <p className="lesson-text">选一个功能，亲手体验"升级前"和"升级后"的差别！</p>
+          <h2 className="lesson-section-title">📋 手把手注册指南</h2>
+          <p className="lesson-text">点击任意工具，查看详细注册步骤。</p>
 
-          {!selectedUpgrade ? (
-            <div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-                {UPGRADES.map(u => (
-                  <button key={u.id} onClick={() => setSelectedUpgrade(u.id)}
-                    style={{ border: `2px solid ${completedUpgrades.includes(u.id) ? accentColor : '#e2e8f0'}`, borderRadius: 14, padding: '14px 16px', textAlign: 'left', background: completedUpgrades.includes(u.id) ? '#fdf2f8' : '#fff', cursor: 'pointer' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <span style={{ fontSize: 20, marginRight: 8 }}>{u.emoji}</span>
-                        <span style={{ fontWeight: 700, color: '#1e293b' }}>{u.label}</span>
-                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, marginLeft: 28 }}>{u.desc}</div>
-                      </div>
-                      {completedUpgrades.includes(u.id)
-                        ? <span style={{ color: accentColor, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>✓ 已体验</span>
-                        : <span style={{ color: '#94a3b8', fontSize: 13 }}>→ 试试</span>}
+          {!selectedTool ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+              {TOOLS.map(t => (
+                <button key={t.id} onClick={() => setSelectedTool(t.id)}
+                  style={{ background: completedTools.includes(t.id) ? t.bg : '#fff', border: `2px solid ${completedTools.includes(t.id) ? t.color : '#e2e8f0'}`, borderRadius: 14, padding: '14px 16px', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 24 }}>{t.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontWeight: 700, color: t.color }}>{t.name}</span>
+                      <span style={{ background: t.tagColor + '20', color: t.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{t.tag}</span>
                     </div>
-                  </button>
-                ))}
-              </div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{t.register}</div>
+                  </div>
+                  {completedTools.includes(t.id)
+                    ? <span style={{ color: accentColor, fontWeight: 700, fontSize: 13 }}>✓ 已完成</span>
+                    : <span style={{ color: '#94a3b8', fontSize: 13 }}>→ 查看</span>}
+                </button>
+              ))}
             </div>
           ) : (
             <div>
-              <button onClick={() => setSelectedUpgrade(null)} style={{ fontSize: 13, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12, textDecoration: 'underline' }}>← 返回选择</button>
+              <button onClick={() => setSelectedTool(null)} style={{ fontSize: 13, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12, textDecoration: 'underline' }}>← 返回列表</button>
 
-              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>{upgrade.emoji} {upgrade.label}</div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                <div style={{ background: '#fff5f5', border: '1.5px solid #fca5a5', borderRadius: 12, padding: 12 }}>
-                  <div style={{ fontSize: 12, color: '#ef4444', fontWeight: 700, marginBottom: 6 }}>✗ 升级前 v1.0</div>
-                  <div style={{ fontSize: 13, color: '#475569' }}>{upgrade.v1}</div>
-                </div>
-                <div style={{ background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 12, padding: 12 }}>
-                  <div style={{ fontSize: 12, color: '#10b981', fontWeight: 700, marginBottom: 6 }}>✓ 升级后 v2.0</div>
-                  <div style={{ fontSize: 13, color: '#475569' }}>{upgrade.v2}</div>
-                </div>
-              </div>
-
-              <div style={{ border: '2px solid #f9a8d4', borderRadius: 14, padding: 16, background: '#fdf2f8', marginBottom: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#9d174d', marginBottom: 12 }}>🎮 升级后效果演示：</div>
-
-                {selectedUpgrade === 'counter' && (
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 48, fontWeight: 900, color: accentColor, marginBottom: 8 }}>{count}</div>
-                    <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 10 }}>点击次数</div>
-                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                      <button className="lesson-btn" style={{ background: accentColor, margin: 0 }} onClick={() => setCount(c => c + 1)}>👍 点赞！</button>
-                      <button className="lesson-btn" style={{ background: '#e2e8f0', color: '#475569', margin: 0 }} onClick={() => setCount(0)}>重置</button>
-                    </div>
-                  </div>
-                )}
-
-                {selectedUpgrade === 'toggle' && (
+              <div style={{ background: tool.bg, border: `2px solid ${tool.color}40`, borderRadius: 16, padding: '18px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <span style={{ fontSize: 28 }}>{tool.emoji}</span>
                   <div>
-                    <div style={{ background: '#fff', borderRadius: 10, padding: 14, marginBottom: 10 }}>
-                      <div style={{ fontWeight: 700, marginBottom: 6 }}>我的个人页面</div>
-                      <p style={{ fontSize: 14, color: '#475569', margin: 0 }}>大家好，我是一个爱学习的孩子！</p>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontWeight: 800, color: tool.color, fontSize: 18 }}>{tool.name}</span>
+                      <span style={{ background: tool.tagColor + '20', color: tool.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{tool.tag} · {tool.maker}</span>
                     </div>
-                    <button className="lesson-btn" style={{ background: accentColor, margin: 0 }} onClick={() => setShowSecret(s => !s)}>
-                      {showSecret ? '🙈 收起我的秘密' : '👁️ 展开我的秘密'}
-                    </button>
-                    {showSecret && (
-                      <div style={{ background: '#fff', borderRadius: 10, padding: 14, marginTop: 10, border: '1px dashed #f9a8d4' }}>
-                        <div style={{ fontSize: 13, color: '#475569' }}>🌟 我的秘密：我最喜欢的颜色是粉色，梦想是成为一名工程师！</div>
-                      </div>
-                    )}
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>网址：{tool.register}</div>
                   </div>
-                )}
+                </div>
 
-                {selectedUpgrade === 'theme' && (
-                  <div style={{ background: darkMode ? '#1e293b' : '#fff', borderRadius: 10, padding: 14, transition: 'all 0.3s' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                      <span style={{ fontWeight: 700, color: darkMode ? '#f1f5f9' : '#1e293b' }}>我的展示页</span>
-                      <button onClick={() => setDarkMode(d => !d)} style={{ background: darkMode ? '#f1f5f9' : '#1e293b', color: darkMode ? '#1e293b' : '#f1f5f9', border: 'none', borderRadius: 20, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}>
-                        {darkMode ? '☀️ 浅色' : '🌙 深色'}
-                      </button>
-                    </div>
-                    <p style={{ fontSize: 13, color: darkMode ? '#94a3b8' : '#475569', margin: 0 }}>这是一个支持深色模式的展示页！</p>
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 14 }}>📋 注册需要准备：</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {tool.need.map(n => (
+                      <span key={n} style={{ background: '#fff', border: `1.5px solid ${tool.color}60`, color: tool.color, fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 999 }}>{n}</span>
+                    ))}
                   </div>
+                </div>
+
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: 8, fontSize: 14 }}>🪜 注册步骤：</div>
+                  {tool.steps.map((step, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 8 }}>
+                      <div style={{ background: tool.color, color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                      <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.6 }}>{step}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: '#fff', borderRadius: 10, padding: '10px 12px', border: `1px solid ${tool.color}30`, fontSize: 13, color: '#475569', marginBottom: 16 }}>
+                  💡 {tool.tip}
+                </div>
+
+                {!completedTools.includes(tool.id) ? (
+                  <button className="lesson-btn" style={{ background: tool.color }} onClick={() => handleMark(tool.id)}>
+                    ✅ 我已注册成功！
+                  </button>
+                ) : (
+                  <div style={{ color: accentColor, fontWeight: 700, textAlign: 'center', padding: 10 }}>✓ 已完成注册！</div>
                 )}
               </div>
-
-              <button className="lesson-btn" style={{ background: accentColor }} onClick={() => handleCompleteUpgrade(selectedUpgrade)}>
-                ✅ 体验完成，标记升级！
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {tab === 'ai' && (
-        <div className="lesson-content">
-          <h2 className="lesson-section-title">🤖 让AI给你的作品提升级建议</h2>
-          <p className="lesson-text">描述你现在的作品，AI会给你3个具体的升级方向！</p>
-
-          <div className="l8-field">
-            <label className="l8-label">📝 描述你现在的作品 *</label>
-            <textarea
-              style={{ width: '100%', border: '2px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', minHeight: 80, resize: 'vertical', boxSizing: 'border-box', outline: 'none' }}
-              value={projectDesc}
-              onChange={e => setProjectDesc(e.target.value)}
-              placeholder={'比如：我做了一个兴趣展示网站，有名字、爱好图标和AI生成的自我介绍，颜色是海洋蓝主题，还没有任何互动功能。'}
-              maxLength={200}
-            />
-          </div>
-
-          <button className="lesson-btn" style={{ background: projectDesc.trim() ? accentColor : '#e2e8f0', color: projectDesc.trim() ? '#fff' : '#94a3b8' }}
-            disabled={!projectDesc.trim() || loadingAi} onClick={handleGetAdvice}>
-            {loadingAi ? '💡 AI正在想方案...' : '⬆️ 给我升级建议！'}
-          </button>
-
-          {aiError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{aiError}</div>}
-
-          {aiAdvice && (
-            <div style={{ marginTop: 14, padding: '16px', background: '#fdf2f8', border: '2px solid #f9a8d4', borderRadius: 12 }}>
-              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 8 }}>💡 AI的升级建议：</div>
-              <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{aiAdvice}</div>
-              <button onClick={handleGetAdvice} style={{ marginTop: 10, fontSize: 12, color: accentColor, background: 'none', border: `1px solid ${accentColor}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
-                重新生成建议
-              </button>
             </div>
           )}
 
-          <div className="ai-prompt-card" style={{ marginTop: 20 }}>
-            <div className="ai-prompt-title">📋 让AI帮你设计升级路线图</div>
-            <div className="ai-prompt-body">
-              我的作品现在有这些功能：[列举现有功能]<br /><br />
-              我想在接下来[1周/1个月]内升级它。<br />
-              请帮我制定一个升级路线图，<br />
-              按照从简单到难的顺序，<br />
-              每次只加一个功能，<br />
-              共3个升级步骤。
+          {completedTools.length >= 1 && !selectedTool && (
+            <div style={{ marginTop: 16, background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '14px', textAlign: 'center' }}>
+              <div style={{ fontWeight: 700, color: '#15803d' }}>🎉 你已经注册了 {completedTools.length} 个AI工具！出发！</div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -371,7 +320,7 @@ export default function Lesson17({ onBack }) {
             <div className="quiz-done">
               <div className="quiz-done-score">{quizScore}/{QUIZ.length}</div>
               <div className="quiz-done-msg">
-                {quizScore === 3 ? '🎉 全对！你掌握了迭代思维！' : quizScore === 2 ? '👍 答对两题，快了！' : '💪 回去"学一学"复习一下迭代原理！'}
+                {quizScore === 3 ? '🎉 全对！你是AI工具达人！' : quizScore === 2 ? '👍 不错，快去注册一个试试！' : '💪 回去"注册指南"看一看再来！'}
               </div>
             </div>
           )}
@@ -380,42 +329,41 @@ export default function Lesson17({ onBack }) {
 
       {tab === 'work' && (
         <div className="lesson-content">
-          <div className="certificate">
-            <div className="certificate-title">⬆️ 作品升级 · 完成！</div>
-            <div className="certificate-name">
-              {completedUpgrades.length > 0 ? `体验了 ${completedUpgrades.length} 个升级功能` : '开始你的第一次升级！'}
-            </div>
-            <div className="certificate-sub">第 17 课 · 模块 C · AI 项目实践</div>
-            <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
-              你学会了迭代的核心：<br />
-              <strong style={{ color: '#bfdbfe' }}>v1.0 → 发现问题 → v1.1 → 加功能 → v2.0</strong><br />
-              每一次小改进，都让作品更好！
-            </div>
-            <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
-          </div>
+          <h2 className="lesson-section-title">🎖️ 我的第一个AI账号</h2>
+          <p className="lesson-text">选出你已经注册或最想先注册的那一个：</p>
 
-          <div style={{ marginTop: 16 }}>
-            <div style={{ fontWeight: 600, color: '#475569', marginBottom: 10 }}>📋 今天体验的升级：</div>
-            {UPGRADES.map(u => (
-              <div key={u.id} style={{ background: completedUpgrades.includes(u.id) ? '#fdf2f8' : '#f8fafc', border: `1px solid ${completedUpgrades.includes(u.id) ? '#f9a8d4' : '#e2e8f0'}`, borderRadius: 10, padding: '10px 14px', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 14 }}>{u.emoji} {u.label}</span>
-                <span style={{ fontSize: 13, color: completedUpgrades.includes(u.id) ? accentColor : '#94a3b8', fontWeight: 600 }}>
-                  {completedUpgrades.includes(u.id) ? '✓ 已体验' : '○ 未完成'}
-                </span>
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+            {TOOLS.map(t => (
+              <button key={t.id} onClick={() => setMyFirstTool(t.id)}
+                style={{ border: `2.5px solid ${myFirstTool === t.id ? t.color : '#e2e8f0'}`, borderRadius: 14, padding: '12px 14px', textAlign: 'left', background: myFirstTool === t.id ? t.bg : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 22 }}>{t.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontWeight: 700, color: t.color }}>{t.name}</span>
+                  <span style={{ marginLeft: 6, background: t.tagColor + '20', color: t.tagColor, fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{t.tag}</span>
+                </div>
+                {myFirstTool === t.id && <span style={{ color: t.color, fontWeight: 700, fontSize: 18 }}>✓</span>}
+              </button>
             ))}
           </div>
 
-          {aiAdvice && (
-            <div style={{ marginTop: 12, padding: '14px', background: '#fdf2f8', border: '1.5px solid #f9a8d4', borderRadius: 12 }}>
-              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 6 }}>💡 你的作品升级建议（来自AI）：</div>
-              <div style={{ fontSize: 13, color: '#1e293b', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiAdvice}</div>
+          {myFirstTool && (
+            <div className="certificate">
+              <div className="certificate-title">🔑 账号开通！正式出发！</div>
+              <div className="certificate-name">
+                我的第一个AI工具：{TOOLS.find(t => t.id === myFirstTool)?.emoji} {TOOLS.find(t => t.id === myFirstTool)?.name}
+              </div>
+              <div className="certificate-sub">第 17 课 · 模块 D · 工具基础</div>
+              <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
+                今天开了门，下面就是：<br />
+                <strong style={{ color: '#bfdbfe' }}>认识各种AI → 动手体验 → 用AI做作品</strong>
+              </div>
+              <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
             </div>
           )}
 
           <div className="lesson-next-preview" style={{ marginTop: 16 }}>
-            <div className="lesson-next-title">🚀 最后一课预告：第 18 课 · 发布与展示</div>
-            <p>这是你 18 课学习旅程的最后一站！你将学会向别人介绍你的作品，用AI生成展示演讲稿，完成结业！</p>
+            <div className="lesson-next-title">🚀 下一课预告：第 18 课 · 会聊天的AI</div>
+            <p>账号开通了，下一步就是认识主流的聊天AI！豆包、Kimi、ChatGPT、Claude——各有特点，我们一起来比一比。</p>
           </div>
         </div>
       )}
