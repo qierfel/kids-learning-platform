@@ -1,80 +1,123 @@
 import { useState } from 'react'
 import './Lesson.css'
 
-const THEMES = [
-  { id: 'ocean', label: '海洋蓝', primary: '#0ea5e9', secondary: '#e0f2fe', text: '#0c4a6e' },
-  { id: 'forest', label: '森林绿', primary: '#10b981', secondary: '#dcfce7', text: '#064e3b' },
-  { id: 'candy', label: '糖果粉', primary: '#ec4899', secondary: '#fce7f3', text: '#831843' },
-  { id: 'galaxy', label: '星空紫', primary: '#8b5cf6', secondary: '#ede9fe', text: '#4c1d95' },
-  { id: 'fire', label: '烈焰橙', primary: '#f97316', secondary: '#ffedd5', text: '#7c2d12' },
+const DEVICE_BADGE = (
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0 4px' }}>
+    {['📱 手机', '📱 iPad', '💻 电脑'].map(d => (
+      <span key={d} style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, padding: '4px 12px', fontSize: 13, color: '#475569' }}>{d}</span>
+    ))}
+    <span style={{ fontSize: 12, color: '#94a3b8', alignSelf: 'center' }}>· 有浏览器就能用</span>
+  </div>
+)
+
+const BUG_CASES = [
+  {
+    id: 'typo',
+    title: '按钮点了没反应',
+    code: `<button onclik="sayHi()">打招呼</button>`,
+    error: '没有报错，但按钮完全没用',
+    bugLine: 'onclik',
+    fix: 'onclick',
+    type: '拼写错误',
+    hint: '"onclik" 是不存在的属性。正确写法是 "onclick"。拼写错误是最常见的 Bug！',
+  },
+  {
+    id: 'missing-quote',
+    title: '页面样式全乱了',
+    code: `<p style="color: red; font-size: 16px>这是红色文字</p>`,
+    error: 'SyntaxError: 样式解析失败',
+    bugLine: '16px>',
+    fix: '16px">',
+    type: '引号没关上',
+    hint: 'style 属性的值必须用引号包围。这里 font-size: 16px 后面少了一个 " 号。',
+  },
+  {
+    id: 'logic',
+    title: '分数显示错了',
+    code: `let score = 100\nif (score > 60) {\n  console.log("不及格")\n}`,
+    error: '程序能运行，但100分的结果是"不及格"',
+    bugLine: '"不及格"',
+    fix: '"及格"',
+    type: '逻辑错误',
+    hint: 'score > 60 是真（100 > 60），所以会执行里面的代码。但"及格"和"不及格"写反了！',
+  },
 ]
 
-const HOBBY_EMOJIS = ['🎨', '📚', '⚽', '🎮', '🎵', '🍕', '🌱', '🐾', '✈️', '🔬', '🎭', '🏊']
+const MY_WORKS = [
+  { id: 'l13', lesson: 'L13', title: 'AI 变声器', emoji: '🔄', desc: '输入一句话，AI 用不同风格重新说一遍' },
+  { id: 'l14', lesson: 'L14', title: 'AI 占卜机', emoji: '🔮', desc: '选运势类别，AI 给你专属占卜结果' },
+  { id: 'l15', lesson: 'L15', title: 'Bug 修复工具', emoji: '🐛', desc: '学会读报错、找 Bug、请 AI 帮忙修复' },
+]
 
 const QUIZ = [
   {
-    q: '规划一个展示网站，第一步应该做什么？',
-    options: ['先写代码', '先想清楚要展示什么内容', '先选颜色', '先找图片'],
+    q: '遇到代码报错时，最好的第一步是？',
+    options: ['把代码全删了', '仔细读报错信息，找到行号和错误类型', '换个项目做', '关掉电脑'],
     correct: 1,
-    explain: '先想好"要展示什么"，才能知道需要哪些功能和内容。这叫"内容规划"，是做任何网站的第一步。',
+    explain: '报错信息是程序给你的线索！里面有文件名、行号、错误类型，帮你快速定位问题。',
   },
   {
-    q: '下面哪个关于"自我介绍"的说法是正确的？',
-    options: ['越长越好，什么都要写', '要突出你最独特的特点', '只写名字就够了', '一定要和别人一样'],
+    q: '"拼写错误"类型的Bug有什么特点？',
+    options: ['程序会崩溃', '有时没有报错但功能失效', '代码变慢', '不会影响程序运行'],
     correct: 1,
-    explain: '好的自我介绍要突出你最独特的地方。不是越长越好，而是让别人一看就记住你。',
+    explain: '拼写错误最狡猾——有时浏览器直接忽略了错误的属性，不报错但功能就是不工作。',
   },
   {
-    q: '为什么要给网站选一个统一的颜色主题？',
-    options: ['因为规定要这样做', '让网站看起来整洁、有设计感', '因为颜色可以更多', '让别人看不懂'],
+    q: '作品集的作用是什么？',
+    options: ['证明你写了很多代码', '让别人一眼看到你做过什么、会什么', '只用来存文件', '比赛评分用的'],
     correct: 1,
-    explain: '颜色一致让网站看起来专业、整洁。这叫"视觉一致性"，是设计师很重视的概念。',
+    explain: '作品集就是你的"能力展示"。别人看到你的作品集，就能快速了解你会什么、做过什么。',
   },
 ]
 
 export default function Lesson15({ onBack }) {
   const [tab, setTab] = useState('learn')
-  const [name, setName] = useState('')
-  const [age, setAge] = useState('')
-  const [motto, setMotto] = useState('')
-  const [hobbies, setHobbies] = useState([])
-  const [hobbyDesc, setHobbyDesc] = useState('')
-  const [theme, setTheme] = useState('ocean')
-  const [aiIntro, setAiIntro] = useState('')
-  const [loadingIntro, setLoadingIntro] = useState(false)
-  const [introError, setIntroError] = useState('')
-  const [showPreview, setShowPreview] = useState(false)
+  const [selectedBug, setSelectedBug] = useState(null)
+  const [revealedBugs, setRevealedBugs] = useState({})
+  const [fixedBugs, setFixedBugs] = useState([])
+
+  // Portfolio
+  const [workNotes, setWorkNotes] = useState({})
+  const [portfolioTitle, setPortfolioTitle] = useState('')
+
+  // AI Debug
+  const [bugInput, setBugInput] = useState('')
+  const [aiDebug, setAiDebug] = useState('')
+  const [loadingDebug, setLoadingDebug] = useState(false)
+  const [debugError, setDebugError] = useState('')
+
+  // Quiz
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
 
-  const accentColor = '#10b981'
-  const currentTheme = THEMES.find(t => t.id === theme)
+  const accentColor = '#f59e0b'
+  const bug = BUG_CASES.find(b => b.id === selectedBug)
 
-  function toggleHobby(emoji) {
-    setHobbies(h => h.includes(emoji) ? h.filter(e => e !== emoji) : h.length < 5 ? [...h, emoji] : h)
-  }
+  async function handleAiDebug() {
+    if (!bugInput.trim()) return
+    setLoadingDebug(true)
+    setDebugError('')
+    setAiDebug('')
+    const prompt = `我是一个10-12岁的编程学习者，遇到了Bug，请用简单友善的语言帮我分析（不超过120字）：
 
-  async function handleGenerateIntro() {
-    if (!name.trim() || hobbies.length === 0) return
-    setLoadingIntro(true)
-    setIntroError('')
-    setAiIntro('')
-    const prompt = `请帮我写一段简短的个人兴趣自我介绍，用第一人称，活泼可爱的语气，不超过80字。\n\n我的信息：\n- 名字：${name.trim()}\n- 年龄：${age.trim() || '不透露'}岁\n- 兴趣爱好：${hobbies.join(' ')}${hobbyDesc.trim() ? `，尤其喜欢${hobbyDesc.trim()}` : ''}\n${motto.trim() ? `- 我的座右铭：${motto.trim()}` : ''}\n\n请直接给出介绍文字，不需要额外解释。`
+问题：${bugInput.trim()}
+
+请告诉我：①可能是什么类型的错误；②最可能的原因；③如何修复。语气要鼓励孩子。`
     try {
       const res = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: '个人介绍' } }),
+        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: 'Debug助手' } }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      setAiIntro(data.text || '')
+      setAiDebug(data.text || '')
     } catch {
-      setIntroError('AI暂时没有响应，请稍后再试。')
+      setDebugError('AI 暂时没有响应，请稍后再试。')
     } finally {
-      setLoadingIntro(false)
+      setLoadingDebug(false)
     }
   }
 
@@ -90,25 +133,24 @@ export default function Lesson15({ onBack }) {
     else { setQuizIdx(i => i + 1); setQuizAnswer(null) }
   }
 
-  const canPreview = name.trim().length > 0
-
   return (
     <div className="lesson-page">
       <button className="lesson-back" onClick={onBack}>← 返回课程列表</button>
 
-      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
-        <span className="lesson-hero-badge" style={{ background: '#dcfce7', color: '#15803d' }}>第 15 课 · 模块 C</span>
-        <span className="lesson-hero-emoji">🌈</span>
-        <h1 className="lesson-hero-title">做一个兴趣展示网站</h1>
-        <p className="lesson-hero-sub">Interest Showcase</p>
+      <div className="lesson-hero" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
+        <span className="lesson-hero-badge" style={{ background: '#fef3c7', color: '#b45309' }}>第 15 课 · 模块 C</span>
+        <span className="lesson-hero-emoji">🐛</span>
+        <h1 className="lesson-hero-title">Bug 修复 + 作品集</h1>
+        <p className="lesson-hero-sub">Debug & Portfolio</p>
+        {DEVICE_BADGE}
       </div>
 
       <div className="lesson-objectives">
         <div className="lesson-objectives-title">本课目标</div>
         <ul className="lesson-objectives-list">
-          <li>规划个人兴趣展示页面</li>
-          <li>用AI生成自我介绍文字</li>
-          <li>完成一个有内容的展示网站</li>
+          <li>不再害怕程序报错，学会读懂错误</li>
+          <li>用AI帮你找Bug并修复</li>
+          <li>整理前面所有作品，形成作品集</li>
         </ul>
       </div>
 
@@ -116,7 +158,7 @@ export default function Lesson15({ onBack }) {
         {['learn', 'do', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '做一做' : t === 'ai' ? '用AI帮忙' : t === 'quiz' ? '测一测' : '我的作品'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '找Bug' : t === 'ai' ? 'AI助手' : t === 'quiz' ? '测一测' : '我的作品集'}
           </button>
         ))}
       </div>
@@ -124,99 +166,112 @@ export default function Lesson15({ onBack }) {
       {tab === 'learn' && (
         <div className="lesson-content">
           <div className="lesson-section">
-            <h2 className="lesson-section-title">🌈 什么是展示网站？</h2>
-            <p className="lesson-text">展示网站就是一个"关于我"的页面，让别人通过网页认识你——你是谁、你喜欢什么、你的风格是什么。很多设计师、程序员、艺术家都有自己的展示网站。</p>
+            <h2 className="lesson-section-title">🐛 Bug 是什么？别怕它！</h2>
+            <p className="lesson-text">Bug 就是代码里的错误。<strong>所有程序员</strong>——不管多厉害——每天都在处理 Bug。区别是：有经验的程序员能快速找到并修复它。今天你就来练这个！</p>
+            <div className="lesson-tip-box">
+              💪 <strong>正确心态：</strong>报错不是失败，是程序在给你发"求救信号"——它告诉你问题在哪里。学会读懂这个信号，你就赢了。
+            </div>
           </div>
+
           <div className="lesson-section">
-            <h2 className="lesson-section-title">📋 规划需要哪几步？</h2>
-            <div className="lesson-step-list">
+            <h2 className="lesson-section-title">📚 三种常见 Bug</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { step: '1', title: '基本信息', desc: '名字、简短介绍——让人一眼知道这是谁的页面' },
-                { step: '2', title: '兴趣爱好', desc: '你最喜欢什么？用图标和文字展示出来' },
-                { step: '3', title: '个性风格', desc: '颜色、字体——让页面"看起来像你"' },
-                { step: '4', title: '一句话', desc: '你的座右铭或者最想说的话' },
-              ].map(s => (
-                <div key={s.step} className="lesson-step-item">
-                  <span className="lesson-step-num" style={{ background: accentColor }}>{s.step}</span>
-                  <div><strong>{s.title}</strong><p>{s.desc}</p></div>
+                { emoji: '🔤', name: '拼写错误', desc: '把 onclick 写成 onclik，函数名写错——浏览器不认识，直接忽略', color: '#ef4444' },
+                { emoji: '❝', name: '符号错误', desc: '引号没关、括号不配对——程序根本读不下去', color: '#f59e0b' },
+                { emoji: '🔄', name: '逻辑错误', desc: '代码能跑，但结果和你想的不一样——最难发现', color: '#8b5cf6' },
+              ].map(b => (
+                <div key={b.name} style={{ background: `${b.color}10`, border: `1.5px solid ${b.color}30`, borderRadius: 12, padding: '12px 14px', display: 'flex', gap: 12 }}>
+                  <span style={{ fontSize: 24, flexShrink: 0 }}>{b.emoji}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, color: b.color }}>{b.name}</div>
+                    <div style={{ fontSize: 13, color: '#475569', marginTop: 2 }}>{b.desc}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="lesson-tip-box">
-            💡 <strong>今天的任务：</strong>填写信息 → 选兴趣和颜色 → 让AI写自我介绍 → 预览完整展示页！
+
+          <div className="lesson-section">
+            <h2 className="lesson-section-title">🗂️ 作品集是什么？</h2>
+            <p className="lesson-text">作品集就是把你做过的所有作品整理在一起，让别人一眼看到你的能力。本课最后你会整理出模块 C 的三个作品！</p>
           </div>
         </div>
       )}
 
       {tab === 'do' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🛠️ 搭建你的展示网站</h2>
-          <div className="l8-field">
-            <label className="l8-label">👤 你的名字 *</label>
-            <input className="l8-input" value={name} onChange={e => setName(e.target.value)} placeholder="你叫什么名字？" maxLength={10} />
-          </div>
-          <div className="l8-field">
-            <label className="l8-label">🎂 年龄（可选）</label>
-            <input className="l8-input" value={age} onChange={e => setAge(e.target.value)} placeholder="比如：11" maxLength={3} />
-          </div>
-          <div className="l8-field">
-            <label className="l8-label">💬 你的座右铭（可选）</label>
-            <input className="l8-input" value={motto} onChange={e => setMotto(e.target.value)} placeholder='比如：做真实的自己！' maxLength={30} />
-          </div>
-          <div className="l8-field">
-            <label className="l8-label">❤️ 选兴趣标签（最多5个）</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 8 }}>
-              {HOBBY_EMOJIS.map(emoji => (
-                <button key={emoji} onClick={() => toggleHobby(emoji)}
-                  style={{ fontSize: 26, width: 52, height: 52, border: `2px solid ${hobbies.includes(emoji) ? accentColor : '#e2e8f0'}`, borderRadius: 12, background: hobbies.includes(emoji) ? `${accentColor}15` : '#fff', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  {emoji}
+          <h2 className="lesson-section-title">🔍 Bug 侦探训练</h2>
+          <p className="lesson-text">下面有 3 段有 Bug 的代码，你能找到问题吗？</p>
+
+          {!selectedBug ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {BUG_CASES.map(b => (
+                <button key={b.id} onClick={() => setSelectedBug(b.id)}
+                  style={{ border: `2px solid ${fixedBugs.includes(b.id) ? '#10b981' : '#fde68a'}`, borderRadius: 14, padding: '14px 16px', textAlign: 'left', background: fixedBugs.includes(b.id) ? '#f0fdf4' : '#fffbeb', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: 13, color: '#94a3b8', marginRight: 8 }}>{b.type}</span>
+                      <span style={{ fontWeight: 700, color: '#1e293b' }}>{b.title}</span>
+                    </div>
+                    <span style={{ color: fixedBugs.includes(b.id) ? '#10b981' : '#f59e0b', fontSize: 13, fontWeight: 600 }}>
+                      {fixedBugs.includes(b.id) ? '✓ 已修复' : '→ 查看'}
+                    </span>
+                  </div>
                 </button>
               ))}
-            </div>
-            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>已选 {hobbies.length}/5</div>
-          </div>
-          {hobbies.length > 0 && (
-            <div className="l8-field">
-              <label className="l8-label">📝 关于你的兴趣，说一句话</label>
-              <input className="l8-input" value={hobbyDesc} onChange={e => setHobbyDesc(e.target.value)} placeholder='比如：最爱踢足球，梦想成为职业球员' maxLength={40} />
-            </div>
-          )}
-          <div className="l8-field">
-            <label className="l8-label">🎨 颜色主题</label>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 8 }}>
-              {THEMES.map(t => (
-                <button key={t.id} onClick={() => setTheme(t.id)}
-                  style={{ background: t.secondary, border: `2px solid ${theme === t.id ? t.primary : 'transparent'}`, borderRadius: 10, padding: '8px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.primary, display: 'inline-block' }} />
-                  <span style={{ fontSize: 13, color: t.primary, fontWeight: 600 }}>{t.label}</span>
-                  {theme === t.id && <span>✓</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-          <button className="lesson-btn" style={{ background: canPreview ? accentColor : '#e2e8f0', color: canPreview ? '#fff' : '#94a3b8' }}
-            disabled={!canPreview} onClick={() => setShowPreview(true)}>
-            👁️ 预览我的网站
-          </button>
-          {showPreview && canPreview && (
-            <div style={{ marginTop: 20, border: `2px solid ${currentTheme.primary}`, borderRadius: 16, overflow: 'hidden' }}>
-              <div style={{ background: currentTheme.primary, padding: '16px 20px', color: '#fff' }}>
-                <div style={{ fontSize: 20, fontWeight: 800 }}>{name} 的兴趣展示</div>
-                {motto && <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>"{motto}"</div>}
-              </div>
-              <div style={{ background: currentTheme.secondary, padding: 16 }}>
-                <div style={{ fontSize: 13, color: currentTheme.text, marginBottom: 8 }}>{age && `${age}岁 · `}我的兴趣爱好：</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-                  {hobbies.map(h => <span key={h} style={{ fontSize: 28 }}>{h}</span>)}
-                  {hobbies.length === 0 && <span style={{ color: '#94a3b8', fontSize: 13 }}>（还没选兴趣标签）</span>}
+              {fixedBugs.length === 3 && (
+                <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '14px', textAlign: 'center', marginTop: 4 }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>🎉</div>
+                  <div style={{ fontWeight: 700, color: '#15803d' }}>全部 Bug 修复！你是真正的 Bug 侦探！</div>
                 </div>
-                {aiIntro
-                  ? <div style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', fontSize: 14, color: currentTheme.text, lineHeight: 1.7, border: `1px solid ${currentTheme.primary}40` }}>{aiIntro}</div>
-                  : <div style={{ color: '#94a3b8', fontSize: 13, fontStyle: 'italic' }}>（去"用AI帮忙"生成自我介绍）</div>
-                }
+              )}
+            </div>
+          ) : (
+            <div>
+              <button onClick={() => setSelectedBug(null)} style={{ fontSize: 13, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12, textDecoration: 'underline' }}>← 返回</button>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#1e293b', marginBottom: 4 }}>{bug.title}</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>Bug 类型：{bug.type}</div>
+
+              <div style={{ background: '#1e293b', borderRadius: 10, padding: '14px 16px', fontFamily: 'monospace', fontSize: 13, color: '#e2e8f0', lineHeight: 1.8, marginBottom: 10, overflowX: 'auto' }}>
+                {bug.code.split('\n').map((line, i) => (
+                  <div key={i} style={{ color: revealedBugs[bug.id] && line.includes(bug.bugLine) ? '#fbbf24' : '#e2e8f0' }}>
+                    <span style={{ color: '#475569', marginRight: 12, userSelect: 'none' }}>{i + 1}</span>{line}
+                  </div>
+                ))}
               </div>
-              <div style={{ background: '#fff', padding: '10px 16px', textAlign: 'center', fontSize: 12, color: '#94a3b8' }}>Made with AI · {name}的个人展示页</div>
+
+              <div style={{ background: '#fff5f5', border: '1.5px solid #fca5a5', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#ef4444', marginBottom: 12 }}>
+                <strong>报错/现象：</strong> {bug.error}
+              </div>
+
+              {!revealedBugs[bug.id] ? (
+                <button className="lesson-btn" style={{ background: accentColor }} onClick={() => setRevealedBugs(r => ({ ...r, [bug.id]: true }))}>
+                  🔍 揭示 Bug！
+                </button>
+              ) : (
+                <div>
+                  <div style={{ background: '#fffbeb', border: '2px solid #fde68a', borderRadius: 12, padding: '14px', marginBottom: 12 }}>
+                    <div style={{ fontWeight: 700, color: '#b45309', marginBottom: 8 }}>🐛 发现了！</div>
+                    <div style={{ fontSize: 13, fontFamily: 'monospace', marginBottom: 4 }}>
+                      <span style={{ color: '#ef4444' }}>✗ 错误：</span>
+                      <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>{bug.bugLine}</code>
+                    </div>
+                    <div style={{ fontSize: 13, fontFamily: 'monospace', marginBottom: 10 }}>
+                      <span style={{ color: '#10b981' }}>✓ 修复：</span>
+                      <code style={{ background: '#dcfce7', padding: '2px 6px', borderRadius: 4 }}>{bug.fix}</code>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#78350f', background: '#fef3c7', borderRadius: 8, padding: '8px 10px' }}>💡 {bug.hint}</div>
+                  </div>
+                  {!fixedBugs.includes(bug.id) ? (
+                    <button className="lesson-btn" style={{ background: '#10b981' }} onClick={() => { setFixedBugs(f => [...f, bug.id]); setSelectedBug(null) }}>
+                      ✅ 明白了，标记修复！
+                    </button>
+                  ) : (
+                    <div style={{ color: '#10b981', fontWeight: 700, textAlign: 'center' }}>✓ 已修复</div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -224,45 +279,44 @@ export default function Lesson15({ onBack }) {
 
       {tab === 'ai' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🤖 让AI帮你写自我介绍</h2>
-          <p className="lesson-text">填好了信息，让AI帮你生成一段自我介绍！生成后会自动出现在展示网站预览里。</p>
-          {!name.trim() ? (
-            <div className="lesson-tip-box">💡 先去"做一做"填写你的名字和兴趣，再回来生成介绍！</div>
-          ) : (
-            <>
-              <div style={{ background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 12, padding: '14px 16px', marginBottom: 16 }}>
-                <div style={{ fontSize: 13, color: '#15803d', fontWeight: 600, marginBottom: 6 }}>AI将根据这些信息帮你写：</div>
-                <div style={{ fontSize: 14, color: '#1e293b' }}>
-                  👤 {name}{age && `，${age}岁`}<br />
-                  ❤️ 兴趣：{hobbies.join(' ') || '（还没选）'}<br />
-                  {hobbyDesc && `📝 ${hobbyDesc}`}<br />
-                  {motto && `💬 座右铭：${motto}`}
-                </div>
-              </div>
-              <button className="lesson-btn" style={{ background: hobbies.length > 0 ? accentColor : '#e2e8f0', color: hobbies.length > 0 ? '#fff' : '#94a3b8' }}
-                disabled={hobbies.length === 0 || loadingIntro} onClick={handleGenerateIntro}>
-                {loadingIntro ? '✍️ AI正在写...' : '✨ 生成自我介绍！'}
-              </button>
-              {introError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{introError}</div>}
-              {aiIntro && (
-                <div style={{ marginTop: 14, padding: '16px', background: `${accentColor}08`, border: `2px solid ${accentColor}30`, borderRadius: 12 }}>
-                  <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 8 }}>✅ AI生成的自我介绍：</div>
-                  <div style={{ fontSize: 15, color: '#1e293b', lineHeight: 1.8 }}>{aiIntro}</div>
-                  <button onClick={handleGenerateIntro} style={{ marginTop: 10, fontSize: 12, color: accentColor, background: 'none', border: `1px solid ${accentColor}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
-                    重新生成
-                  </button>
-                </div>
-              )}
-              {aiIntro && <div className="lesson-tip-box" style={{ marginTop: 12 }}>🎉 介绍已生成！去"做一做"点"预览我的网站"，看完整效果！</div>}
-            </>
+          <h2 className="lesson-section-title">🤖 AI Debug 助手</h2>
+          <p className="lesson-text">遇到自己找不到的 Bug？描述给 AI 听，AI 帮你分析！</p>
+
+          <div className="l8-field">
+            <label className="l8-label">📝 描述你遇到的问题 *</label>
+            <textarea
+              style={{ width: '100%', border: '2px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', minHeight: 80, resize: 'vertical', boxSizing: 'border-box', outline: 'none' }}
+              value={bugInput}
+              onChange={e => setBugInput(e.target.value)}
+              placeholder={'比如：我的按钮点了没反应，控制台显示 TypeError: sayHi is not a function，第3行'}
+              maxLength={300}
+            />
+          </div>
+
+          <button className="lesson-btn" style={{ background: bugInput.trim() ? accentColor : '#e2e8f0', color: bugInput.trim() ? '#fff' : '#94a3b8' }}
+            disabled={!bugInput.trim() || loadingDebug} onClick={handleAiDebug}>
+            {loadingDebug ? '🔍 AI正在分析...' : '🐛 AI 帮我找 Bug！'}
+          </button>
+
+          {debugError && <div style={{ color: '#ef4444', fontSize: 13, marginTop: 10, padding: '8px 12px', background: '#fff5f5', borderRadius: 8 }}>{debugError}</div>}
+
+          {aiDebug && (
+            <div style={{ marginTop: 14, padding: '16px', background: '#fffbeb', border: '2px solid #fde68a', borderRadius: 12 }}>
+              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 8 }}>🤖 AI 的分析：</div>
+              <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{aiDebug}</div>
+            </div>
           )}
+
           <div className="ai-prompt-card" style={{ marginTop: 20 }}>
-            <div className="ai-prompt-title">📋 提示词拓展：让AI改风格</div>
+            <div className="ai-prompt-title">📋 高效 Debug 提问模板</div>
             <div className="ai-prompt-body">
-              我有一段自我介绍：<br />
-              "[贴上AI生成的介绍]"<br /><br />
-              请帮我改成[更酷/更可爱/更正式]的风格，<br />
-              但保留我的名字和兴趣内容，不超过80字。
+              我的代码遇到了 Bug，请帮我分析：<br /><br />
+              <strong>报错信息：</strong>[粘贴报错文字]<br />
+              <strong>出错位置：</strong>第 [X] 行<br />
+              <strong>期望结果：</strong>[想发生什么]<br />
+              <strong>实际结果：</strong>[实际发生了什么]<br /><br />
+              [粘贴出问题的代码]<br /><br />
+              请用简单语言告诉我原因和修复方法。
             </div>
           </div>
         </div>
@@ -296,7 +350,7 @@ export default function Lesson15({ onBack }) {
             <div className="quiz-done">
               <div className="quiz-done-score">{quizScore}/{QUIZ.length}</div>
               <div className="quiz-done-msg">
-                {quizScore === 3 ? '🎉 全对！你已经是网站规划小能手了！' : quizScore === 2 ? '👍 答对两题，非常棒！' : '💪 回去"学一学"看看，再来挑战！'}
+                {quizScore === 3 ? '🎉 全对！你是 Debug 高手！' : quizScore >= 2 ? '👍 不错！' : '💪 回去复习一下再来！'}
               </div>
             </div>
           )}
@@ -305,30 +359,53 @@ export default function Lesson15({ onBack }) {
 
       {tab === 'work' && (
         <div className="lesson-content">
+          <h2 className="lesson-section-title">🗂️ 模块 C 作品集</h2>
+          <p className="lesson-text">整理你在模块 C 完成的三个作品，形成你的第一份作品集！</p>
+
+          <div className="l8-field">
+            <label className="l8-label">📋 给你的作品集起个名字</label>
+            <input className="l8-input" value={portfolioTitle} onChange={e => setPortfolioTitle(e.target.value)}
+              placeholder={'比如：我的 AI 编程三件套'} maxLength={20} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '12px 0 20px' }}>
+            {MY_WORKS.map(w => (
+              <div key={w.id} style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 28 }}>{w.emoji}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, color: '#1e293b' }}>{w.title}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{w.lesson}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}>{w.desc}</div>
+                <div className="l8-field" style={{ margin: 0 }}>
+                  <input className="l8-input" style={{ fontSize: 13 }}
+                    value={workNotes[w.id] || ''}
+                    onChange={e => setWorkNotes(n => ({ ...n, [w.id]: e.target.value }))}
+                    placeholder={'写一句你学到了什么，或者最自豪的地方'}
+                    maxLength={50}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="certificate">
-            <div className="certificate-title">🌈 兴趣展示网站 · 完成！</div>
-            <div className="certificate-name">{name || '我的展示网站'}</div>
-            <div className="certificate-sub">第 15 课 · 模块 C · AI 项目实践</div>
+            <div className="certificate-title">🗂️ 模块 C 作品集 · 完成！</div>
+            <div className="certificate-name">{portfolioTitle || '我的 AI 编程作品集'}</div>
+            <div className="certificate-sub">第 15 课 · 模块 C 结束 · 共 3 个作品</div>
             <div style={{ fontSize: 14, color: '#93c5fd', margin: '16px 0', lineHeight: 1.8 }}>
-              你完成了一个真正属于你自己的展示页面！<br />
-              <strong style={{ color: '#bfdbfe' }}>规划内容 → AI生成介绍 → 主题定制</strong><br />
-              {aiIntro && '你的AI自我介绍已经生成并展示在页面上了！'}
+              模块 C 完成！你学会了：<br />
+              <strong style={{ color: '#bfdbfe' }}>变声器 · 占卜机 · Bug 修复</strong><br />
+              从这里开始，你将进入工具大全的世界！
             </div>
             <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
           </div>
-          {name && (
-            <div style={{ marginTop: 16, border: `2px solid ${currentTheme.primary}`, borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ background: currentTheme.primary, padding: '12px 16px', color: '#fff', fontWeight: 700 }}>{name} 的兴趣展示 · {currentTheme.label}主题</div>
-              <div style={{ background: currentTheme.secondary, padding: 14 }}>
-                {hobbies.length > 0 && <div style={{ fontSize: 24, marginBottom: 8 }}>{hobbies.join(' ')}</div>}
-                {aiIntro && <div style={{ fontSize: 14, color: currentTheme.text, lineHeight: 1.7 }}>{aiIntro}</div>}
-                {motto && <div style={{ fontSize: 13, color: currentTheme.primary, marginTop: 8, fontStyle: 'italic' }}>"{motto}"</div>}
-              </div>
-            </div>
-          )}
+
           <div className="lesson-next-preview" style={{ marginTop: 16 }}>
-            <div className="lesson-next-title">🚀 下一课预告：第 16 课 · 学会改 Bug</div>
-            <p>别怕报错！下一课你将学会读懂错误信息，用AI帮你找到并修复Bug——从此Debug不再是噩梦！</p>
+            <div className="lesson-next-title">🚀 下一课预告：第 16 课 · 你的设备能做什么</div>
+            <p>模块 D 开始！手机、iPad、电脑能用哪些 AI？各有什么优缺点？帮你选好最适合的学习设备！</p>
           </div>
         </div>
       )}
