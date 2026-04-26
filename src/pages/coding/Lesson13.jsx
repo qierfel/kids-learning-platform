@@ -37,12 +37,25 @@ export default function Lesson13({ onBack }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [history, setHistory] = useState([])
+  const [speaking, setSpeaking] = useState(false)
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
 
   const accentColor = '#6366f1'
+
+  function speak(text) {
+    if (!window.speechSynthesis || !text) return
+    window.speechSynthesis.cancel()
+    const utter = new SpeechSynthesisUtterance(text)
+    utter.lang = 'zh-CN'
+    utter.rate = 0.9
+    utter.onstart = () => setSpeaking(true)
+    utter.onend = () => setSpeaking(false)
+    utter.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(utter)
+  }
 
   async function handleTransform() {
     if (!inputText.trim() || !selectedStyle) return
@@ -67,6 +80,7 @@ export default function Lesson13({ onBack }) {
       const result = data.text || ''
       setAiOutput(result)
       setHistory(h => [{ input: inputText.trim(), style: style.label, output: result }, ...h].slice(0, 5))
+      speak(result)
     } catch (e) {
       setError('AI 暂时没有响应，请稍后再试。')
     } finally {
@@ -221,8 +235,17 @@ export default function Lesson13({ onBack }) {
 
           {aiOutput && (
             <div style={{ marginTop: 16, padding: '16px', background: `${accentColor}08`, border: `2px solid ${accentColor}30`, borderRadius: 12 }}>
-              <div style={{ fontSize: 13, color: accentColor, fontWeight: 600, marginBottom: 8 }}>
-                📤 输出 · {STYLES.find(s => s.id === selectedStyle)?.label} 版本：
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ fontSize: 13, color: accentColor, fontWeight: 600 }}>
+                  📤 输出 · {STYLES.find(s => s.id === selectedStyle)?.label} 版本：
+                </div>
+                <button
+                  onClick={() => speak(aiOutput)}
+                  disabled={speaking}
+                  style={{ background: speaking ? '#e2e8f0' : accentColor, color: speaking ? '#94a3b8' : '#fff', border: 'none', borderRadius: 20, padding: '5px 14px', fontSize: 13, cursor: speaking ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.2s' }}
+                >
+                  {speaking ? '🔊 朗读中...' : '🔊 朗读'}
+                </button>
               </div>
               <div style={{ fontSize: 16, color: '#1e293b', lineHeight: 1.7 }}>{aiOutput}</div>
             </div>
