@@ -12,6 +12,7 @@ const MODULE_OPTIONS = [
   { subject: '语文', module: '古诗词',   moduleKey: 'poems',      defaultUnit: '首',   defaultTarget: 1 },
   { subject: '语文', module: '默写练习', moduleKey: 'dictation',  defaultUnit: '道',   defaultTarget: 10 },
   { subject: '跨学科', module: '错题复习', moduleKey: 'mistakes', defaultUnit: '道',   defaultTarget: 5 },
+  { subject: '跨学科', module: 'AI编程',   moduleKey: 'ai_coding', defaultUnit: '课',  defaultTarget: 1 },
 ]
 
 function makeItemId() {
