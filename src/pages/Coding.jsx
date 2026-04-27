@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import codingLessons from '../data/codingLessons'
+import { logActivity, getActivityForDate } from '../utils/activityLogger'
 import Lesson1 from './coding/Lesson1'
 import Lesson2 from './coding/Lesson2'
 import Lesson3 from './coding/Lesson3'
@@ -53,6 +54,13 @@ import './Coding.css'
 const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12, Lesson13, Lesson14, Lesson15, Lesson16, Lesson17, Lesson18, Lesson19, Lesson20, Lesson21, Lesson22, Lesson23, Lesson24, Lesson25, Lesson26, Lesson27, Lesson28, Lesson29]
 const JUNIOR_LESSON_COMPONENTS = [null, JuniorLesson1, JuniorLesson2, JuniorLesson3, JuniorLesson4, JuniorLesson5, JuniorLesson6, JuniorLesson7, JuniorLesson8, JuniorLesson9, JuniorLesson10, JuniorLesson11, JuniorLesson12, JuniorLesson13, JuniorLesson14, JuniorLesson15, JuniorLesson16, JuniorLesson17, JuniorLesson18]
 
+// Treat ≥60s spent inside a lesson view as a completion signal for the
+// learning plan's "AI编程" module (moduleKey: ai_coding, unit: 课). Each
+// lesson counts at most once per day per track. Precise per-lesson signals
+// (quiz pass / final project reached) would require touching every Lesson*.jsx,
+// which is intentionally out of scope here.
+const LESSON_COMPLETION_THRESHOLD_MS = 60 * 1000
+
 const CODING_NOTES = [
   '启蒙部分负责让孩子不再怕 AI，创作部分负责让孩子真正入坑。',
   '课程页要更像"闯关做作品"，而不是一组单独知识点。',
@@ -82,6 +90,30 @@ function getLessonCardTheme(lessonId, track) {
 export default function Coding({ user }) {
   const [track, setTrack] = useState('tween')
   const [activeLesson, setActiveLesson] = useState(null)
+
+  useEffect(() => {
+    if (!activeLesson) return
+    const enteredAt = Date.now()
+    const lessonNum = activeLesson
+    const trackKey = track
+    return () => {
+      if (Date.now() - enteredAt < LESSON_COMPLETION_THRESHOLD_MS) return
+      const lessonId = `${trackKey}_${lessonNum}`
+      const today = new Date().toISOString().slice(0, 10)
+      const day = getActivityForDate(user?.uid, today)
+      const already = day.events.some(
+        e => e.type === 'coding_lesson_completed' && e.lessonId === lessonId
+      )
+      if (already) return
+      logActivity(user?.uid, {
+        type: 'coding_lesson_completed',
+        subject: '跨学科',
+        moduleKey: 'ai_coding',
+        count: 1,
+        lessonId,
+      })
+    }
+  }, [activeLesson, track, user?.uid])
 
   if (activeLesson) {
     const LessonComp = track === 'kids' ? JUNIOR_LESSON_COMPONENTS[activeLesson] : LESSON_COMPONENTS[activeLesson]
