@@ -2,9 +2,10 @@
   min-height: 100vh;
   padding: 0 0 72px;
   background:
-    radial-gradient(circle at top left, rgba(255, 154, 76, 0.18), transparent 24%),
-    radial-gradient(circle at top right, rgba(90, 172, 255, 0.16), transparent 28%),
-    linear-gradient(180deg, #fff9f1 0%, #f4f7ff 48%, #fff0dc 100%);
+    radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.18), transparent 18%),
+    radial-gradient(circle at 90% 12%, rgba(251, 191, 36, 0.16), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.16), transparent 24%),
+    linear-gradient(180deg, #12152a 0%, #181f3a 44%, #1b2140 100%);
 }
 
 .junior-back {
@@ -13,7 +14,7 @@
   gap: 6px;
   padding: 14px 16px 8px;
   font-size: 14px;
-  color: #2563eb;
+  color: #93c5fd;
   font-weight: 800;
   background: none;
   border: none;
@@ -24,7 +25,12 @@
   margin: 0 14px;
   padding: 20px 16px;
   border-radius: 28px;
-  box-shadow: 0 20px 40px rgba(74, 55, 39, 0.10);
+  box-shadow:
+    0 24px 50px rgba(2, 8, 23, 0.36),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
+  position: relative;
+  overflow: hidden;
 }
 
 .junior-badge {
@@ -34,6 +40,7 @@
   font-size: 12px;
   font-weight: 900;
   margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 .junior-hero-row {
@@ -49,25 +56,29 @@
   border-radius: 24px;
   display: grid;
   place-items: center;
-  background: rgba(255,255,255,0.66);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 16px 30px rgba(2,8,23,0.22);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
 .junior-emoji {
   font-size: 48px;
+  filter: drop-shadow(0 10px 22px rgba(255,255,255,0.10));
 }
 
 .junior-title {
   margin: 0;
   font-size: clamp(28px, 6vw, 40px);
   line-height: 1.06;
-  color: #22303b;
+  color: #f8fafc;
   font-weight: 900;
 }
 
 .junior-sub {
   margin: 6px 0 0;
-  color: #6a7280;
+  color: rgba(226, 232, 240, 0.82);
   font-size: 14px;
   font-weight: 700;
 }
@@ -79,13 +90,14 @@
 }
 
 .junior-goal {
-  background: rgba(255,255,255,0.88);
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.84), rgba(30, 41, 59, 0.68));
   border-radius: 18px;
   padding: 14px 14px;
   font-size: 14px;
-  color: #334155;
+  color: #e2e8f0;
   font-weight: 700;
-  box-shadow: 0 8px 18px rgba(73, 54, 36, 0.06);
+  box-shadow: 0 16px 30px rgba(2, 8, 23, 0.24);
+  border: 1px solid rgba(148,163,184,0.12);
 }
 
 .junior-tabs {
@@ -104,8 +116,8 @@
   padding: 0 14px;
   border-radius: 999px;
   border: 2px solid transparent;
-  background: rgba(255,255,255,0.75);
-  color: #4b5563;
+  background: rgba(15, 23, 42, 0.56);
+  color: #dbeafe;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
@@ -116,22 +128,23 @@
 }
 
 .junior-card {
-  background: rgba(255,255,255,0.92);
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.86), rgba(30, 41, 59, 0.70));
   border-radius: 24px;
   padding: 18px 16px;
-  box-shadow: 0 16px 32px rgba(73, 54, 36, 0.08);
+  box-shadow: 0 20px 38px rgba(2, 8, 23, 0.26);
   margin-bottom: 14px;
+  border: 1px solid rgba(148,163,184,0.14);
 }
 
 .junior-card h2,
 .junior-card h3 {
   margin: 0 0 10px;
-  color: #22303b;
+  color: #f8fafc;
 }
 
 .junior-card p {
   margin: 0;
-  color: #5b6471;
+  color: #dbe4ee;
   font-size: 14px;
   line-height: 1.7;
 }
@@ -146,10 +159,11 @@
 .junior-pill {
   padding: 8px 12px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #374151;
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
   font-size: 13px;
   font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .junior-action-btn,
@@ -187,14 +201,14 @@
 .junior-option-btn {
   padding: 14px 12px;
   border-radius: 18px;
-  background: #fff;
-  border: 2px solid #e5e7eb;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(148,163,184,0.14);
   display: grid;
   gap: 8px;
   place-items: center;
   font-size: 13px;
   font-weight: 800;
-  color: #334155;
+  color: #e2e8f0;
 }
 
 .junior-option-btn.active {
@@ -210,28 +224,29 @@
   margin-top: 14px;
   padding: 14px;
   border-radius: 18px;
-  background: #f8fafc;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(148,163,184,0.12);
 }
 
 .junior-result {
   margin-top: 16px;
   border-radius: 22px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96));
-  border: 2px dashed rgba(59,130,246,0.22);
+  background: linear-gradient(135deg, rgba(15,23,42,0.72), rgba(30,41,59,0.58));
+  border: 2px dashed rgba(125,211,252,0.22);
 }
 
 .junior-result-title {
   font-size: 15px;
   font-weight: 900;
-  color: #1f2937;
+  color: #f8fafc;
 }
 
 .junior-result-copy {
   margin-top: 8px;
   font-size: 14px;
   line-height: 1.7;
-  color: #475569;
+  color: #cbd5e1;
 }
 
 .robot-board {
@@ -246,15 +261,15 @@
 .robot-cell {
   aspect-ratio: 1;
   border-radius: 16px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.08);
   display: grid;
   place-items: center;
   font-size: 28px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid rgba(148,163,184,0.14);
 }
 
 .robot-cell.goal {
-  background: #fef3c7;
+  background: rgba(250, 204, 21, 0.22);
 }
 
 .command-row {
@@ -267,16 +282,16 @@
 .command-chip {
   padding: 10px 14px;
   border-radius: 999px;
-  background: #fff;
-  border: 2px solid #dbeafe;
-  color: #2563eb;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(125,211,252,0.16);
+  color: #93c5fd;
   font-size: 13px;
   font-weight: 900;
   cursor: pointer;
 }
 
 .command-chip.active {
-  background: #2563eb;
+  background: linear-gradient(135deg, #0ea5e9, #4f46e5);
   color: #fff;
 }
 
@@ -285,10 +300,11 @@
   min-height: 56px;
   padding: 10px 12px;
   border-radius: 16px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.12);
+  color: #bfdbfe;
   font-size: 14px;
   font-weight: 800;
+  border: 1px solid rgba(125,211,252,0.12);
 }
 
 .story-preview,
@@ -296,9 +312,9 @@
   margin-top: 16px;
   border-radius: 24px;
   overflow: hidden;
-  background: #fff;
+  background: rgba(15, 23, 42, 0.82);
   border: 2px solid rgba(148, 163, 184, 0.18);
-  box-shadow: 0 12px 28px rgba(73, 54, 36, 0.08);
+  box-shadow: 0 20px 40px rgba(2, 8, 23, 0.24);
 }
 
 .story-top,
@@ -310,7 +326,7 @@
 .story-body,
 .project-body {
   padding: 18px 16px;
-  background: #fff;
+  background: rgba(15, 23, 42, 0.86);
 }
 
 .sticker-row {
@@ -327,8 +343,8 @@
   display: grid;
   place-items: center;
   font-size: 28px;
-  background: #fff;
-  border: 2px solid #e5e7eb;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(148,163,184,0.16);
   cursor: pointer;
 }
 
@@ -342,8 +358,11 @@
   border-radius: 28px;
   padding: 18px;
   text-align: center;
-  background: linear-gradient(135deg, #1d4ed8, #7c3aed, #f97316);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 18%),
+    linear-gradient(135deg, #0f172a, #4338ca, #f97316);
   color: #fff;
+  box-shadow: 0 24px 48px rgba(30, 41, 59, 0.32);
 }
 
 .junior-certificate-emoji {

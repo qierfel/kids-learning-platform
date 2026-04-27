@@ -2,16 +2,46 @@
   min-height: 100%;
   padding: 20px 18px 72px;
   background:
-    radial-gradient(circle at top left, rgba(23, 140, 189, 0.14), transparent 24%),
-    radial-gradient(circle at top right, rgba(255, 152, 74, 0.16), transparent 26%),
-    linear-gradient(180deg, #f4f6f7 0%, #eef3f6 54%, #f7efdf 100%);
+    radial-gradient(circle at 12% 8%, rgba(59, 130, 246, 0.22), transparent 18%),
+    radial-gradient(circle at 88% 12%, rgba(249, 115, 22, 0.22), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.18), transparent 28%),
+    linear-gradient(180deg, #07111b 0%, #0c1724 34%, #111f2f 64%, #161b2c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.coding-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.35));
+  opacity: 0.26;
+}
+
+.coding-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(34, 211, 238, 0.12), transparent 16%),
+    radial-gradient(circle at 78% 68%, rgba(244, 114, 182, 0.10), transparent 18%);
+  filter: blur(18px);
 }
 
 .coding-hero,
 .coding-section,
 .coding-note-panel {
-  border: 1px solid rgba(38, 75, 88, 0.10);
-  box-shadow: 0 20px 58px rgba(31, 55, 63, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow:
+    0 24px 80px rgba(2, 8, 23, 0.42),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
 }
 
 .coding-hero {
@@ -21,8 +51,21 @@
   padding: 28px;
   border-radius: 30px;
   background:
-    radial-gradient(circle at top right, rgba(255, 164, 78, 0.18), transparent 26%),
-    linear-gradient(145deg, rgba(248, 252, 255, 0.98), rgba(233, 245, 249, 0.94) 56%, rgba(255, 244, 225, 0.95) 100%);
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.18), transparent 26%),
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 22%),
+    linear-gradient(145deg, rgba(12, 22, 38, 0.92), rgba(19, 33, 53, 0.88) 56%, rgba(26, 24, 48, 0.92) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.coding-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto -8% -34% 42%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.20), transparent 62%);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
 .coding-hero-copy {
@@ -35,25 +78,28 @@
   width: fit-content;
   padding: 8px 13px;
   border-radius: 999px;
-  background: rgba(33, 116, 146, 0.10);
-  color: #176b86;
+  background: rgba(34, 211, 238, 0.12);
+  color: #7dd3fc;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.07em;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .coding-hero-title {
   margin: 0;
-  color: #173442;
+  color: #eff6ff;
   font-size: clamp(32px, 5vw, 50px);
   line-height: 1.03;
   font-weight: 900;
   letter-spacing: -0.04em;
+  text-shadow: 0 0 24px rgba(56, 189, 248, 0.16);
 }
 
 .coding-hero-sub {
   max-width: 58ch;
-  color: #5d6870;
+  color: rgba(226, 232, 240, 0.86);
   font-size: 15px;
   line-height: 1.8;
   margin: 0;
@@ -75,19 +121,20 @@
   min-height: 42px;
   padding: 0 14px;
   border-radius: 999px;
-  border: 2px solid rgba(23, 107, 134, 0.14);
-  background: rgba(255,255,255,0.72);
-  color: #176b86;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: rgba(15, 23, 42, 0.54);
+  color: #bae6fd;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .coding-age-pill.active {
-  background: linear-gradient(135deg, #127c97, #1f5fd4);
+  background: linear-gradient(135deg, #0ea5e9, #4f46e5);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 14px 30px rgba(25, 102, 160, 0.20);
+  box-shadow: 0 16px 34px rgba(59, 130, 246, 0.30);
 }
 
 .coding-primary-btn,
@@ -101,15 +148,15 @@
 }
 
 .coding-primary-btn {
-  background: linear-gradient(135deg, #127c97, #1f5fd4);
+  background: linear-gradient(135deg, #06b6d4, #4f46e5);
   color: #fff;
-  box-shadow: 0 14px 30px rgba(25, 102, 160, 0.24);
+  box-shadow: 0 16px 34px rgba(59, 130, 246, 0.32);
 }
 
 .coding-secondary-btn {
-  background: rgba(255, 251, 245, 0.86);
-  color: #176b86;
-  border: 1px solid rgba(23, 107, 134, 0.14);
+  background: rgba(15, 23, 42, 0.58);
+  color: #dbeafe;
+  border: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .coding-primary-btn:hover,
@@ -127,8 +174,13 @@
   padding: 20px;
   border-radius: 24px;
   background:
-    linear-gradient(140deg, rgba(13, 101, 136, 0.96) 0%, rgba(27, 142, 164, 0.92) 52%, rgba(255, 159, 76, 0.90) 100%);
+    radial-gradient(circle at 18% 22%, rgba(255,255,255,0.16), transparent 18%),
+    linear-gradient(140deg, rgba(8, 47, 73, 0.96) 0%, rgba(29, 78, 216, 0.90) 48%, rgba(168, 85, 247, 0.84) 100%);
   color: #fff;
+  border: 1px solid rgba(125, 211, 252, 0.14);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.32),
+    inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .coding-highlight-label,
@@ -163,13 +215,13 @@
 .coding-mini-card {
   padding: 18px;
   border-radius: 22px;
-  background: rgba(255, 252, 248, 0.88);
-  border: 1px solid rgba(33, 72, 93, 0.08);
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.74), rgba(30, 41, 59, 0.62));
+  border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 .coding-mini-value {
   margin-top: 10px;
-  color: #173442;
+  color: #f8fafc;
   font-size: 18px;
   line-height: 1.4;
   font-weight: 900;
@@ -179,7 +231,7 @@
   margin-top: 20px;
   padding: 22px;
   border-radius: 28px;
-  background: rgba(252, 250, 246, 0.74);
+  background: linear-gradient(160deg, rgba(10, 17, 30, 0.76), rgba(20, 29, 46, 0.64));
 }
 
 .coding-section--notes {
@@ -194,7 +246,7 @@
 }
 
 .coding-section-title {
-  color: #1f3641;
+  color: #eef2ff;
   font-size: 25px;
   font-weight: 900;
   letter-spacing: -0.03em;
@@ -202,7 +254,7 @@
 
 .coding-section-subtitle {
   margin-top: 6px;
-  color: #68717a;
+  color: rgba(203, 213, 225, 0.74);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -216,17 +268,18 @@
 .coding-track-card {
   padding: 20px;
   border-radius: 24px;
-  border: 1px solid rgba(34, 76, 97, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .coding-track-card--intro {
-  background: linear-gradient(160deg, #fbfdff 0%, #eef7fb 100%);
+  background: linear-gradient(160deg, rgba(12, 35, 56, 0.88) 0%, rgba(13, 61, 82, 0.80) 100%);
 }
 
 .coding-track-card--build {
   background:
-    radial-gradient(circle at top right, rgba(255, 151, 64, 0.20), transparent 28%),
-    linear-gradient(160deg, #f8fdff 0%, #e8f7ff 52%, #fff4e2 100%);
+    radial-gradient(circle at top right, rgba(255, 151, 64, 0.22), transparent 28%),
+    linear-gradient(160deg, rgba(11, 29, 54, 0.88) 0%, rgba(16, 76, 119, 0.80) 52%, rgba(83, 32, 73, 0.74) 100%);
 }
 
 .coding-track-card--advanced {
@@ -263,22 +316,23 @@
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(18, 124, 151, 0.10);
-  color: #176b86;
+  background: rgba(125, 211, 252, 0.10);
+  color: #7dd3fc;
   font-size: 12px;
   font-weight: 800;
+  border: 1px solid rgba(125, 211, 252, 0.16);
 }
 
 .coding-track-title {
   margin-top: 14px;
-  color: #193542;
+  color: #f8fafc;
   font-size: 24px;
   font-weight: 900;
 }
 
 .coding-track-desc {
   margin-top: 8px;
-  color: #69737b;
+  color: rgba(203, 213, 225, 0.80);
   font-size: 14px;
   line-height: 1.75;
 }
@@ -288,10 +342,11 @@
   min-height: 44px;
   padding: 0 16px;
   border-radius: 14px;
-  background: #193f56;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.94), rgba(79, 70, 229, 0.94));
   color: #fff;
   font-size: 13px;
   font-weight: 800;
+  box-shadow: 0 14px 28px rgba(59, 130, 246, 0.22);
 }
 
 .coding-lesson-list {
@@ -312,12 +367,18 @@
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
   text-align: left;
-  border: 1px solid rgba(38, 75, 88, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background-blend-mode: screen;
+  box-shadow:
+    0 18px 32px rgba(2, 8, 23, 0.24),
+    inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .coding-lesson-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(31, 55, 63, 0.10);
+  box-shadow:
+    0 20px 44px rgba(15, 23, 42, 0.34),
+    0 0 0 1px rgba(255,255,255,0.06);
 }
 
 .coding-lesson-leading {
@@ -332,10 +393,11 @@
   font-size: 11px;
   font-weight: 800;
   color: var(--lesson-color);
-  background: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.84);
   padding: 4px 9px;
   border-radius: 999px;
   border: 1px solid var(--lesson-color);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
 }
 
 .coding-lesson-emoji {
@@ -351,21 +413,21 @@
 }
 
 .coding-lesson-title {
-  color: #183340;
+  color: #f8fafc;
   font-size: 20px;
   font-weight: 900;
 }
 
 .coding-lesson-time {
   flex-shrink: 0;
-  color: #5e6b75;
+  color: rgba(226, 232, 240, 0.68);
   font-size: 12px;
   font-weight: 700;
 }
 
 .coding-lesson-sub {
   margin-top: 6px;
-  color: #6c757b;
+  color: rgba(226, 232, 240, 0.74);
   font-size: 13px;
 }
 
@@ -379,10 +441,11 @@
 .coding-goal-pill {
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.72);
-  color: #3e525d;
+  background: rgba(255,255,255,0.10);
+  color: #e2e8f0;
   font-size: 12px;
   font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
 .coding-lesson-arrow {
@@ -395,8 +458,11 @@
   margin-top: 20px;
   padding: 20px 22px;
   border-radius: 28px;
-  background: linear-gradient(135deg, rgba(15, 93, 121, 0.96), rgba(18, 66, 99, 0.96));
+  background:
+    radial-gradient(circle at 18% 24%, rgba(125, 211, 252, 0.14), transparent 18%),
+    linear-gradient(135deg, rgba(10, 34, 58, 0.96), rgba(22, 24, 58, 0.96));
   color: #fdf8f1;
+  border: 1px solid rgba(125, 211, 252, 0.14);
 }
 
 .coding-note-title {
@@ -415,8 +481,8 @@
   min-height: 92px;
   padding: 14px;
   border-radius: 18px;
-  background: rgba(255, 251, 244, 0.08);
-  border: 1px solid rgba(255, 247, 234, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   color: rgba(255, 251, 246, 0.92);
   font-size: 13px;
   line-height: 1.7;
