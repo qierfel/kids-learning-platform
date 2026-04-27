@@ -37,11 +37,18 @@ const QUIZ = [
   },
 ]
 
+const IMPROVE_OPTIONS = [
+  { id: 'more-data', label: '再找更多训练数据', reason: '让 AI 看过更多例子，不容易只记住少数样本。' },
+  { id: 'better-labels', label: '把标签检查得更准', reason: '标签错了，AI 学到的规律也会跟着歪掉。' },
+  { id: 'split-test', label: '训练集和测试集分开', reason: '这样才能真的看出 AI 有没有学会，不是只会背答案。' },
+]
+
 export default function Lesson3({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [rules, setRules] = useState({ hasLegs: null, canFly: null, hasFur: null, isBig: null })
   const [trainPhase, setTrainPhase] = useState('setup') // setup | training | testing | done
   const [testResults, setTestResults] = useState([])
+  const [improve, setImprove] = useState(IMPROVE_OPTIONS[0])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -104,7 +111,7 @@ export default function Lesson3({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['play', '🤖 训练AI'], ['quiz', '✅ 测一测']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['play', '🤖 训练AI'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button key={id} className={`lesson-tab ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -288,6 +295,39 @@ export default function Lesson3({ onBack }) {
                 </button>
               </div>
             )}
+
+            <div className="lesson-card" style={{ marginTop: '18px' }}>
+              <div className="lesson-section-title">🛠️ 第二任务：你会怎么把它训得更好？</div>
+              <p className="lesson-text">真的训练 AI，不是跑一次就结束，还要知道下一步该改哪里。</p>
+              <div className="example-grid">
+                {IMPROVE_OPTIONS.map((item) => (
+                  <button key={item.id} className="quiz-option" style={{ background: improve.id === item.id ? '#dcfce7' : undefined }} onClick={() => setImprove(item)}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <div className="lesson-tip">
+                你选的升级方案：<strong>{improve.label}</strong>。因为：{improve.reason}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 让 AI 帮你看训练过程</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合问 AI 的，不是“答案是什么”，而是“为什么这样训练不够好”。</p>
+              <div className="lesson-tip">
+                可以这样问：<br />
+                `我正在做一个动物分类器。我现在用了这些规则：有腿、会飞、有毛、体型大。请你告诉我，这样的训练为什么还可能不够准？`
+              </div>
+              <div className="lesson-think">
+                继续追问：`如果测试集表现不好，我应该先改数据、改标签，还是改规则？为什么？`
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -336,6 +376,23 @@ export default function Lesson3({ onBack }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完这一课，你应该能自己讲清楚一次最小的训练流程。</p>
+              <div className="lesson-highlight">
+                我先用训练集让 AI 学规则，再用测试集检验它是不是真的学会了。如果效果不好，我会优先：<strong>{improve.label}</strong>。
+              </div>
+              <div className="lesson-tip">
+                如果你能把“训练 → 测试 → 改进”这 3 步顺下来讲出来，就说明你已经开始有 AI 工程师的思路了。
+              </div>
+            </div>
           </div>
         </div>
       )}

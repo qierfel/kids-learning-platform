@@ -43,10 +43,17 @@ const QUIZ = [
   },
 ]
 
+const BUILD_TARGETS = ['做识别猫狗的 AI', '做推荐音乐的 AI', '做判断天气的 AI']
+const BUILD_DATA = ['很多图片', '很多听歌记录', '很多天气数据']
+const BUILD_LABELS = ['这是什么', '这个人喜欢什么', '这是晴天还是雨天']
+
 export default function Lesson2({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [placed, setPlaced] = useState({}) // { itemIdx: category }
   const [checked, setChecked] = useState(false)
+  const [target, setTarget] = useState(BUILD_TARGETS[0])
+  const [dataChoice, setDataChoice] = useState(BUILD_DATA[0])
+  const [labelChoice, setLabelChoice] = useState(BUILD_LABELS[0])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -103,7 +110,7 @@ export default function Lesson2({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['play', '🏷️ 给数据贴标签'], ['quiz', '✅ 测一测']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['play', '🏷️ 给数据贴标签'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button key={id} className={`lesson-tab ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -291,6 +298,53 @@ export default function Lesson2({ onBack }) {
                 <button className="sort-reset-btn" onClick={() => { setPlaced({}); setChecked(false) }}>重新标注</button>
               </div>
             )}
+
+            <div className="lesson-card" style={{ marginTop: '18px' }}>
+              <div className="lesson-section-title">🧩 第二任务：给一个 AI 配齐数据</div>
+              <p className="lesson-text">现在你来决定：想做什么 AI、要喂它什么数据、还要贴什么标签。</p>
+              <div className="example-grid">
+                {BUILD_TARGETS.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: target === item ? '#dbeafe' : undefined }} onClick={() => setTarget(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {BUILD_DATA.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: dataChoice === item ? '#dcfce7' : undefined }} onClick={() => setDataChoice(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {BUILD_LABELS.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: labelChoice === item ? '#fef3c7' : undefined }} onClick={() => setLabelChoice(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="lesson-tip">
+                你的数据集方案：为了<strong>{target}</strong>，我要准备<strong>{dataChoice}</strong>，并告诉 AI：<strong>{labelChoice}</strong>。
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 让 AI 帮你补齐数据方案</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合让 AI 帮你做两件事：解释“为什么需要这种数据”，以及“还缺什么标签”。</p>
+              <div className="lesson-tip">
+                可以这样问：<br />
+                `我想 {target}。我目前想到的数据是 {dataChoice}，标签是 {labelChoice}。请告诉我这样够不够，还缺什么。`
+              </div>
+              <div className="lesson-think">
+                如果 AI 说“数据不够”，你可以继续追问：`还要再补哪几类例子，AI 才不会学偏？`
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -346,6 +400,23 @@ export default function Lesson2({ onBack }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完这一课，你应该能自己说清楚一个最小的数据集方案。</p>
+              <div className="lesson-highlight">
+                为了<strong>{target}</strong>，我要准备<strong>{dataChoice}</strong>，并给数据贴上<strong>{labelChoice}</strong>这样的标签。
+              </div>
+              <div className="lesson-tip">
+                如果你能把“目标 + 数据 + 标签”三件事一起讲清楚，就说明你已经不只是知道“数据重要”，而是开始会设计数据了。
+              </div>
+            </div>
           </div>
         </div>
       )}

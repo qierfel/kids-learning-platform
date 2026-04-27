@@ -33,9 +33,18 @@ const QUIZ = [
   },
 ]
 
+const AI_BUILD_OPTIONS = {
+  sense: ['看图片', '听声音', '读文字'],
+  data: ['很多照片', '很多录音', '很多聊天记录'],
+  task: ['认出是什么', '判断心情', '给出推荐'],
+}
+
 export default function Lesson1({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [answers, setAnswers] = useState({}) // { idx: true/false }
+  const [sense, setSense] = useState(AI_BUILD_OPTIONS.sense[0])
+  const [dataType, setDataType] = useState(AI_BUILD_OPTIONS.data[0])
+  const [task, setTask] = useState(AI_BUILD_OPTIONS.task[0])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -85,7 +94,7 @@ export default function Lesson1({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['play', '🎮 玩一玩'], ['quiz', '✅ 测一测']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['play', '🎮 做一做'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button
             key={id}
             className={`lesson-tab ${tab === id ? 'active' : ''}`}
@@ -245,7 +254,65 @@ export default function Lesson1({ onBack }) {
               )}
             </div>
           </div>
+
+          <div className="lesson-section">
+            <div className="lesson-section-title">🧪 第二任务：拼一个 AI 点子</div>
+            <div className="lesson-card">
+              <p className="lesson-text">
+                现在你来当小产品设计师。给 AI 选一种“看/听/读”的能力、准备一类数据，再决定它要帮人做什么。
+              </p>
+
+              <div className="lesson-highlight">今天不只是认识 AI，还要拼出一个你自己的 AI 小点子。</div>
+
+              <div className="example-grid">
+                {AI_BUILD_OPTIONS.sense.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: sense === item ? '#dbeafe' : undefined }} onClick={() => setSense(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {AI_BUILD_OPTIONS.data.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: dataType === item ? '#dcfce7' : undefined }} onClick={() => setDataType(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {AI_BUILD_OPTIONS.task.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: task === item ? '#fef3c7' : undefined }} onClick={() => setTask(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+
+              <div className="lesson-tip">
+                你的 AI 点子：它会<strong>{sense}</strong>，通过学习<strong>{dataType}</strong>，最后帮助人们<strong>{task}</strong>。
+              </div>
+            </div>
+          </div>
         </>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 这节课怎么问 AI 更有用</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合让 AI 帮你做 3 件事：判断一个东西是不是 AI、解释为什么、帮你扩展成新的点子。</p>
+              <div className="lesson-highlight">
+                先自己猜，再让 AI 解释原因，学习效果最好。
+              </div>
+              <div className="lesson-tip">
+                可以直接这样问：<br />
+                `我在学“认识 AI”。请判断下面这些东西哪些用了 AI，并用 10 岁小朋友能懂的话解释原因：音乐推荐、人脸解锁、普通闹钟。`
+              </div>
+              <div className="lesson-think">
+                也可以继续追问：`如果我想做一个会 {sense} 的 AI，它最需要什么数据？`
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── 测一测 ── */}
@@ -307,6 +374,23 @@ export default function Lesson1({ onBack }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完这一课，你不只是知道“AI 是什么”，还应该能说出一个你自己的 AI 点子。</p>
+              <div className="lesson-tip">
+                我的 AI 点子：它会<strong>{sense}</strong>，学习<strong>{dataType}</strong>，最后帮助人们<strong>{task}</strong>。
+              </div>
+              <div className="lesson-highlight">
+                如果你能把这句话完整讲出来，就说明你已经从“认识 AI”走到“开始想做 AI 了”。
+              </div>
+            </div>
           </div>
         </div>
       )}
