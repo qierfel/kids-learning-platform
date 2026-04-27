@@ -59,6 +59,20 @@ const CODING_NOTES = [
   '手机适合快速继续进度，iPad 更适合完整做一课，电脑更适合作品展示与家长陪学。',
 ]
 
+function getLessonCardTheme(lessonId, track) {
+  if (track === 'kids') {
+    if (lessonId <= 6) return { accent: '#7dd3fc', bg: 'linear-gradient(135deg, rgba(12, 28, 54, 0.92), rgba(18, 74, 98, 0.82))' }
+    if (lessonId <= 12) return { accent: '#f9a8d4', bg: 'linear-gradient(135deg, rgba(22, 22, 52, 0.92), rgba(88, 28, 84, 0.80))' }
+    return { accent: '#86efac', bg: 'linear-gradient(135deg, rgba(13, 32, 39, 0.92), rgba(19, 78, 74, 0.82))' }
+  }
+
+  if (lessonId <= 6) return { accent: '#7dd3fc', bg: 'linear-gradient(135deg, rgba(9, 27, 46, 0.94), rgba(14, 63, 86, 0.82))' }
+  if (lessonId <= 12) return { accent: '#f9a8d4', bg: 'linear-gradient(135deg, rgba(23, 24, 54, 0.94), rgba(91, 33, 95, 0.80))' }
+  if (lessonId <= 17) return { accent: '#c4b5fd', bg: 'linear-gradient(135deg, rgba(24, 26, 62, 0.94), rgba(55, 48, 163, 0.80))' }
+  if (lessonId <= 23) return { accent: '#86efac', bg: 'linear-gradient(135deg, rgba(12, 31, 38, 0.94), rgba(20, 83, 45, 0.82))' }
+  return { accent: '#fdba74', bg: 'linear-gradient(135deg, rgba(40, 23, 18, 0.94), rgba(124, 45, 18, 0.82))' }
+}
+
 export default function Coding({ user }) {
   const [track, setTrack] = useState('tween')
   const [activeLesson, setActiveLesson] = useState(null)
@@ -234,11 +248,13 @@ export default function Coding({ user }) {
         </div>
 
         <div className="coding-lesson-list">
-          {lessons.map((lesson) => (
+          {lessons.map((lesson) => {
+            const theme = getLessonCardTheme(lesson.id, track)
+            return (
             <button
               key={lesson.id}
               className="coding-lesson-card"
-              style={{ '--lesson-color': lesson.color, background: lesson.bg }}
+              style={{ '--lesson-color': theme.accent, background: theme.bg }}
               onClick={() => setActiveLesson(lesson.id)}
             >
               <div className="coding-lesson-leading">
@@ -261,7 +277,7 @@ export default function Coding({ user }) {
 
               <div className="coding-lesson-arrow">→</div>
             </button>
-          ))}
+          )})}
         </div>
       </section>
 
