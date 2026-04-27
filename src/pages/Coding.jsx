@@ -49,6 +49,7 @@ import JuniorLesson15 from './coding-kids/JuniorLesson15'
 import JuniorLesson16 from './coding-kids/JuniorLesson16'
 import JuniorLesson17 from './coding-kids/JuniorLesson17'
 import JuniorLesson18 from './coding-kids/JuniorLesson18'
+import LessonNav from './coding/LessonNav'
 import './Coding.css'
 
 const LESSON_COMPONENTS = [null, Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7, Lesson8, Lesson9, Lesson10, Lesson11, Lesson12, Lesson13, Lesson14, Lesson15, Lesson16, Lesson17, Lesson18, Lesson19, Lesson20, Lesson21, Lesson22, Lesson23, Lesson24, Lesson25, Lesson26, Lesson27, Lesson28, Lesson29]
@@ -117,7 +118,21 @@ export default function Coding({ user }) {
 
   if (activeLesson) {
     const LessonComp = track === 'kids' ? JUNIOR_LESSON_COMPONENTS[activeLesson] : LESSON_COMPONENTS[activeLesson]
-    return <LessonComp onBack={() => setActiveLesson(null)} user={user} />
+    const navLessons = track === 'kids' ? codingJuniorLessons : codingLessons
+    return (
+      <div className="lesson-shell">
+        <LessonComp onBack={() => setActiveLesson(null)} user={user} />
+        <LessonNav
+          lessons={navLessons}
+          currentId={activeLesson}
+          track={track}
+          onJump={(id) => {
+            setActiveLesson(id)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        />
+      </div>
+    )
   }
 
   const isKids = track === 'kids'
