@@ -125,6 +125,7 @@ export default function Coding({ user }) {
 
         <div className="coding-hero-side">
           <div className="coding-mascot-card" aria-hidden="true">
+            <div className="coding-mascot-grid" />
             <div className="coding-mascot-orbit coding-mascot-orbit--one" />
             <div className="coding-mascot-orbit coding-mascot-orbit--two" />
             <div className="coding-mascot-spark coding-mascot-spark--one" />
@@ -132,11 +133,14 @@ export default function Coding({ user }) {
             <div className="coding-mascot-spark coding-mascot-spark--three" />
             <div className="coding-mascot-stage">
               <div className="coding-mascot-shadow" />
+              <div className="coding-mascot-dock" />
               <div className="coding-mascot-bot">
+                <div className="coding-mascot-halo" />
                 <div className="coding-mascot-antenna">
                   <span className="coding-mascot-antenna-dot" />
                 </div>
                 <div className="coding-mascot-head">
+                  <div className="coding-mascot-head-cap" />
                   <div className="coding-mascot-face">
                     <span className="coding-mascot-eye coding-mascot-eye--left" />
                     <span className="coding-mascot-eye coding-mascot-eye--right" />
@@ -145,31 +149,41 @@ export default function Coding({ user }) {
                 </div>
                 <div className="coding-mascot-body">
                   <span className="coding-mascot-core" />
+                  <span className="coding-mascot-panel-dot coding-mascot-panel-dot--one" />
+                  <span className="coding-mascot-panel-dot coding-mascot-panel-dot--two" />
                   <span className="coding-mascot-arm coding-mascot-arm--left" />
                   <span className="coding-mascot-arm coding-mascot-arm--right" />
+                  <span className="coding-mascot-leg coding-mascot-leg--left" />
+                  <span className="coding-mascot-leg coding-mascot-leg--right" />
                 </div>
               </div>
-              <div className="coding-mascot-chip coding-mascot-chip--left">AI</div>
-              <div className="coding-mascot-chip coding-mascot-chip--right">GO</div>
+              <div className="coding-mascot-bubble coding-mascot-bubble--left">HELLO</div>
+              <div className="coding-mascot-bubble coding-mascot-bubble--right">BUILD</div>
+              <div className="coding-mascot-status">
+                <div className="coding-mascot-status-label">AI Buddy</div>
+                <div className="coding-mascot-status-text">Ready To Make Cool Stuff</div>
+              </div>
             </div>
           </div>
-          <div className="coding-highlight-card">
-            <div className="coding-highlight-label">推荐路线</div>
-            <div className="coding-highlight-title">{isKids ? '先会回应，再会做作品，再摸到真工具' : '先启蒙，再做项目'}</div>
-            <div className="coding-highlight-text">
-              {isKids
-                ? '这一条线更适合小童：先通过顺序、颜色、选择和故事感建立控制感，再快速过渡到按钮、输入和小工具。'
-                : '前 1-6 课建立 AI 认知，7-12 课开始进入网页和交互创作。'}
+          <div className="coding-side-panels">
+            <div className="coding-highlight-card">
+              <div className="coding-highlight-label">推荐路线</div>
+              <div className="coding-highlight-title">{isKids ? '先会回应，再会做作品，再摸到真工具' : '先启蒙，再做项目'}</div>
+              <div className="coding-highlight-text">
+                {isKids
+                  ? '这一条线更适合小童：先通过顺序、颜色、选择和故事感建立控制感，再快速过渡到按钮、输入和小工具。'
+                  : '前 1-6 课建立 AI 认知，7-12 课开始进入网页和交互创作。'}
+              </div>
             </div>
-          </div>
-          <div className="coding-mini-stats">
-            <div className="coding-mini-card">
-              <div className="coding-mini-label">课程数量</div>
-              <div className="coding-mini-value">{lessons.length} 节</div>
-            </div>
-            <div className="coding-mini-card">
-              <div className="coding-mini-label">主要年龄</div>
-              <div className="coding-mini-value">{isKids ? '7-10 岁' : '10-12 岁'}</div>
+            <div className="coding-mini-stats">
+              <div className="coding-mini-card">
+                <div className="coding-mini-label">课程数量</div>
+                <div className="coding-mini-value">{lessons.length} 节</div>
+              </div>
+              <div className="coding-mini-card">
+                <div className="coding-mini-label">主要年龄</div>
+                <div className="coding-mini-value">{isKids ? '7-10 岁' : '10-12 岁'}</div>
+              </div>
             </div>
           </div>
         </div>
