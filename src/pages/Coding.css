@@ -259,6 +259,11 @@
   line-height: 1.7;
 }
 
+.coding-section-subtitle--accent {
+  color: #a5f3fc;
+  font-weight: 700;
+}
+
 .coding-track-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -266,10 +271,47 @@
 }
 
 .coding-track-card {
+  position: relative;
+  overflow: hidden;
   padding: 20px;
   border-radius: 24px;
   border: 1px solid rgba(148, 163, 184, 0.14);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  isolation: isolate;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+}
+
+.coding-track-card::before {
+  content: '';
+  position: absolute;
+  inset: auto -10% -32% 40%;
+  height: 140px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 64%);
+  filter: blur(14px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.coding-track-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(130deg, rgba(255,255,255,0.10), transparent 22%),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: auto, 22px 22px, 22px 22px;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.coding-track-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(125, 211, 252, 0.28);
+  box-shadow:
+    0 22px 42px rgba(2, 8, 23, 0.34),
+    inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .coding-track-card--intro {
@@ -369,9 +411,22 @@
   text-align: left;
   border: 1px solid rgba(148, 163, 184, 0.14);
   background-blend-mode: screen;
+  position: relative;
+  overflow: hidden;
   box-shadow:
     0 18px 32px rgba(2, 8, 23, 0.24),
     inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.coding-lesson-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,0.12), transparent 18%, transparent 76%, rgba(255,255,255,0.10)),
+    radial-gradient(circle at 100% 0%, rgba(255,255,255,0.20), transparent 24%);
+  opacity: 0.36;
+  pointer-events: none;
 }
 
 .coding-lesson-card:hover {
@@ -387,6 +442,8 @@
   align-items: center;
   gap: 8px;
   min-width: 72px;
+  position: relative;
+  z-index: 1;
 }
 
 .coding-lesson-num {
@@ -403,6 +460,8 @@
 .coding-lesson-emoji {
   font-size: 36px;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.10));
+  transform: translateZ(0);
+  animation: codingFloat 4.4s ease-in-out infinite;
 }
 
 .coding-lesson-title-row {
@@ -418,17 +477,35 @@
   font-weight: 900;
 }
 
+.coding-lesson-stage {
+  width: fit-content;
+  margin-bottom: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.26);
+  color: color-mix(in srgb, var(--lesson-color) 72%, white);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(255,255,255,0.10);
+  text-transform: uppercase;
+}
+
 .coding-lesson-time {
   flex-shrink: 0;
   color: rgba(226, 232, 240, 0.68);
   font-size: 12px;
   font-weight: 700;
+  position: relative;
+  z-index: 1;
 }
 
 .coding-lesson-sub {
   margin-top: 6px;
   color: rgba(226, 232, 240, 0.74);
   font-size: 13px;
+  position: relative;
+  z-index: 1;
 }
 
 .coding-lesson-goals {
@@ -436,6 +513,8 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .coding-goal-pill {
@@ -452,6 +531,8 @@
   color: var(--lesson-color);
   font-size: 24px;
   font-weight: 900;
+  position: relative;
+  z-index: 1;
 }
 
 .coding-note-panel {
@@ -486,6 +567,11 @@
   color: rgba(255, 251, 246, 0.92);
   font-size: 13px;
   line-height: 1.7;
+}
+
+@keyframes codingFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 @media (max-width: 980px) {
@@ -542,6 +628,7 @@
   .coding-lesson-card {
     grid-template-columns: 1fr;
     gap: 12px;
+    padding: 16px 14px;
   }
 
   .coding-lesson-leading {
@@ -549,6 +636,10 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+  }
+
+  .coding-lesson-emoji {
+    font-size: 30px;
   }
 
   .coding-lesson-title-row {

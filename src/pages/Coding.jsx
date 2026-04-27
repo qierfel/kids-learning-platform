@@ -59,6 +59,12 @@ const CODING_NOTES = [
   '手机适合快速继续进度，iPad 更适合完整做一课，电脑更适合作品展示与家长陪学。',
 ]
 
+const KIDS_NOTES = [
+  '前面先让孩子一按就有回应，后面要尽快进入“我能做一个自己的东西”。',
+  '7-10 岁不是一直停留在可爱小游戏，而是要顺着台阶走到输入框、按钮、结果和小工具。',
+  '每一课都应该像一个迷你创作实验，少一点说明，多一点变化、反馈和展示。',
+]
+
 function getLessonCardTheme(lessonId, track) {
   if (track === 'kids') {
     if (lessonId <= 6) return { accent: '#7dd3fc', bg: 'linear-gradient(135deg, rgba(12, 28, 54, 0.92), rgba(18, 74, 98, 0.82))' }
@@ -93,7 +99,7 @@ export default function Coding({ user }) {
           <h1 className="coding-hero-title">{isKids ? 'AI 小创作乐园' : 'AI 编程创作屋'}</h1>
           <p className="coding-hero-sub">
             {isKids
-              ? '给 7-10 岁孩子的 AI 创作入口。少一点字，多一点图、多一点动手，先把"会玩"变成"会做"。'
+              ? '给 7-10 岁孩子的 AI 创作入口。先让页面会回应，再让作品会长出来，最后把孩子轻轻带到真实工具和开发感觉面前。'
               : '这里不是只认识 AI，而是一步步把想法做成网页、小工具和可以展示的作品。'}
           </p>
 
@@ -106,7 +112,7 @@ export default function Coding({ user }) {
             {isKids ? (
               <>
                 <button className="coding-primary-btn" onClick={() => setActiveLesson(1)}>从第 1 课开始玩</button>
-                <button className="coding-secondary-btn" onClick={() => setActiveLesson(6)}>先看看最后作品</button>
+                <button className="coding-secondary-btn" onClick={() => setActiveLesson(13)}>直接看看工具课</button>
               </>
             ) : (
               <>
@@ -120,10 +126,10 @@ export default function Coding({ user }) {
         <div className="coding-hero-side">
           <div className="coding-highlight-card">
             <div className="coding-highlight-label">推荐路线</div>
-            <div className="coding-highlight-title">{isKids ? '先玩图形，再做小作品' : '先启蒙，再做项目'}</div>
+            <div className="coding-highlight-title">{isKids ? '先会回应，再会做作品，再摸到真工具' : '先启蒙，再做项目'}</div>
             <div className="coding-highlight-text">
               {isKids
-                ? '这一条线更适合小童：一课一个小互动，先认识顺序、选择、颜色和故事页面。'
+                ? '这一条线更适合小童：先通过顺序、颜色、选择和故事感建立控制感，再快速过渡到按钮、输入和小工具。'
                 : '前 1-6 课建立 AI 认知，7-12 课开始进入网页和交互创作。'}
             </div>
           </div>
@@ -149,6 +155,11 @@ export default function Coding({ user }) {
                 ? '小童版不追求讲太多概念，而是让孩子一边点、一边选、一边看到结果。'
                 : '把课程分成两段来看，会更容易理解这条路径为什么能把孩子带入创作状态。'}
             </p>
+            {isKids && (
+              <p className="coding-section-subtitle coding-section-subtitle--accent">
+                这条线不是一直“玩小游戏”，而是按四段升级：会回应 → 会做作品 → 会升级展示 → 会碰到真工具。
+              </p>
+            )}
           </div>
         </div>
 
@@ -156,27 +167,27 @@ export default function Coding({ user }) {
           {isKids ? (
             <>
               <div className="coding-track-card coding-track-card--intro">
-                <div className="coding-track-tag">第一段</div>
-                <div className="coding-track-title">先会玩</div>
-                <p className="coding-track-desc">机器人、颜色、如果就会怎样，这几课先把"程序会回应我"变得很直观。</p>
+                <div className="coding-track-tag">启动舱 · 第 1-3 课</div>
+                <div className="coding-track-title">先会回应</div>
+                <p className="coding-track-desc">机器人、颜色、如果就会怎样，这几课先把“程序会回应我”变得很直观。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(1)}>从第 1 课开始</button>
               </div>
               <div className="coding-track-card coding-track-card--build">
-                <div className="coding-track-tag">第二段</div>
-                <div className="coding-track-title">再会做</div>
-                <p className="coding-track-desc">把故事、选择和风格拼起来，做出一个可爱的小作品。</p>
+                <div className="coding-track-tag">创作舱 · 第 4-6 课</div>
+                <div className="coding-track-title">再会拼作品</div>
+                <p className="coding-track-desc">把故事、选择和风格拼起来，第一次做出“这是我做的”那种感觉。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(4)}>从第 4 课开始</button>
               </div>
-              <div className="coding-track-card coding-track-card--build">
-                <div className="coding-track-tag">第三段</div>
-                <div className="coding-track-title">会展示</div>
-                <p className="coding-track-desc">后半段开始做按钮变化、表情切换、双场景故事，再把作品整理出来。</p>
+              <div className="coding-track-card coding-track-card--advanced">
+                <div className="coding-track-tag">升级舱 · 第 7-12 课</div>
+                <div className="coding-track-title">会升级会展示</div>
+                <p className="coding-track-desc">按钮变化、表情切换、双场景故事、请 AI 帮忙，让作品开始像真的创作项目。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(7)}>从第 7 课开始</button>
               </div>
-              <div className="coding-track-card coding-track-card--build">
-                <div className="coding-track-tag">第四段</div>
-                <div className="coding-track-title">做小工具</div>
-                <p className="coding-track-desc">继续往后会认识输入框、欢迎语、小工具和毕业作品升级，形成完整 18 课。</p>
+              <div className="coding-track-card coding-track-card--tools">
+                <div className="coding-track-tag">工具舱 · 第 13-18 课</div>
+                <div className="coding-track-title">开始碰真工具</div>
+                <p className="coding-track-desc">输入框、欢迎语、小工具、作品 2.0 和毕业展，让逻辑好的孩子可以提前摸到真实开发场景。</p>
                 <button className="coding-track-btn" onClick={() => setActiveLesson(13)}>从第 13 课开始</button>
               </div>
             </>
@@ -264,7 +275,10 @@ export default function Coding({ user }) {
 
               <div className="coding-lesson-info">
                 <div className="coding-lesson-title-row">
-                  <div className="coding-lesson-title">{lesson.title}</div>
+                  <div>
+                    {lesson.stage && <div className="coding-lesson-stage">{lesson.stage}</div>}
+                    <div className="coding-lesson-title">{lesson.title}</div>
+                  </div>
                   <span className="coding-lesson-time">⏱ {lesson.duration}</span>
                 </div>
                 <div className="coding-lesson-sub">{lesson.subtitle}</div>
@@ -285,11 +299,7 @@ export default function Coding({ user }) {
         <div className="coding-note-panel">
           <div className="coding-note-title">{isKids ? '小童版设计重点' : '这个专区现在在往哪里走'}</div>
           <div className="coding-note-grid">
-            {(isKids ? [
-              '7-10 岁先不压太多文字，优先让孩子点一下就看见变化。',
-              '页面更像"故事和小游戏工厂"，而不是一节节技术说明。',
-              '手机和平板上都要舒服，家长陪着看时也能一眼懂在做什么。',
-            ] : CODING_NOTES).map((note) => (
+            {(isKids ? KIDS_NOTES : CODING_NOTES).map((note) => (
               <div key={note} className="coding-note-item">{note}</div>
             ))}
           </div>
