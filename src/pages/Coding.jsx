@@ -124,6 +124,35 @@ export default function Coding({ user }) {
         </div>
 
         <div className="coding-hero-side">
+          <div className="coding-mascot-card" aria-hidden="true">
+            <div className="coding-mascot-orbit coding-mascot-orbit--one" />
+            <div className="coding-mascot-orbit coding-mascot-orbit--two" />
+            <div className="coding-mascot-spark coding-mascot-spark--one" />
+            <div className="coding-mascot-spark coding-mascot-spark--two" />
+            <div className="coding-mascot-spark coding-mascot-spark--three" />
+            <div className="coding-mascot-stage">
+              <div className="coding-mascot-shadow" />
+              <div className="coding-mascot-bot">
+                <div className="coding-mascot-antenna">
+                  <span className="coding-mascot-antenna-dot" />
+                </div>
+                <div className="coding-mascot-head">
+                  <div className="coding-mascot-face">
+                    <span className="coding-mascot-eye coding-mascot-eye--left" />
+                    <span className="coding-mascot-eye coding-mascot-eye--right" />
+                    <span className="coding-mascot-mouth" />
+                  </div>
+                </div>
+                <div className="coding-mascot-body">
+                  <span className="coding-mascot-core" />
+                  <span className="coding-mascot-arm coding-mascot-arm--left" />
+                  <span className="coding-mascot-arm coding-mascot-arm--right" />
+                </div>
+              </div>
+              <div className="coding-mascot-chip coding-mascot-chip--left">AI</div>
+              <div className="coding-mascot-chip coding-mascot-chip--right">GO</div>
+            </div>
+          </div>
           <div className="coding-highlight-card">
             <div className="coding-highlight-label">推荐路线</div>
             <div className="coding-highlight-title">{isKids ? '先会回应，再会做作品，再摸到真工具' : '先启蒙，再做项目'}</div>
