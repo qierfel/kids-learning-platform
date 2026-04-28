@@ -48,10 +48,15 @@ const QUIZ = [
   },
 ]
 
+const PROMPT_SCENES = ['写一句开心日记', '写一句失望评论', '写一句中性通知']
+const PROMPT_STYLES = ['更温暖一点', '更正式一点', '更像同学说的话']
+
 export default function Lesson4({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [text, setText] = useState('')
   const [result, setResult] = useState(null)
+  const [scene, setScene] = useState(PROMPT_SCENES[0])
+  const [style, setStyle] = useState(PROMPT_STYLES[0])
   const [predIdx, setPredIdx] = useState(0)
   const [predAnswer, setPredAnswer] = useState(null)
   const [predScore, setPredScore] = useState(0)
@@ -111,7 +116,7 @@ export default function Lesson4({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['sentiment', '😊 情感分析'], ['predict', '🔮 词语预测'], ['quiz', '✅ 测一测']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['sentiment', '😊 情感分析'], ['predict', '🔮 词语预测'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button key={id} className={`lesson-tab ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -286,6 +291,46 @@ export default function Lesson4({ onBack }) {
                 </button>
               </div>
             )}
+
+            <div className="lesson-card" style={{ marginTop: '18px' }}>
+              <div className="lesson-section-title">🧩 第二任务：给一句话换个情绪</div>
+              <p className="lesson-text">现在你来决定一句话要用在什么场景里，再给它一种风格，看看语言任务是不是更清楚了。</p>
+              <div className="example-grid">
+                {PROMPT_SCENES.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: scene === item ? '#dbeafe' : undefined }} onClick={() => setScene(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {PROMPT_STYLES.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: style === item ? '#fef3c7' : undefined }} onClick={() => setStyle(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="lesson-tip">
+                你的语言任务：让 AI <strong>{scene}</strong>，而且要<strong>{style}</strong>。
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 这节课怎么和 AI 协作</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合让 AI 做两件事：分析一句话的情绪，以及把一句话改成不同语气。</p>
+              <div className="lesson-tip">
+                可以这样问：<br />
+                `请判断这句话的情绪，并解释你是根据哪些词判断的：{text || '今天太棒了，我真的很开心。'}`
+              </div>
+              <div className="lesson-think">
+                再追问：`如果我要 {scene}，而且想要 {style}，请给我 3 个不同版本。`
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -334,6 +379,20 @@ export default function Lesson4({ onBack }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完这一课，你应该能自己描述一个最小的语言 AI 任务。</p>
+              <div className="lesson-highlight">
+                我要让 AI <strong>{scene}</strong>，并且保持<strong>{style}</strong>。如果要分析情绪，它会先找出句子里的关键词，再判断整体是积极、消极还是中性。
+              </div>
+            </div>
           </div>
         </div>
       )}

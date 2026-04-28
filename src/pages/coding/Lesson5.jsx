@@ -58,12 +58,17 @@ const QUIZ = [
   },
 ]
 
+const RECOGNITION_TARGETS = ['识别笑脸', '识别字母 L', '识别小旗子']
+const RECOGNITION_NEEDS = ['更多不同大小的例子', '更多不同颜色的例子', '更多旋转角度的例子']
+
 export default function Lesson5({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [grid, setGrid] = useState(DEFAULT_GRID)
   const [selectedColor, setSelectedColor] = useState('#1a1a2e')
   const [isDrawing, setIsDrawing] = useState(false)
   const [detection, setDetection] = useState(null)
+  const [target, setTarget] = useState(RECOGNITION_TARGETS[0])
+  const [need, setNeed] = useState(RECOGNITION_NEEDS[0])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -121,7 +126,7 @@ export default function Lesson5({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['draw', '🎨 像素画板'], ['quiz', '✅ 测一测']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['draw', '🎨 像素画板'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button key={id} className={`lesson-tab ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -275,6 +280,46 @@ export default function Lesson5({ onBack }) {
             <div style={{ marginTop: '12px', padding: '10px', background: '#f8f9fc', borderRadius: '10px', fontSize: '12px', color: '#666', lineHeight: '1.6', border: '1px solid #e8edf2' }}>
               💡 真实的AI用数以百万计的像素和复杂的神经网络来识别图像。这里我们用简单的形状特征规则来体验这个过程！
             </div>
+
+            <div className="lesson-card" style={{ marginTop: '18px' }}>
+              <div className="lesson-section-title">🧩 第二任务：想一想它还需要什么训练</div>
+              <p className="lesson-text">真正的图像 AI 不只看一张图。你来决定：它想识别什么，还需要补什么训练样本。</p>
+              <div className="example-grid">
+                {RECOGNITION_TARGETS.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: target === item ? '#fce7f3' : undefined }} onClick={() => setTarget(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {RECOGNITION_NEEDS.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: need === item ? '#dbeafe' : undefined }} onClick={() => setNeed(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="lesson-tip">
+                你的训练计划：为了让 AI 学会<strong>{target}</strong>，我还要补<strong>{need}</strong>。
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 这节课怎么让 AI 帮你想</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合问 AI：为了识别一个图形，它还需要看过哪些不同的样本。</p>
+              <div className="lesson-tip">
+                可以这样问：<br />
+                `我想训练一个图像识别 AI，让它识别 {target}。请告诉我除了普通样子，我还要准备哪些不同角度、不同颜色、不同大小的图片。`
+              </div>
+              <div className="lesson-think">
+                继续追问：`如果训练集里只有一种颜色，会出现什么问题？`
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -323,6 +368,20 @@ export default function Lesson5({ onBack }) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完这一课，你应该能说出一个最小的图像识别训练计划。</p>
+              <div className="lesson-highlight">
+                我想让 AI 识别<strong>{target}</strong>。除了当前这张图，我还要补<strong>{need}</strong>，这样它才不会只认一种固定样子。
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -37,6 +37,9 @@ const AI_ETHICS = [
   { emoji: '👶', title: '儿童保护', desc: '确保AI内容适合不同年龄，不伤害孩子' },
 ]
 
+const PROJECT_TARGETS = ['判断今天去哪里玩', '帮同学推荐阅读书', '给晚饭做选择']
+const PROJECT_IMPROVES = ['多加一个判断问题', '准备更多测试情况', '检查有没有对某些人不公平']
+
 function DTreeNode({ node, depth = 0 }) {
   const [answer, setAnswer] = useState(null)
 
@@ -82,6 +85,8 @@ export default function Lesson6({ onBack }) {
   const [tab, setTab] = useState('learn')
   const [dtreeKey, setDtreeKey] = useState(0)
   const [certified, setCertified] = useState(false)
+  const [projectTarget, setProjectTarget] = useState(PROJECT_TARGETS[0])
+  const [projectImprove, setProjectImprove] = useState(PROJECT_IMPROVES[0])
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -141,7 +146,7 @@ export default function Lesson6({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {[['learn', '📖 学一学'], ['build', '🌳 构建决策树'], ['ethics', '⚖️ AI伦理'], ['quiz', '✅ 测一测'], ['cert', '🏆 领证书']].map(([id, label]) => (
+        {[['learn', '📖 学一学'], ['build', '🌳 构建决策树'], ['ethics', '⚖️ AI伦理'], ['ai', '🤖 用AI帮忙'], ['quiz', '✅ 测一测'], ['cert', '🏆 领证书'], ['work', '🌟 本课输出']].map(([id, label]) => (
           <button key={id} className={`lesson-tab ${tab === id ? 'active' : ''}`} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -245,6 +250,28 @@ export default function Lesson6({ onBack }) {
             <div style={{ marginTop: '12px', padding: '10px', background: '#faf5ff', borderRadius: '10px', fontSize: '12px', color: '#6d28d9', lineHeight: '1.6', border: '1.5px solid #ddd6fe' }}>
               💡 这个决策树有 3 层问题，可以做出 7 种不同的推荐。真实的AI决策树可能有数千层！
             </div>
+
+            <div className="lesson-card" style={{ marginTop: '18px' }}>
+              <div className="lesson-section-title">🧩 第二任务：设计你自己的小决策器</div>
+              <p className="lesson-text">现在换成你自己的场景，想一想这个小系统到底要帮谁解决什么问题，还要继续怎么优化。</p>
+              <div className="example-grid">
+                {PROJECT_TARGETS.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: projectTarget === item ? '#ede9fe' : undefined }} onClick={() => setProjectTarget(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="example-grid">
+                {PROJECT_IMPROVES.map((item) => (
+                  <button key={item} className="quiz-option" style={{ background: projectImprove === item ? '#fef3c7' : undefined }} onClick={() => setProjectImprove(item)}>
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <div className="lesson-tip">
+                你的 AI 小项目：它要<strong>{projectTarget}</strong>，下一步最该做的是<strong>{projectImprove}</strong>。
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -286,6 +313,24 @@ export default function Lesson6({ onBack }) {
             </div>
           </div>
         </>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🤖 用 AI 帮你看项目设计</div>
+            <div className="lesson-card">
+              <p className="lesson-text">这一课最适合让 AI 做“项目顾问”：帮你补问题、补测试情况、补风险。</p>
+              <div className="lesson-tip">
+                可以这样问：<br />
+                `我想做一个小决策器，它要 {projectTarget}。请你帮我补 3 个判断问题，再告诉我这个系统可能会在哪些情况下出错。`
+              </div>
+              <div className="lesson-think">
+                继续追问：`如果我想让它更公平、更可靠，我应该补什么数据或测试？`
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── 测一测 ── */}
@@ -398,6 +443,23 @@ export default function Lesson6({ onBack }) {
             </button>
           </div>
         </>
+      )}
+
+      {tab === 'work' && (
+        <div className="lesson-content">
+          <div className="lesson-section">
+            <div className="lesson-section-title">🌟 本课输出</div>
+            <div className="lesson-card">
+              <p className="lesson-text">学完启蒙模块，你应该已经能说出一个最小 AI 项目的完整思路。</p>
+              <div className="lesson-highlight">
+                我想做一个系统，帮人<strong>{projectTarget}</strong>。它会通过一连串判断来给出结果。为了让它更靠谱，下一步我会<strong>{projectImprove}</strong>。
+              </div>
+              <div className="lesson-tip">
+                如果你能把“目标 + 判断 + 改进”三件事一起讲出来，这 6 课就真的连起来了。
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
