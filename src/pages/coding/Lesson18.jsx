@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -355,6 +356,25 @@ export default function Lesson18({ onBack }) {
               <strong>限定长度和格式：</strong><br />
               ✓ 不超过100字 / 用列表方式 / 给3个例子
             </div>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：同一个问题，三种问法</h2>
+            <p className="lesson-text">同一个想法，用三种不同方式问 AI——结果差很多！点按钮看 AI 真实回答的对比：</p>
+            <PromptCompareLab
+              prompts={[
+                { id: 'vague', label: '模糊问法', text: '解释一下人工智能', tone: 'weak' },
+                { id: 'context', label: '加了情境', text: '我是小学生，用简单的话解释一下人工智能是什么', tone: 'medium' },
+                { id: 'precise', label: '完整提示词', text: '我是10岁小学生，请用我能听懂的话解释"人工智能"是什么。要求：1) 用一个生活中的比喻； 2) 给一个具体例子； 3) 不超过80字。', tone: 'strong' },
+              ]}
+              subject="聊天AI体验"
+              accent={accentColor}
+              hint="加上身份、要求、字数后，AI 的回答会马上变得更贴合你需要！"
+              intro="同一件事，问得越具体，AI 越能给你真正想要的答案："
+              allowCustom
+              customLabel="✏️ 用你自己的方式问 AI"
+              customPlaceholder="试试加上：你是谁、想要什么、字数限制"
+            />
           </div>
         </div>
       )}
