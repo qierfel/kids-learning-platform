@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const PROMPT_PAIRS = [
   {
@@ -239,6 +240,26 @@ ${genName ? `作品名称：${genName}` : ''}
                 {pairScore >= 3 ? '🎉' : '💪'} 答对 {pairScore}/{PROMPT_PAIRS.length} 组
               </div>
               <p>{pairScore >= 3 ? '太棒了！你已经掌握好提问的感觉！' : '继续练习，感受"具体描述"的威力！'}</p>
+            </div>
+          )}
+
+          {pairChecked && (
+            <div style={{ marginTop: 24 }}>
+              <h2 className="lesson-section-title">🤖 让真 AI 来回答这两种提问</h2>
+              <p className="lesson-text">理论说够了，现在让 AI 真的回答一下"坏提问"和"好提问"，看看回答差多少：</p>
+              <PromptCompareLab
+                prompts={[
+                  { id: 'bad', label: '❌ 坏提问', text: PROMPT_PAIRS[0].bad, tone: 'weak' },
+                  { id: 'good', label: '✅ 好提问', text: PROMPT_PAIRS[0].good, tone: 'strong' },
+                ]}
+                subject="好提问示范"
+                accent="#14b8a6"
+                hint="坏提问 AI 只能给套话；好提问 AI 才能给真正能用的步骤和代码！"
+                intro="点 ▶ 让 AI 分别回答这两个提问，对比一下："
+                allowCustom
+                customLabel="✏️ 你自己写一个提问试试"
+                customPlaceholder="试试加上：做什么 + 包含什么 + 风格要求"
+              />
             </div>
           )}
 

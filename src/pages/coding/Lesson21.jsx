@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -68,8 +69,6 @@ export default function Lesson21({ onBack }) {
   const [aiResult, setAiResult] = useState('')
   const [loading, setLoading] = useState(false)
   const [aiError, setAiError] = useState('')
-  const [comparedResult, setComparedResult] = useState({})
-  const [compareLoading, setCompareLoading] = useState(null)
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [quizScore, setQuizScore] = useState(0)
@@ -77,14 +76,10 @@ export default function Lesson21({ onBack }) {
 
   const accentColor = '#8b5cf6'
 
-  async function fetchAI(prompt, key) {
-    if (key) {
-      setCompareLoading(key)
-    } else {
-      setLoading(true)
-      setAiError('')
-      setAiResult('')
-    }
+  async function fetchAI(prompt) {
+    setLoading(true)
+    setAiError('')
+    setAiResult('')
     try {
       const res = await fetch('/api/claude', {
         method: 'POST',
@@ -93,16 +88,11 @@ export default function Lesson21({ onBack }) {
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      if (key) {
-        setComparedResult(r => ({ ...r, [key]: data.text || '' }))
-      } else {
-        setAiResult(data.text || '')
-      }
+      setAiResult(data.text || '')
     } catch {
-      if (!key) setAiError('AI暂时没有响应，请稍后再试。')
+      setAiError('AI暂时没有响应，请稍后再试。')
     } finally {
-      if (key) setCompareLoading(null)
-      else setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -120,7 +110,7 @@ export default function Lesson21({ onBack }) {
   function handleWrite() {
     const prompt = selectedScene === 'custom' ? customPrompt : filledPrompt
     if (!prompt.trim()) return
-    fetchAI(prompt.trim(), null)
+    fetchAI(prompt.trim())
   }
 
   function handleQuizAnswer(optIdx) {
@@ -221,38 +211,18 @@ export default function Lesson21({ onBack }) {
       {tab === 'compare' && (
         <div className="lesson-content">
           <h2 className="lesson-section-title">🔬 对比实验：同一件事，不同提示词</h2>
-          <p className="lesson-text">点击下面的按钮，让AI用三种不同的提示词生成内容，亲眼看差别！</p>
+          <p className="lesson-text">让 AI 用三种不同的提示词分别生成内容，亲眼看差别！也可以在最后写你自己的提示词试一试。</p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-            {PROMPT_PAIRS.map((p, i) => (
-              <div key={p.id} style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '14px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-                  <div>
-                    <span style={{ fontWeight: 700, color: '#1e293b', fontSize: 14 }}>{p.issue ? (i === 0 ? '❌' : '⚠️') : '✅'} {p.label}</span>
-                    <div style={{ fontFamily: 'monospace', fontSize: 12, color: '#475569', marginTop: 4, background: '#f1f5f9', borderRadius: 6, padding: '4px 8px' }}>
-                      "{p.prompt.slice(0, 40)}{p.prompt.length > 40 ? '...' : ''}"
-                    </div>
-                  </div>
-                  <button onClick={() => fetchAI(p.prompt, p.id)}
-                    disabled={compareLoading === p.id}
-                    style={{ flexShrink: 0, padding: '6px 12px', background: accentColor, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                    {compareLoading === p.id ? '生成中...' : '生成'}
-                  </button>
-                </div>
-                {comparedResult[p.id] && (
-                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#1e293b', lineHeight: 1.8 }}>
-                    {comparedResult[p.id]}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {Object.keys(comparedResult).length === 3 && (
-            <div style={{ marginTop: 14, background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '14px', textAlign: 'center' }}>
-              <div style={{ fontWeight: 700, color: '#15803d' }}>👀 看到区别了吗？强提示词的效果明显更好！</div>
-            </div>
-          )}
+          <PromptCompareLab
+            prompts={PROMPT_PAIRS.map(p => ({ id: p.id, label: p.label, text: p.prompt }))}
+            subject="AI写作"
+            accent={accentColor}
+            hint="提示词写得越具体（主题 + 对象 + 语气 + 字数），AI 写出来的内容越贴合你的需求！"
+            intro="点 ▶ 让每条提示词分别请 AI 写一段话，对比一下："
+            allowCustom
+            customLabel="✏️ 我自己写一条提示词试试"
+            customPlaceholder="记得写清楚：主题 + 对象 + 语气 + 字数"
+          />
         </div>
       )}
 
