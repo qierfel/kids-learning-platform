@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const MOODS = ['😐', '🙂', '😄', '😁', '🤩']
 
@@ -295,6 +296,20 @@ export default function Lesson10({ onBack }) {
                 <span className="ai-chat-text" style={{ whiteSpace: 'pre-line', fontFamily: msg.role === 'ai' && i === 1 ? 'monospace' : 'inherit', fontSize: 13 }}>{msg.text}</span>
               </div>
             ))}
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：按钮需求怎么问更有用</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'button-old', label: '旧问法', text: '给我的网页加个按钮。', tone: 'weak' },
+                { id: 'button-new', label: '更好的问法', text: '任务：给我的个人网页加一个按钮交互。现在页面已经有标题和介绍。请帮我设计一个“显示更多内容”按钮，并告诉我：1. 点击前看到什么；2. 点击后显示什么；3. 初学者先做哪一步。限制：简单中文，分3点。', tone: 'strong' },
+              ]}
+              subject="按钮交互对比"
+              accent="#ef4444"
+              hint="交互类需求最重要的是把“点击前 / 点击后”说清楚。"
+              intro="同样是“加按钮”，结构化问法会得到更能直接动手的建议："
+            />
           </div>
         </div>
       )}

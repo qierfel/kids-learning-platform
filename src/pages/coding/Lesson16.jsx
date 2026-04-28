@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -143,10 +144,10 @@ export default function Lesson16({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'do', 'match', 'quiz', 'work'].map(t => (
+        {['learn', 'do', 'match', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'do' ? '设备对比' : t === 'match' ? '场景匹配' : t === 'quiz' ? '测一测' : '我的设备'}
+            {t === 'learn' ? '学一学' : t === 'do' ? '设备对比' : t === 'match' ? '场景匹配' : t === 'ai' ? '问AI选设备' : t === 'quiz' ? '测一测' : '我的设备'}
           </button>
         ))}
       </div>
@@ -374,6 +375,23 @@ export default function Lesson16({ onBack }) {
             <div className="lesson-next-title">🚀 下一课预告：第 17 课 · 开通你的AI账号</div>
             <p>知道了用什么设备，下一步就是开通账号！我们会手把手教你注册主流AI工具，让你正式开始用AI创作。</p>
           </div>
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <h2 className="lesson-section-title">🤖 让 AI 帮你选设备</h2>
+          <p className="lesson-text">同样是“帮我选设备”，问法不同，AI 给你的建议会差很多。</p>
+          <PromptCompareLab
+            prompts={[
+              { id: 'device-old', label: '旧问法', text: '我该用什么设备学AI？', tone: 'weak' },
+              { id: 'device-new', label: 'GPT-5.5 新问法', text: '任务：帮10-12岁学生选学习AI编程的主力设备。我的情况：平时有手机和iPad，周末能用电脑。我主要想做网页、问AI问题、做小作品。请输出：1. 主力设备建议；2. 每种设备最适合做什么；3. 我这周的使用方案。限制：用简单中文，80字内。', tone: 'strong' },
+            ]}
+            subject="设备建议对比"
+            accent={accentColor}
+            hint="带上自己的设备条件和任务目标，AI 才能给出真正能执行的建议。"
+            intro="先试试这两种问法："
+          />
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const COLOR_OPTIONS = [
   { id: 'blue', label: '海洋蓝', bg: '#0ea5e9', text: '#fff' },
@@ -278,6 +279,20 @@ export default function Lesson8({ onBack }) {
 
           <div className="lesson-tip-box" style={{ marginTop: 16 }}>
             💡 <strong>注意：</strong>告诉AI越具体越好！名字、颜色、风格、要放什么内容……说得清楚，AI给的方案才更准确。
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：让 AI 帮你规划网页</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'intro-old', label: '旧问法', text: '帮我做一个个人网页。', tone: 'weak' },
+                { id: 'intro-new', label: '更好的问法', text: '任务：帮我规划一个个人介绍网页。我是10-12岁学生。网页要包含：名字、3个爱好、1个梦想、1个按钮。请输出：1. 页面结构；2. 建议主色调；3. 第一步该先做什么。限制：简单中文，不超过100字。', tone: 'strong' },
+              ]}
+              subject="个人网页规划"
+              accent="#06b6d4"
+              hint="网页类任务最适合把“内容、结构、限制”一次说清楚。"
+              intro="试试看模糊问法和结构化问法有什么差别："
+            />
           </div>
         </div>
       )}

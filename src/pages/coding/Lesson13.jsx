@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const STYLES = [
   { id: 'robot', label: '🤖 机器人', desc: '用机器人的方式说话，每个字都很精确', prompt: '请用冷静、精确的机器人口吻重新表达这句话，可以加入一些科技感词汇和机械感符号，保持简短有趣。' },
@@ -64,15 +65,28 @@ export default function Lesson13({ onBack }) {
     setAiOutput('')
     const style = STYLES.find(s => s.id === selectedStyle)
     try {
-      const res = await fetch('/api/claude', {
+      const prompt = `任务：把原句改写成${style.label}风格。
+
+原句：${inputText.trim()}
+
+输出要求：
+1. 只输出1句改写结果
+2. 保留原句的核心意思
+3. 让风格明显，但不要太长
+
+限制：
+- 不要解释
+- 不超过30字`
+      const res = await fetch('/api/openai-text', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          type: 'chat',
-          payload: {
-            messages: [{ role: 'user', content: `${style.prompt}\n\n原句：「${inputText.trim()}」\n\n请直接给出变声后的句子，不需要解释。` }],
-            subject: '变声器',
-          },
+          system: '你是一个儿童编程课里的语言风格实验助手。请严格按要求输出，不要解释。',
+          messages: [{ role: 'user', content: prompt }],
+          reasoningEffort: 'low',
+          verbosity: 'low',
+          maxOutputTokens: 160,
+          metadata: { lesson: '13', subject: '变声器' },
         }),
       })
       const data = await res.json()
@@ -293,6 +307,21 @@ export default function Lesson13({ onBack }) {
               <li>分析"天气App"的输入和输出</li>
               <li>分析"图像识别AI"的输入和输出</li>
             </ul>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 提示词对比：旧问法 vs GPT-5.5 新问法</h2>
+            <p className="lesson-text">同样是让 AI 改写一句话，模糊问法和结构化问法，结果会差很多：</p>
+            <PromptCompareLab
+              prompts={[
+                { id: 'old', label: '旧问法', text: '把这句话改成机器人风格：今天我很开心。', tone: 'weak' },
+                { id: 'new', label: 'GPT-5.5 新问法', text: '任务：把这句话改写成机器人风格。原句：今天我很开心。输出要求：1. 只输出1句；2. 保留原意；3. 有明显科技感。限制：不超过20字，不要解释。', tone: 'strong' },
+              ]}
+              subject="输入输出对比"
+              accent={accentColor}
+              hint="GPT-5.5 更适合这种结构清楚、没有冲突的任务说明。"
+              intro="现在直接让模型回答两种提示词，看看谁更稳定："
+            />
           </div>
         </div>
       )}

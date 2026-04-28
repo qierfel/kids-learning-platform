@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const PROJECT_TYPES = [
   { id: 'intro', label: '自我介绍页', emoji: '👤', desc: '展示你是谁、你的爱好和梦想' },
@@ -351,6 +352,20 @@ export default function Lesson12({ onBack }) {
               <li>AI：用 Claude 或 ChatGPT 帮你继续改进作品</li>
               <li>分享：把你的网页链接发给朋友看！</li>
             </ul>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：项目问法为什么决定作品质量</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'project-old', label: '旧问法', text: '帮我做一个网页作品。', tone: 'weak' },
+                { id: 'project-new', label: '更好的问法', text: '任务：帮我完成一个10-12岁学生的网页小作品。作品类型：自我介绍页。要包含：标题、简介、3个爱好、1个按钮。请输出：1. 制作顺序；2. 哪一步最先完成；3. 完成后怎么自查。限制：简单中文，分3步。', tone: 'strong' },
+              ]}
+              subject="项目规划对比"
+              accent="#f59e0b"
+              hint="项目类提问最需要“范围、顺序、检查标准”这三件事。"
+              intro="把整件作品说清楚以后，AI 才会像真正的项目教练："
+            />
           </div>
         </div>
       )}

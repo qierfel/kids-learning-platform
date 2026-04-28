@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -154,10 +155,10 @@ export default function Lesson17({ onBack }) {
       </div>
 
       <div className="lesson-tabs">
-        {['learn', 'guide', 'quiz', 'work'].map(t => (
+        {['learn', 'guide', 'ai', 'quiz', 'work'].map(t => (
           <button key={t} className={`lesson-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
             style={tab === t ? { borderBottomColor: accentColor, color: accentColor } : {}}>
-            {t === 'learn' ? '学一学' : t === 'guide' ? '注册指南' : t === 'quiz' ? '测一测' : '我的账号'}
+            {t === 'learn' ? '学一学' : t === 'guide' ? '注册指南' : t === 'ai' ? '问AI怎么开始' : t === 'quiz' ? '测一测' : '我的账号'}
           </button>
         ))}
       </div>
@@ -289,6 +290,23 @@ export default function Lesson17({ onBack }) {
               <div style={{ fontWeight: 700, color: '#15803d' }}>🎉 你已经注册了 {completedTools.length} 个AI工具！出发！</div>
             </div>
           )}
+        </div>
+      )}
+
+      {tab === 'ai' && (
+        <div className="lesson-content">
+          <h2 className="lesson-section-title">🤖 让 AI 帮你规划第一步</h2>
+          <p className="lesson-text">如果你不知道先注册哪个工具，可以直接问 AI。但记得把自己的条件说清楚。</p>
+          <PromptCompareLab
+            prompts={[
+              { id: 'account-old', label: '旧问法', text: '我应该注册哪个AI？', tone: 'weak' },
+              { id: 'account-new', label: 'GPT-5.5 新问法', text: '任务：帮10-12岁学生选第一个要注册的AI工具。我的情况：人在中国大陆，先想体验聊天和做网页，以后可能再学编程。请输出：1. 最先注册哪个工具；2. 为什么；3. 下一步再注册什么。限制：简单中文，列3点。', tone: 'strong' },
+            ]}
+            subject="账号规划对比"
+            accent={accentColor}
+            hint="明确地区、目标和当前条件后，AI 的建议会更像一份真正的行动方案。"
+            intro="看一看“随便问”和“结构化问”会得到什么差别："
+          />
         </div>
       )}
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const THEMES = [
   { id: 'ocean', label: '深海蓝', primary: '#0ea5e9', secondary: '#e0f2fe', text: '#0c4a6e' },
@@ -287,6 +288,20 @@ export default function Lesson9({ onBack }) {
                 <span className="ai-chat-text" style={{ whiteSpace: 'pre-line' }}>{msg.text}</span>
               </div>
             ))}
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：颜色方案为什么会越问越准</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'style-old', label: '旧问法', text: '帮我配个网页颜色。', tone: 'weak' },
+                { id: 'style-new', label: '更好的问法', text: '任务：帮10-12岁学生的个人网页设计颜色方案。网页主题是“海洋风自我介绍”。请输出：1. 主色；2. 背景色；3. 按钮色；4. 说明为什么适合。限制：用简单中文，不超过80字。', tone: 'strong' },
+              ]}
+              subject="网页配色对比"
+              accent="#a855f7"
+              hint="一旦把主题和输出格式说清楚，AI 的配色建议就会明显更稳定。"
+              intro="同样是要颜色方案，问法清不清楚，结果差很多："
+            />
           </div>
         </div>
       )}

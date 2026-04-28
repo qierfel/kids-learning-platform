@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0 4px' }}>
@@ -100,16 +101,31 @@ export default function Lesson15({ onBack }) {
     setLoadingDebug(true)
     setDebugError('')
     setAiDebug('')
-    const prompt = `我是一个10-12岁的编程学习者，遇到了Bug，请用简单友善的语言帮我分析（不超过120字）：
+    const prompt = `任务：帮一个10-12岁学生分析Bug。
 
-问题：${bugInput.trim()}
+问题描述：${bugInput.trim()}
 
-请告诉我：①可能是什么类型的错误；②最可能的原因；③如何修复。语气要鼓励孩子。`
+请按这个格式回答：
+1. 错误类型
+2. 最可能原因
+3. 第一步该怎么修
+
+限制：
+- 用简单中文
+- 不超过120字
+- 语气鼓励，不要批评`
     try {
-      const res = await fetch('/api/claude', {
+      const res = await fetch('/api/openai-text', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: prompt }], subject: 'Debug助手' } }),
+        body: JSON.stringify({
+          system: '你是一个儿童编程Debug老师，擅长把报错解释给10-12岁孩子听。',
+          messages: [{ role: 'user', content: prompt }],
+          reasoningEffort: 'medium',
+          verbosity: 'medium',
+          maxOutputTokens: 220,
+          metadata: { lesson: '15', subject: 'Debug助手' },
+        }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -318,6 +334,20 @@ export default function Lesson15({ onBack }) {
               [粘贴出问题的代码]<br /><br />
               请用简单语言告诉我原因和修复方法。
             </div>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：一句“帮我修”为什么不够</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'old-debug', label: '旧问法', text: '代码坏了，帮我修一下。', tone: 'weak' },
+                { id: 'new-debug', label: 'GPT-5.5 新问法', text: '任务：帮我分析一个网页按钮Bug。报错信息：TypeError: sayHi is not a function。出错位置：第3行。期望结果：点击按钮后弹出问候。实际结果：点击没反应。请按“错误类型 / 最可能原因 / 第一步修法”回答，用简单中文。', tone: 'strong' },
+              ]}
+              subject="Debug对比"
+              accent={accentColor}
+              hint="Bug 类问题最适合结构化描述：报错、位置、期望、实际结果。"
+              intro="把 Bug 信息说完整，AI 才能像真正的调试助手那样工作："
+            />
           </div>
         </div>
       )}

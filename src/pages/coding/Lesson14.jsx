@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0 4px' }}>
@@ -84,14 +85,30 @@ export default function Lesson14({ onBack }) {
     setFortuneResult('')
     const ft = FORTUNE_TYPES.find(f => f.id === selectedType)
     const namePrefix = userName.trim() ? `为${userName.trim()}` : ''
-    const prompt = `${namePrefix}${ft.prompt}`
+    const prompt = `任务：生成一条儿童友好的占卜结果。
+
+对象：${userName.trim() ? `${userName.trim()}，10-12岁孩子` : '一位10-12岁孩子'}
+主题：${ft.label}
+
+输出要求：
+1. 语气神秘但温暖
+2. 给1条具体的小建议
+3. 如果适合，可以加入幸运颜色或幸运数字
+
+限制：
+- 不超过60字
+- 不要写得像大人星座文案`
     try {
-      const res = await fetch('/api/claude', {
+      const res = await fetch('/api/openai-text', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          type: 'chat',
-          payload: { messages: [{ role: 'user', content: prompt }], subject: '占卜机' },
+          system: '你是儿童AI课程里的创意占卜助手。请输出简短、有趣、适合孩子阅读的结果。',
+          messages: [{ role: 'user', content: `${namePrefix}${prompt}` }],
+          reasoningEffort: 'low',
+          verbosity: 'low',
+          maxOutputTokens: 180,
+          metadata: { lesson: '14', subject: '占卜机' },
         }),
       })
       const data = await res.json()
@@ -265,6 +282,20 @@ export default function Lesson14({ onBack }) {
               <li>先问"用户最想要什么"，再决定加什么功能</li>
               <li>v1.0 能用就发布，收到反馈再继续改</li>
             </ul>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 提示词对比：为什么新版更稳</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'old-fortune', label: '旧问法', text: '给我一个学习运占卜。', tone: 'weak' },
+                { id: 'new-fortune', label: 'GPT-5.5 新问法', text: '任务：生成一条给10-12岁孩子看的学习运占卜。输出要求：1. 神秘但温暖；2. 给1条具体学习建议；3. 不超过60字。限制：不要写得太成人化。', tone: 'strong' },
+              ]}
+              subject="占卜机对比"
+              accent={accentColor}
+              hint="说清楚对象、语气、长度和限制后，输出会更稳定、更像产品内容。"
+              intro="占卜类内容最怕发散。试试看两种问法的差别："
+            />
           </div>
         </div>
       )}

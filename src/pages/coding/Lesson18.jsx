@@ -140,10 +140,17 @@ export default function Lesson18({ onBack }) {
     setChatError('')
     setChatResult('')
     try {
-      const res = await fetch('/api/claude', {
+      const res = await fetch('/api/openai-text', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: [{ role: 'user', content: chatInput.trim() }], subject: '聊天AI体验' } }),
+        body: JSON.stringify({
+          system: '你是一个适合10-12岁孩子互动的聊天AI老师。请用自然、友好、直接的中文回答，不要自称AI。',
+          messages: [{ role: 'user', content: chatInput.trim() }],
+          reasoningEffort: 'medium',
+          verbosity: 'medium',
+          maxOutputTokens: 260,
+          metadata: { lesson: '18', subject: '聊天AI体验' },
+        }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -299,8 +306,8 @@ export default function Lesson18({ onBack }) {
 
       {tab === 'try' && (
         <div className="lesson-content">
-          <h2 className="lesson-section-title">🌿 亲手和AI对话！</h2>
-          <p className="lesson-text">下面接入的是 Claude AI。选一个模板快速开始，或者直接写你想问的！</p>
+          <h2 className="lesson-section-title">🤖 亲手和 GPT-5.5 对话！</h2>
+          <p className="lesson-text">下面接入的是课程里的 GPT-5.5 体验接口。选一个模板快速开始，或者直接写你想问的！</p>
 
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 8 }}>📋 快速模板（点击填入）：</div>
@@ -335,8 +342,8 @@ export default function Lesson18({ onBack }) {
           {chatResult && (
             <div style={{ marginTop: 14, padding: '16px', background: '#eef2ff', border: '2px solid #c7d2fe', borderRadius: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <span style={{ fontSize: 18 }}>🌿</span>
-                <span style={{ fontSize: 13, color: accentColor, fontWeight: 700 }}>Claude 的回复：</span>
+                <span style={{ fontSize: 18 }}>🤖</span>
+                <span style={{ fontSize: 13, color: accentColor, fontWeight: 700 }}>GPT-5.5 的回复：</span>
               </div>
               <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{chatResult}</div>
               <button onClick={() => { setChatResult(''); setChatInput('') }} style={{ marginTop: 10, fontSize: 12, color: '#94a3b8', background: 'none', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>

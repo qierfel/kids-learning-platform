@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const ELEMENTS = [
   { id: 'logo', icon: '🏷️', label: '网站名称 / Logo', desc: '告诉访客这是哪个网站', correct: 'top' },
@@ -272,6 +273,20 @@ export default function Lesson7({ onBack }) {
               <li>"举个例子说明 XX"</li>
               <li>"为什么网页需要 XX？"</li>
             </ul>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🔬 对比实验：网页问题怎么问更好</h2>
+            <PromptCompareLab
+              prompts={[
+                { id: 'web-old', label: '旧问法', text: '网页是什么？', tone: 'weak' },
+                { id: 'web-new', label: '更好的问法', text: '我是10-12岁学生，请用简单中文解释网页是什么。要求：1. 用“房间”做比喻；2. 说出顶部、内容、底部三个区域；3. 不超过90字。', tone: 'strong' },
+              ]}
+              subject="网页入门对比"
+              accent="#f97316"
+              hint="加上对象、比喻和输出范围后，回答会更像真正的课程讲解。"
+              intro="同样是问“网页是什么”，两种问法会得到不同质量的答案："
+            />
           </div>
         </div>
       )}

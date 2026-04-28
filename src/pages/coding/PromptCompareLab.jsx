@@ -37,12 +37,24 @@ export default function PromptCompareLab({
     setLoading(s => ({ ...s, [id]: true }))
     setErrors(s => ({ ...s, [id]: '' }))
     try {
-      const res = await fetch('/api/claude', {
+      const system = `你是一个面向10-12岁孩子的AI编程老师。
+你的任务是直接回答孩子的提问，并让他们清楚看见"提示词质量不同，回答效果也不同"。
+规则：
+- 用简单中文
+- 优先给可执行内容
+- 不要自称AI
+- 回答长度控制在120字内，除非用户明确要求更长
+`
+      const res = await fetch('/api/openai-text', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          type: 'chat',
-          payload: { messages: [{ role: 'user', content: text.trim() }], subject },
+          system,
+          messages: [{ role: 'user', content: text.trim() }],
+          reasoningEffort: 'medium',
+          verbosity: 'medium',
+          maxOutputTokens: 260,
+          metadata: { subject: subject || 'PromptCompareLab' },
         }),
       })
       const data = await res.json()
