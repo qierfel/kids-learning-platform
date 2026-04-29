@@ -15,6 +15,38 @@ export default defineConfig({
       name: 'local-media-server',
       configureServer(server) {
         const MEDIA_DIR = process.env.MEDIA_DIR || '/Volumes/D/kids-learning-media'
+        // ── /api/generate-image 本地代理 ─────────────────────────────
+        server.middlewares.use('/api/generate-image', async (req, res) => {
+          if (req.method !== 'POST') { res.writeHead(405); res.end('POST only'); return }
+          const apiKey = process.env.OPENAI_API_KEY
+          if (!apiKey) {
+            res.writeHead(500, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ error: 'OPENAI_API_KEY not set in environment' }))
+            return
+          }
+          const chunks = []
+          for await (const chunk of req) chunks.push(chunk)
+          let body
+          try { body = JSON.parse(Buffer.concat(chunks).toString('utf-8')) }
+          catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Invalid JSON' })); return }
+
+          // forward to the production handler in dev — wrap in a Request-like context
+          try {
+            const handler = await import('./functions/api/generate-image.js')
+            const fakeReq = new Request('http://local/api/generate-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            })
+            const out = await handler.onRequestPost({ request: fakeReq, env: { OPENAI_API_KEY: apiKey } })
+            res.writeHead(out.status, { 'Content-Type': 'application/json' })
+            res.end(await out.text())
+          } catch (e) {
+            res.writeHead(500, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ error: e?.message || 'dev proxy failed' }))
+          }
+        })
+
         // ── /api/tts 本地代理 ──────────────────────────────────────────
         server.middlewares.use('/api/tts', async (req, res) => {
           const apiKey = process.env.OPENAI_API_KEY
