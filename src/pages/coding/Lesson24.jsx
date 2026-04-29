@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Lesson.css'
+import ImageGenLab from './ImageGenLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -128,10 +129,29 @@ export default function Lesson24({ onBack }) {
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
   const [posterDone, setPosterDone] = useState(false)
+  const [savedPosters, setSavedPosters] = useState([])
 
   const accentColor = '#f59e0b'
   const toolDetail = POSTER_TOOLS.find(t => t.id === selectedTool)
   const theme = POSTER_THEMES.find(t => t.id === selectedTheme)
+
+  useEffect(() => {
+    if (tab !== 'work') return
+    try {
+      const list = JSON.parse(localStorage.getItem('imageGenLab:lesson24') || '[]')
+      setSavedPosters(Array.isArray(list) ? list : [])
+    } catch { setSavedPosters([]) }
+  }, [tab])
+
+  const themeKeywords = selectedTheme === 'custom'
+    ? (customTheme || '').trim()
+    : (theme?.keywords || '')
+  const themeLabel = selectedTheme === 'custom'
+    ? (customTheme || '我的主题').trim()
+    : (theme?.label?.slice(2) || '')
+  const posterPrompt = selectedTheme && themeKeywords
+    ? `一张${themeLabel}主题的海报设计，包含元素：${themeKeywords}。竖版构图，留出标题区域，配色和谐统一，矢量插画风格，干净有设计感，超清晰细节`
+    : ''
 
   function toggleElement(name) {
     setCheckedElements(e => e.includes(name) ? e.filter(x => x !== name) : [...e, name])
@@ -305,6 +325,31 @@ export default function Lesson24({ onBack }) {
               ))}
             </div>
           )}
+
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '2px dashed #fde68a' }}>
+            <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🎨 或者，直接在这里生成海报背景</h2>
+            <p className="lesson-text">
+              {selectedTheme
+                ? '根据"我的策划"里选的主题，AI 帮你画一张海报背景图。生成后下载，再去 Canva/美图/稿定加文字！'
+                : '👈 先去"我的策划"标签选一个主题，AI 才知道要画什么风格的海报。'}
+            </p>
+            {selectedTheme && (
+              <ImageGenLab
+                defaultPrompt={posterPrompt}
+                accent={accentColor}
+                subject="Lesson24-poster"
+                size="1024x1536"
+                quality="hd"
+                savedKey="lesson24"
+                intro={'点击 "让 AI 画一张"，AI 会根据你的主题画一张竖版海报背景。觉得好看就保存到我的作品。'}
+                presetPrompts={[
+                  '一张生日派对海报，五彩气球漂浮，蛋糕和星星点缀，温暖明亮配色，居中留出标题区域，矢量插画风格，超清晰',
+                  '一张运动激情主题的海报，奔跑剪影 + 动感线条，鲜红与橙色对比，留出标题区域，活力漫画风格',
+                  '一张科技未来海报，霓虹蓝紫渐变，几何电路元素飘浮，留出标题区域，赛博朋克风格，超精细',
+                ]}
+              />
+            )}
+          </div>
         </div>
       )}
 
@@ -381,6 +426,23 @@ export default function Lesson24({ onBack }) {
                 <strong style={{ color: '#bfdbfe' }}>模块G第一个真实作品！</strong>
               </div>
               <div style={{ fontSize: 24, letterSpacing: 4 }}>⭐⭐⭐</div>
+            </div>
+          )}
+
+          {savedPosters.length > 0 && (
+            <div style={{ marginTop: 16, background: '#fff', border: `2px solid ${accentColor}40`, borderRadius: 14, padding: '14px' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: accentColor, marginBottom: 10 }}>🖼️ 你保存的海报作品（{savedPosters.length}）</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
+                {savedPosters.map((w, i) => (
+                  <a key={i} href={w.url} target="_blank" rel="noreferrer" style={{ display: 'block', borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <img src={w.url} alt={w.prompt} style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }} />
+                    <div style={{ padding: '6px 8px', fontSize: 11, color: '#475569', lineHeight: 1.4, maxHeight: 50, overflow: 'hidden' }}>
+                      {(w.prompt || '').slice(0, 40)}{(w.prompt || '').length > 40 ? '…' : ''}
+                    </div>
+                  </a>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>点缩略图查看大图。可以下载后去 Canva/美图加文字标题。</div>
             </div>
           )}
 

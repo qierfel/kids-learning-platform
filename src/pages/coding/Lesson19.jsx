@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import ImageGenLab from './ImageGenLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -309,11 +310,28 @@ export default function Lesson19({ onBack }) {
 
           {builtPrompt && (
             <div style={{ marginTop: 12, background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#15803d' }}>
-              🎉 提示词写好了！去这些平台试试吧：<br />
-              <strong>即梦（jimeng.jianying.com）</strong> 或 <strong>可灵（klingai.com）</strong><br />
-              把上面这段话粘贴进去，看看AI画出来什么！
+              🎉 提示词写好了！下面直接让 AI 画一张试试 ↓<br />
+              （也可以去 <strong>即梦（jimeng.jianying.com）</strong> 或 <strong>可灵（klingai.com）</strong> 用同样的提示词对比）
             </div>
           )}
+
+          <div style={{ marginTop: 18, paddingTop: 14, borderTop: '2px dashed #f9a8d4' }}>
+            <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🤖 直接让 AI 画一张</h2>
+            <p className="lesson-text">来对比一下：先用"懒提示词"画一张，再用"详细提示词"画一张，看看差多少！</p>
+            <ImageGenLab
+              defaultPrompt={builtPrompt}
+              accent={accentColor}
+              subject="Lesson19-prompt-builder"
+              size="1024x1024"
+              quality="standard"
+              intro="把上面拼好的提示词试一试，或者点下面的预设对比看看："
+              presetPrompts={[
+                '画一只猫',
+                '一只戴着宇航员头盔的橙色猫咪，在星空下望向地球，水彩画风格，温暖光线，超清晰',
+                '一座漂浮在云端的奇幻图书馆，阳光透过彩色玻璃窗洒入，温暖梦幻，8K 超清细节',
+              ]}
+            />
+          </div>
         </div>
       )}
 
