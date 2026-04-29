@@ -82,6 +82,11 @@ export default function CharacterList({ onBack }) {
           {data && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
             一类字 {data.type1.length} 个 · 二类字 {data.type2.length} 个
           </div>}
+          {data && data.type1.length === 0 && data.type2.length === 0 && (
+            <div style={{ color: '#94a3b8', textAlign: 'center', marginTop: 40, fontSize: 15 }}>
+              该年级生字数据准备中，敬请期待
+            </div>
+          )}
           {/* per-lesson char groups */}
           {data?.lessons ? (
             data.lessons.map(l => {
