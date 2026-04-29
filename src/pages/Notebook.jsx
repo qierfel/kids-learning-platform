@@ -13,7 +13,28 @@ function updateReadMark(userId, threadId) {
   try { localStorage.setItem(READ_MARKS_KEY(userId), JSON.stringify(marks)) } catch {}
 }
 
-const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理']
+const SUBJECTS = ['不限科目', '语文', '数学', '英语', '物理', '化学', '历史', '地理', 'AI编程']
+
+const TEACHER_PROFILES = {
+  academic: {
+    key: 'academic',
+    name: '晓敏老师',
+    avatar: '👩‍🏫',
+    status: '资深学科老师 · 引导式答疑',
+    welcomeLines: ['你好！我是晓敏老师 🌟', '有不会的题目、知识点复习、作业困惑，都可以来问我。'],
+    hint: '可以直接发文字，也可以📷拍照上传题目～',
+    placeholder: '问晓敏老师…',
+  },
+  coding: {
+    key: 'coding',
+    name: '阿创老师',
+    avatar: '🤖',
+    status: 'AI编程课老师 · 项目开发陪练',
+    welcomeLines: ['你好！我是阿创老师 🚀', '想做网页、小游戏或小工具，都可以跟我一起拆项目、定路线、查 bug。'],
+    hint: '可以聊项目点子、页面结构、实现步骤，也可以贴代码或截图。',
+    placeholder: '和阿创老师聊项目开发…',
+  },
+}
 
 function getToken() { return localStorage.getItem('session_token') }
 
@@ -43,6 +64,7 @@ function compressImage(file, maxWidth = 1200, quality = 0.82) {
 export default function Notebook({ user }) {
   const [messages, setMessages]       = useState([])
   const [subject, setSubject]         = useState('不限科目')
+  const [teacherRole, setTeacherRole] = useState('academic')
   const [inputText, setInputText]     = useState('')
   const [streamingText, setStreamingText] = useState('')
   const [isStreaming, setIsStreaming]  = useState(false)
@@ -61,6 +83,7 @@ export default function Notebook({ user }) {
   const recognitionRef = useRef(null)
   const textareaRef   = useRef(null)
   const fileInputRef  = useRef(null)
+  const teacher = TEACHER_PROFILES[teacherRole] || TEACHER_PROFILES.academic
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -111,7 +134,7 @@ export default function Notebook({ user }) {
       const res = await fetch('/api/claude', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ type: 'chat', payload: { messages: newMessages, subject } }),
+        body: JSON.stringify({ type: 'chat', payload: { messages: newMessages, subject, teacherRole } }),
       })
 
       const data = await res.json()
@@ -141,7 +164,7 @@ export default function Notebook({ user }) {
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             action: 'create', token: getToken(),
-            userName, subject, content: text || '[图片]', messages: msgsToSave,
+            userName, subject, teacherRole, content: text || '[图片]', messages: msgsToSave,
           }),
         })
         const saveData = await saveRes.json()
@@ -150,7 +173,7 @@ export default function Notebook({ user }) {
         await fetch('/api/threads', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ action: 'update', token: getToken(), id: tid, messages: msgsToSave }),
+          body: JSON.stringify({ action: 'update', token: getToken(), id: tid, teacherRole, messages: msgsToSave }),
         })
       }
 
@@ -213,6 +236,7 @@ export default function Notebook({ user }) {
   function loadThread(thread) {
     setMessages(thread.messages || []); setThreadId(thread.id)
     setSubject(thread.subject || '不限科目'); setShowHistory(false)
+    setTeacherRole(thread.teacherRole || 'academic')
     setStreamingText(''); setPendingImage(null)
     updateReadMark(user?.uid, thread.id)
   }
@@ -244,7 +268,12 @@ export default function Notebook({ user }) {
           {historyList.map(thread => (
             <div key={thread.id} className="history-card" onClick={() => loadThread(thread)}>
               <div className="history-card-top">
-                <span className={`subject-pill subject-pill-${thread.subject}`}>{thread.subject || '不限科目'}</span>
+                <div className="history-card-meta">
+                  <span className={`subject-pill subject-pill-${thread.subject}`}>{thread.subject || '不限科目'}</span>
+                  <span className={`teacher-tag ${thread.teacherRole === 'coding' ? 'teacher-tag-coding' : ''}`}>
+                    {thread.teacherRole === 'coding' ? '🤖 AI编程老师' : '👩‍🏫 学科老师'}
+                  </span>
+                </div>
                 <span className="history-time">
                   {thread.createdAt ? new Date(thread.createdAt).toLocaleDateString('zh-CN') : ''}
                 </span>
@@ -266,10 +295,10 @@ export default function Notebook({ user }) {
       {/* 顶栏 */}
       <div className="chat-topbar">
         <div className="topbar-teacher">
-          <div className="teacher-avatar">👩‍🏫</div>
+          <div className={`teacher-avatar ${teacherRole === 'coding' ? 'teacher-avatar-coding' : ''}`}>{teacher.avatar}</div>
           <div className="teacher-info">
-            <div className="teacher-name">晓敏老师</div>
-            <div className="teacher-status">资深教师 · 随时在线</div>
+            <div className="teacher-name">{teacher.name}</div>
+            <div className="teacher-status">{teacher.status}</div>
           </div>
         </div>
         <div className="topbar-actions">
@@ -285,6 +314,19 @@ export default function Notebook({ user }) {
         </div>
       </div>
 
+      <div className="teacher-selector">
+        {Object.values(TEACHER_PROFILES).map(profile => (
+          <button
+            key={profile.key}
+            className={`teacher-pill ${teacherRole === profile.key ? 'active' : ''}`}
+            onClick={() => setTeacherRole(profile.key)}
+          >
+            <span className="teacher-pill-avatar">{profile.avatar}</span>
+            <span>{profile.name}</span>
+          </button>
+        ))}
+      </div>
+
       {/* 科目选择 */}
       <div className="subject-selector">
         {SUBJECTS.map(s => (
@@ -298,18 +340,17 @@ export default function Notebook({ user }) {
       <div className="chat-messages">
         {!hasMessages && !isStreaming && (
           <div className="chat-welcome">
-            <div className="welcome-avatar">👩‍🏫</div>
+            <div className={`welcome-avatar ${teacherRole === 'coding' ? 'welcome-avatar-coding' : ''}`}>{teacher.avatar}</div>
             <div className="welcome-bubble">
-              你好！我是晓敏老师 🌟<br />
-              有什么不懂的题目，或者想复习的知识点，都可以问我！<br />
-              <small>可以直接发文字，也可以📷拍照上传题目～</small>
+              {teacher.welcomeLines.map((line, idx) => <div key={idx}>{line}</div>)}
+              <small>{teacher.hint}</small>
             </div>
           </div>
         )}
 
         {messages.map((m, i) => (
           <div key={i} className={`message message-${m.role === 'ai' ? 'ai' : 'user'}`}>
-            <div className="msg-avatar">{m.role === 'ai' ? '👩‍🏫' : '👤'}</div>
+            <div className={`msg-avatar ${m.role === 'ai' && teacherRole === 'coding' ? 'msg-avatar-coding' : ''}`}>{m.role === 'ai' ? teacher.avatar : '👤'}</div>
             <div className={`msg-bubble ${m.role === 'ai' ? 'bubble-ai' : 'bubble-user'}`}>
               {/* 图片气泡 */}
               {m.image?.dataUrl && (
@@ -328,7 +369,7 @@ export default function Notebook({ user }) {
 
         {isStreaming && (
           <div className="message message-ai">
-            <div className="msg-avatar">👩‍🏫</div>
+            <div className={`msg-avatar ${teacherRole === 'coding' ? 'msg-avatar-coding' : ''}`}>{teacher.avatar}</div>
             <div className="msg-bubble bubble-ai streaming">
               {streamingText
                 ? <>{streamingText}<span className="cursor">▋</span></>
@@ -393,7 +434,7 @@ export default function Notebook({ user }) {
         <textarea
           ref={textareaRef}
           className="chat-input"
-          placeholder={pendingImage ? '补充说明（可选），然后发送…' : '问晓敏老师…'}
+          placeholder={pendingImage ? '补充说明（可选），然后发送…' : teacher.placeholder}
           value={inputText}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
