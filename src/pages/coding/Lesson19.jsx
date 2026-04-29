@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -314,6 +315,39 @@ export default function Lesson19({ onBack }) {
               把上面这段话粘贴进去，看看AI画出来什么！
             </div>
           )}
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🤖 真的让 AI 来"读"你的提示词</h2>
+            <p className="lesson-text" style={{ marginBottom: 8 }}>
+              下面三条提示词，从最简单到最完整。让 AI 用每条来想象画面、给出建议——你就能直观感受到：提示词差一点，AI 想出来的画面差很多！
+            </p>
+            <PromptCompareLab
+              subject="ai-image-prompt"
+              accent={accentColor}
+              intro="点按钮，让 AI 用每条提示词描述它脑中的画面、并打分。"
+              hint="主体 + 场景 + 风格 + 细节，缺一条 AI 都得自己脑补 ✏️"
+              prompts={[
+                {
+                  id: 'l19-bad',
+                  label: '太简单',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只猫"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？这条提示词缺了哪些关键信息？给它打 1-10 分。',
+                },
+                {
+                  id: 'l19-mid',
+                  label: '还不够',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只橙色小猫在窗台上"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？还缺什么？给它打 1-10 分。',
+                },
+                {
+                  id: 'l19-good',
+                  label: '主体+场景+风格+细节',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只橙色小猫坐在木窗台上看雨，水彩画风格，温暖橙色光线，超清晰细节"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？给它打 1-10 分，并说说为什么。',
+                },
+              ]}
+              allowCustom={true}
+              customLabel="✏️ 试试你刚拼好的提示词"
+              customPlaceholder="把上面拼出来的提示词粘贴进来，让 AI 评价一下，再决定要不要拿去画图工具用"
+            />
+          </div>
         </div>
       )}
 
