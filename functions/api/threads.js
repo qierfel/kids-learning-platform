@@ -36,10 +36,10 @@ async function handleList(KV, uid) {
 }
 
 async function handleCreate(KV, uid, body) {
-  const { userName, subject, content, messages } = body
+  const { userName, subject, teacherRole = 'academic', content, messages } = body
   const id = generateId()
   const now = Date.now()
-  const thread = { id, userId: uid, userName, subject, content, messages: messages || [], createdAt: now, updatedAt: now }
+  const thread = { id, userId: uid, userName, subject, teacherRole, content, messages: messages || [], createdAt: now, updatedAt: now }
 
   await KV.put(`thread:${id}`, JSON.stringify(thread))
 
@@ -51,7 +51,7 @@ async function handleCreate(KV, uid, body) {
 }
 
 async function handleUpdate(KV, uid, body) {
-  const { id, messages } = body
+  const { id, messages, teacherRole } = body
   if (!id) return json({ error: 'id required' }, 400)
 
   const raw = await KV.get(`thread:${id}`)
@@ -60,6 +60,7 @@ async function handleUpdate(KV, uid, body) {
   if (thread.userId !== uid) return json({ error: 'Forbidden' }, 403)
 
   thread.messages = messages
+  if (teacherRole) thread.teacherRole = teacherRole
   thread.updatedAt = Date.now()
   await KV.put(`thread:${id}`, JSON.stringify(thread))
 

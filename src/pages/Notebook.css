@@ -43,6 +43,13 @@
   flex-shrink: 0;
 }
 
+.teacher-avatar-coding,
+.msg-avatar-coding,
+.welcome-avatar-coding {
+  background: linear-gradient(135deg, #d8e6ff, #d9d2ff);
+  box-shadow: 0 10px 24px rgba(83, 98, 214, 0.18);
+}
+
 .teacher-info {
   display: flex;
   flex-direction: column;
@@ -93,6 +100,44 @@
   color: #1a1a2e;
 }
 
+.teacher-selector {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.teacher-selector::-webkit-scrollbar { display: none; }
+
+.teacher-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(108, 88, 66, 0.10);
+  background: rgba(255, 252, 247, 0.90);
+  color: #4a4a45;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.teacher-pill-avatar {
+  font-size: 16px;
+}
+
+.teacher-pill.active {
+  background: linear-gradient(135deg, #2f5fff, #6b4dff);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 12px 28px rgba(69, 86, 201, 0.22);
+}
+
 /* ============ Subject Selector ============ */
 .subject-selector {
   display: flex;
@@ -132,6 +177,7 @@
 .subject-pill-化学.active { background: #db2777; border-color: #db2777; }
 .subject-pill-历史.active { background: #c2410c; border-color: #c2410c; }
 .subject-pill-地理.active { background: #059669; border-color: #059669; }
+.subject-pill-AI编程.active { background: #7c3aed; border-color: #7c3aed; }
 
 /* ============ Messages ============ */
 .chat-messages {
@@ -402,7 +448,31 @@
   margin-bottom: 8px;
 }
 
+.history-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .subject-pill-不限科目 { background: #f3f4f6; color: #666; }
+
+.teacher-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.10);
+  color: #5144cf;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.teacher-tag-coding {
+  background: rgba(89, 76, 214, 0.12);
+  color: #5a43db;
+}
 
 .history-time {
   font-size: 11px;

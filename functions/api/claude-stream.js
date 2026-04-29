@@ -28,14 +28,32 @@ export async function onRequestPost(context) {
     user = userRaw ? JSON.parse(userRaw) : null
   }
 
-  const { messages = [], subject = '' } = body
+  const { messages = [], subject = '', teacherRole = 'academic' } = body
   if (!Array.isArray(messages) || messages.length === 0) {
     return sseError('No messages provided')
   }
 
   const subjectStr = subject && subject !== '不限科目' ? subject : '各科目'
 
-  const systemPrompt = `你是"晓敏老师"，一位拥有20年教学经验的资深教师，精通语文、数学、英语、物理、化学、历史、地理，尤其擅长${subjectStr}。
+  const systemPrompt = teacherRole === 'coding'
+    ? `你是"阿创老师"，一位专门带孩子做 AI 编程项目的老师，擅长网页、小工具、小游戏、项目拆解、实现路径设计、调试与作品迭代，尤其擅长${subjectStr}相关的创作和开发。
+
+你的风格：
+• 先帮孩子把想法变成一个清楚的小项目目标
+• 善于把大任务拆成 3-5 个可执行的小步骤
+• 既讲思路，也讲落地，不空谈概念
+• 遇到项目问题时，优先帮孩子判断：目标、页面结构、功能模块、实现顺序、调试方法
+• 可以给示例代码，但优先给最小可运行版本，不一次性堆太多
+• 如果孩子表述不清楚，要先追问目标、用户、页面、功能
+• 鼓励孩子自己动手修改、测试、展示作品
+
+规则：
+1. 每次回复尽量控制在220字以内，必要时可用短列表
+2. 用"你"称呼学生，像真正的编程老师带项目
+3. 不要直接把完整大项目一次性做完，先给当前最有帮助的一步
+4. 当问题涉及项目开发时，优先回答：先做什么、怎么拆、怎么验证
+5. 绝不说"作为AI"或"我是AI"，你就是阿创老师`
+    : `你是"晓敏老师"，一位拥有20年教学经验的资深教师，精通语文、数学、英语、物理、化学、历史、地理，尤其擅长${subjectStr}。
 
 你的风格：
 • 温暖亲切，像朋友一样和学生交流，但专业权威
@@ -96,12 +114,13 @@ export async function onRequestPost(context) {
             uid: user.uid,
             email: user.email,
             nickname: user.nickname,
-            endpoint: 'claude-stream',
+            endpoint: teacherRole === 'coding' ? 'claude-coding-teacher-stream' : 'claude-stream',
             provider: 'anthropic',
             model: 'claude-haiku-4-5-20251001',
             success: false,
             inputChars: JSON.stringify(apiMessages).length,
             latencyMs: Date.now() - startedAt,
+            metadata: { subject: subjectStr, teacherRole, streaming: true },
           })
         }
       } else {
@@ -134,7 +153,7 @@ export async function onRequestPost(context) {
             uid: user.uid,
             email: user.email,
             nickname: user.nickname,
-            endpoint: 'claude-stream',
+            endpoint: teacherRole === 'coding' ? 'claude-coding-teacher-stream' : 'claude-stream',
             provider: 'anthropic',
             model: 'claude-haiku-4-5-20251001',
             success: true,
@@ -144,7 +163,7 @@ export async function onRequestPost(context) {
             totalTokens: estOutputTokens,
             latencyMs: Date.now() - startedAt,
             estCostUsd: estimateCostUsd({ provider: 'anthropic', model: 'claude-haiku-4-5-20251001', outputTokens: estOutputTokens }),
-            metadata: { subject: subjectStr, streaming: true },
+            metadata: { subject: subjectStr, teacherRole, streaming: true },
           })
         }
       }
@@ -157,13 +176,13 @@ export async function onRequestPost(context) {
           uid: user.uid,
           email: user.email,
           nickname: user.nickname,
-          endpoint: 'claude-stream',
+          endpoint: teacherRole === 'coding' ? 'claude-coding-teacher-stream' : 'claude-stream',
           provider: 'anthropic',
           model: 'claude-haiku-4-5-20251001',
           success: false,
           inputChars: JSON.stringify(apiMessages).length,
           latencyMs: Date.now() - startedAt,
-          metadata: { subject: subjectStr, streaming: true },
+          metadata: { subject: subjectStr, teacherRole, streaming: true },
         })
       }
     } finally {
