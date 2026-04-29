@@ -1,6 +1,7 @@
 // Cloudflare Pages Function — OpenAI Realtime API ephemeral session token
 // POST /api/realtime-session  { level: 'KET' | 'PET' | 'FCE' }
 // Returns OpenAI session object containing client_secret for WebRTC signaling
+import { estimateCostUsd, getSessionFromRequest, recordUsage } from './_usage.js'
 
 const LEVEL_CTX = {
   KET: 'The student is a beginner (A2). Speak slowly and clearly. Use very simple vocabulary and short sentences. Keep corrections simple and highly encouraging.',
@@ -24,6 +25,8 @@ Only correct the single most important mistake per turn. Prioritise keeping the 
 
 export async function onRequestPost(context) {
   const { request, env } = context
+  const KV = env.KV
+  const startedAt = Date.now()
 
   if (!env.OPENAI_API_KEY) {
     return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
@@ -32,11 +35,19 @@ export async function onRequestPost(context) {
     })
   }
 
+  let body = {}
   let level = 'KET'
   try {
-    const body = await request.json()
+    body = await request.json()
     if (body.level && LEVEL_CTX[body.level]) level = body.level
   } catch {}
+
+  const session = await getSessionFromRequest(KV, request, body)
+  let user = null
+  if (session?.uid && KV) {
+    const userRaw = await KV.get(`user:${session.uid}`)
+    user = userRaw ? JSON.parse(userRaw) : null
+  }
 
   const instructions = `${BASE_INSTRUCTIONS}\n\n${LEVEL_CTX[level]}`
 
@@ -63,10 +74,39 @@ export async function onRequestPost(context) {
   const data = await resp.json()
 
   if (!resp.ok) {
+    if (user) {
+      await recordUsage(KV, {
+        uid: user.uid,
+        email: user.email,
+        nickname: user.nickname,
+        endpoint: 'realtime-session',
+        provider: 'openai',
+        model: 'gpt-4o-realtime-preview',
+        success: false,
+        latencyMs: Date.now() - startedAt,
+        estCostUsd: 0,
+        metadata: { level },
+      })
+    }
     return new Response(
       JSON.stringify({ error: data.error?.message || `OpenAI error ${resp.status}` }),
       { status: resp.status, headers: { 'Content-Type': 'application/json' } }
     )
+  }
+
+  if (user) {
+    await recordUsage(KV, {
+      uid: user.uid,
+      email: user.email,
+      nickname: user.nickname,
+      endpoint: 'realtime-session',
+      provider: 'openai',
+      model: 'gpt-4o-realtime-preview',
+      success: true,
+      latencyMs: Date.now() - startedAt,
+      estCostUsd: 0,
+      metadata: { level },
+    })
   }
 
   return new Response(JSON.stringify(data), {

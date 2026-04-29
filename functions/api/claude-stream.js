@@ -4,10 +4,13 @@
 // IMPORTANT: Do NOT use context.waitUntil() for streaming.
 // When returning new Response(readable), CF keeps the worker alive
 // until the ReadableStream is closed. Start the write work via IIFE.
+import { estimateCostUsd, getSessionFromRequest, recordUsage } from './_usage.js'
 
 export async function onRequestPost(context) {
   const { request, env } = context
+  const KV = env.KV
   const apiKey = env.ANTHROPIC_API_KEY
+  const startedAt = Date.now()
 
   if (!apiKey) {
     return sseError('API key not configured on server')
@@ -16,6 +19,13 @@ export async function onRequestPost(context) {
   let body
   try { body = await request.json() } catch {
     return sseError('Invalid JSON body')
+  }
+
+  const session = await getSessionFromRequest(KV, request, body)
+  let user = null
+  if (session?.uid && KV) {
+    const userRaw = await KV.get(`user:${session.uid}`)
+    user = userRaw ? JSON.parse(userRaw) : null
   }
 
   const { messages = [], subject = '' } = body
@@ -60,6 +70,7 @@ export async function onRequestPost(context) {
   // until the stream is closed. Start writing via IIFE — no waitUntil needed.
   ;(async () => {
     try {
+      let streamedText = ''
       const upstream = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -80,6 +91,19 @@ export async function onRequestPost(context) {
         const errText = await upstream.text()
         await writer.write(encoder.encode(`data: ${JSON.stringify({ error: `Anthropic API error: ${upstream.status}` })}\n\n`))
         console.error('Anthropic error:', errText)
+        if (user) {
+          await recordUsage(KV, {
+            uid: user.uid,
+            email: user.email,
+            nickname: user.nickname,
+            endpoint: 'claude-stream',
+            provider: 'anthropic',
+            model: 'claude-haiku-4-5-20251001',
+            success: false,
+            inputChars: JSON.stringify(apiMessages).length,
+            latencyMs: Date.now() - startedAt,
+          })
+        }
       } else {
         const reader = upstream.body.getReader()
         const decoder = new TextDecoder()
@@ -98,16 +122,50 @@ export async function onRequestPost(context) {
             try {
               const event = JSON.parse(data)
               if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+                streamedText += event.delta.text
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`))
               }
             } catch { /* ignore malformed SSE lines */ }
           }
+        }
+        if (user) {
+          const estOutputTokens = Math.ceil(streamedText.length / 2)
+          await recordUsage(KV, {
+            uid: user.uid,
+            email: user.email,
+            nickname: user.nickname,
+            endpoint: 'claude-stream',
+            provider: 'anthropic',
+            model: 'claude-haiku-4-5-20251001',
+            success: true,
+            inputChars: JSON.stringify(apiMessages).length,
+            outputChars: streamedText.length,
+            outputTokens: estOutputTokens,
+            totalTokens: estOutputTokens,
+            latencyMs: Date.now() - startedAt,
+            estCostUsd: estimateCostUsd({ provider: 'anthropic', model: 'claude-haiku-4-5-20251001', outputTokens: estOutputTokens }),
+            metadata: { subject: subjectStr, streaming: true },
+          })
         }
       }
     } catch (e) {
       try {
         await writer.write(encoder.encode(`data: ${JSON.stringify({ error: e.message })}\n\n`))
       } catch { /* writer might already be closed */ }
+      if (user) {
+        await recordUsage(KV, {
+          uid: user.uid,
+          email: user.email,
+          nickname: user.nickname,
+          endpoint: 'claude-stream',
+          provider: 'anthropic',
+          model: 'claude-haiku-4-5-20251001',
+          success: false,
+          inputChars: JSON.stringify(apiMessages).length,
+          latencyMs: Date.now() - startedAt,
+          metadata: { subject: subjectStr, streaming: true },
+        })
+      }
     } finally {
       try {
         await writer.write(encoder.encode('data: [DONE]\n\n'))

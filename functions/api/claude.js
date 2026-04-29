@@ -1,5 +1,6 @@
 // Cloudflare Pages Function
 // 路径 /functions/api/claude.js → 自动映射到 /api/claude
+import { estimateCostUsd, getSessionFromRequest, recordUsage } from './_usage.js'
 
 export async function onRequestPost(context) {
   try {
@@ -12,12 +13,21 @@ export async function onRequestPost(context) {
 
 async function handleRequest(context) {
   const { request, env } = context
+  const KV = env.KV
+  const startedAt = Date.now()
 
   let body
   try {
     body = await request.json()
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
+  }
+
+  const session = await getSessionFromRequest(KV, request, body)
+  let user = null
+  if (session?.uid && KV) {
+    const userRaw = await KV.get(`user:${session.uid}`)
+    user = userRaw ? JSON.parse(userRaw) : null
   }
 
   const { type, payload } = body
@@ -144,7 +154,7 @@ ${lines.join('\n')}
       max_tokens: 1024,
       system: systemPrompt,
       messages: apiMessages,
-    })
+    }, { KV, user, endpoint: 'claude-chat', startedAt, metadata: { type, subject: chatSubject } })
 
   } else if (type === 'question_guide') {
     const { question, history = [], subject = '学习' } = payload
@@ -169,7 +179,7 @@ ${lines.join('\n')}
       max_tokens: 200,
       system: systemPrompt,
       messages,
-    })
+    }, { KV, user, endpoint: 'claude-question-guide', startedAt, metadata: { type, subject } })
 
   } else if (type === 'grammar_explain') {
     const { grammarPoint, level, queryType } = payload
@@ -468,7 +478,7 @@ Explain in Chinese (简明扼要，不超过100字): ${question || '这篇文章
     model: 'claude-haiku-4-5-20251001',
     max_tokens,
     messages: [{ role: 'user', content: prompt }],
-  })
+  }, { KV, user, endpoint: `claude-${type}`, startedAt, metadata: { type } })
 }
 
 export async function onRequestOptions() {
@@ -478,7 +488,7 @@ export async function onRequestOptions() {
   })
 }
 
-async function callClaude(apiKey, body) {
+async function callClaude(apiKey, body, usageCtx = {}) {
   const t0 = Date.now()
   try {
     console.log(`[claude] calling model=${body.model} max_tokens=${body.max_tokens}`)
@@ -499,9 +509,47 @@ async function callClaude(apiKey, body) {
     const data = await response.json()
     const text = data.content?.[0]?.text?.trim() || ''
     console.log(`[claude] ✅ done in ${Date.now() - t0}ms, chars=${text.length}`)
+    if (usageCtx.user && usageCtx.KV) {
+      const usage = data.usage || {}
+      const inputTokens = Number(usage.input_tokens || 0)
+      const outputTokens = Number(usage.output_tokens || 0)
+      const totalTokens = inputTokens + outputTokens
+      await recordUsage(usageCtx.KV, {
+        uid: usageCtx.user.uid,
+        email: usageCtx.user.email,
+        nickname: usageCtx.user.nickname,
+        endpoint: usageCtx.endpoint || 'claude',
+        provider: 'anthropic',
+        model: body.model,
+        success: true,
+        inputTokens,
+        outputTokens,
+        totalTokens,
+        inputChars: JSON.stringify(body.messages || []).length,
+        outputChars: text.length,
+        latencyMs: Date.now() - (usageCtx.startedAt || t0),
+        estCostUsd: estimateCostUsd({ provider: 'anthropic', model: body.model, inputTokens, outputTokens }),
+        metadata: usageCtx.metadata || {},
+      })
+    }
     return json({ text })
   } catch (e) {
     console.error(`[claude] ❌ exception:`, e.message)
+    if (usageCtx.user && usageCtx.KV) {
+      await recordUsage(usageCtx.KV, {
+        uid: usageCtx.user.uid,
+        email: usageCtx.user.email,
+        nickname: usageCtx.user.nickname,
+        endpoint: usageCtx.endpoint || 'claude',
+        provider: 'anthropic',
+        model: body.model,
+        success: false,
+        inputChars: JSON.stringify(body.messages || []).length,
+        latencyMs: Date.now() - (usageCtx.startedAt || t0),
+        estCostUsd: 0,
+        metadata: usageCtx.metadata || {},
+      })
+    }
     return json({ error: e.message }, 500)
   }
 }

@@ -1,5 +1,6 @@
 // Cloudflare Pages Function — OpenAI text proxy for coding lessons
 // POST /api/openai-text
+import { estimateCostUsd, getSessionFromRequest, recordUsage } from './_usage.js'
 
 function extractText(data) {
   if (typeof data?.output_text === 'string' && data.output_text.trim()) return data.output_text.trim()
@@ -25,6 +26,8 @@ function json(payload, status = 200) {
 
 export async function onRequestPost(context) {
   const { request, env } = context
+  const KV = env.KV
+  const startedAt = Date.now()
 
   if (!env.OPENAI_API_KEY) {
     return json({ error: 'OPENAI_API_KEY not configured' }, 500)
@@ -35,6 +38,13 @@ export async function onRequestPost(context) {
     body = await request.json()
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
+  }
+
+  const session = await getSessionFromRequest(KV, request, body)
+  let user = null
+  if (session?.uid && KV) {
+    const userRaw = await KV.get(`user:${session.uid}`)
+    user = userRaw ? JSON.parse(userRaw) : null
   }
 
   const {
@@ -86,9 +96,54 @@ export async function onRequestPost(context) {
 
   const data = await resp.json()
   if (!resp.ok) {
+    if (user) {
+      const usage = data?.usage || {}
+      const inputTokens = Number(usage.input_tokens || 0)
+      const outputTokens = Number(usage.output_tokens || 0)
+      const totalTokens = Number(usage.total_tokens || (inputTokens + outputTokens))
+      await recordUsage(KV, {
+        uid: user.uid,
+        email: user.email,
+        nickname: user.nickname,
+        endpoint: 'openai-text',
+        provider: 'openai',
+        model: 'gpt-5.5',
+        success: false,
+        inputTokens,
+        outputTokens,
+        totalTokens,
+        inputChars: JSON.stringify(input).length,
+        latencyMs: Date.now() - startedAt,
+        estCostUsd: estimateCostUsd({ provider: 'openai', model: 'gpt-5.5', inputTokens, outputTokens }),
+        metadata,
+      })
+    }
     return json({ error: data?.error?.message || `OpenAI error ${resp.status}` }, resp.status)
   }
 
   const text = extractText(data)
+  if (user) {
+    const usage = data?.usage || {}
+    const inputTokens = Number(usage.input_tokens || 0)
+    const outputTokens = Number(usage.output_tokens || 0)
+    const totalTokens = Number(usage.total_tokens || (inputTokens + outputTokens))
+    await recordUsage(KV, {
+      uid: user.uid,
+      email: user.email,
+      nickname: user.nickname,
+      endpoint: 'openai-text',
+      provider: 'openai',
+      model: 'gpt-5.5',
+      success: true,
+      inputTokens,
+      outputTokens,
+      totalTokens,
+      inputChars: JSON.stringify(input).length,
+      outputChars: text.length,
+      latencyMs: Date.now() - startedAt,
+      estCostUsd: estimateCostUsd({ provider: 'openai', model: 'gpt-5.5', inputTokens, outputTokens }),
+      metadata,
+    })
+  }
   return json({ text, raw: data })
 }
