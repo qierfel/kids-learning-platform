@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -371,15 +372,57 @@ export default function Lesson27({ onBack }) {
                 border: '1px solid #bbf7d0', fontSize: 14, color: '#374151',
                 lineHeight: 1.7, fontStyle: 'italic'
               }}>
-                {idea.id === 'hello' && '"帮我把小程序首页改成一张名片样式：大标题是我的名字，下面是我的爱好列表，底部有一个绿色按钮点击后显示欢迎语"'}
-                {idea.id === 'quiz' && '"帮我做一个3题知识问答小程序，有答题界面，答完后显示得分，有一个"再玩一次"按钮"'}
-                {idea.id === 'wish' && '"帮我做一个许愿瓶小程序，有一个输入框和保存按钮，保存后能在列表里看到所有愿望"'}
-                {idea.id === 'calc' && '"帮我做一个计算器小程序，有数字按钮和加减乘除，界面要好看，用微信绿色主题"'}
-                {idea.id === 'fortune' && '"帮我做一个今日运势小程序，点击按钮随机显示一句鼓励的话，每次都不一样，界面要有星星装饰"'}
+                {selectedIdea.id === 'hello' && '"帮我把小程序首页改成一张名片样式：大标题是我的名字，下面是我的爱好列表，底部有一个绿色按钮点击后显示欢迎语"'}
+                {selectedIdea.id === 'quiz' && '"帮我做一个3题知识问答小程序，有答题界面，答完后显示得分，有一个"再玩一次"按钮"'}
+                {selectedIdea.id === 'wish' && '"帮我做一个许愿瓶小程序，有一个输入框和保存按钮，保存后能在列表里看到所有愿望"'}
+                {selectedIdea.id === 'calc' && '"帮我做一个计算器小程序，有数字按钮和加减乘除，界面要好看，用微信绿色主题"'}
+                {selectedIdea.id === 'fortune' && '"帮我做一个今日运势小程序，点击按钮随机显示一句鼓励的话，每次都不一样，界面要有星星装饰"'}
               </div>
               <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>
                 💡 可以直接复制这段话，让AI帮你写代码
               </div>
+            </div>
+          )}
+
+          {selectedIdea && (
+            <div style={{ marginTop: 24 }}>
+              <h3 style={{ color: accentColor, marginBottom: 4 }}>🤖 让 AI 先帮你"想清楚要做什么"（三种提示词对比）</h3>
+              <p style={{ color: '#6b7280', fontSize: 14, marginTop: 0 }}>
+                丢给 Cursor 之前，先让 AI 把你的想法变成"功能清单 + 界面草稿"。三种提示词，写得越清楚 AI 给的越能直接动手做！
+              </p>
+              <PromptCompareLab
+                subject="ai-miniapp-spec"
+                accent={accentColor}
+                intro="点按钮，让 AI 用每条提示词给你一份小程序设计稿。"
+                hint="说清楚【做什么 + 谁用 + 几个页面 + 每页要哪些元素】，AI 给的稿才能直接开 Cursor 落地 ✨"
+                prompts={[
+                  {
+                    id: 'l27-bad',
+                    label: '太模糊',
+                    text: `帮我做一个${selectedIdea.name}小程序。`,
+                  },
+                  {
+                    id: 'l27-mid',
+                    label: '说了功能',
+                    text: `帮我做一个${selectedIdea.name}小程序。${selectedIdea.desc}。请列出主要功能。`,
+                  },
+                  {
+                    id: 'l27-good',
+                    label: '功能+页面+元素+交互',
+                    text: `请帮我设计一个微信小程序的"${selectedIdea.name}"。简介：${selectedIdea.desc}。受众是 10-12 岁的同学。请输出：
+1. 一句话功能定位
+2. 需要几个页面，每个页面分别叫什么
+3. 主页面上需要哪些元素（每个元素一行：是什么 / 长什么样 / 点击后会怎样）
+4. 配色建议（主色 + 强调色，要符合微信绿主题）
+5. 一段 30 字以内的"对 Cursor 说的话"，可以直接粘贴去 Cmd+K 用
+
+请直接给我成品，不要绕。`,
+                  },
+                ]}
+                allowCustom={true}
+                customLabel="✏️ 你也想个提示词"
+                customPlaceholder={`比如加上"再做一个分享按钮"或者"换成深色主题"，看 AI 改出什么`}
+              />
             </div>
           )}
         </div>

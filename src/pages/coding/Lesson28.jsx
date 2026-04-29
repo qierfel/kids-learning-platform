@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -455,6 +456,81 @@ export default function Lesson28({ onBack }) {
               "帮我写一首关于[你的主题]的歌词，4段，每段4行，风格要[你想要的风格]"
               然后把歌词复制到Suno或天音里生成！
             </p>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h3 style={{ color: accentColor, marginBottom: 4 }}>🤖 现场试：让 AI 写一段{activeCategory === 'video' ? '视频脚本' : '歌词'}（三种提示词对比）</h3>
+            <p style={{ color: '#6b7280', fontSize: 14, marginTop: 0 }}>
+              丢给{activeCategory === 'video' ? '可灵 / Runway' : 'Suno / 天音'}之前，先让 Claude 写个稿。三种提示词从随便说→说清楚→主体+场景+风格+情绪，差距一眼看出来！
+            </p>
+            {activeCategory === 'video' ? (
+              <PromptCompareLab
+                subject="ai-video-script"
+                accent={accentColor}
+                intro="点按钮，让 AI 用每条提示词写一段 5-8 秒的视频脚本。"
+                hint="说清楚【主角 + 场景 + 镜头 + 风格 + 情绪】，AI 写出来的脚本才能直接喂给视频 AI ✨"
+                prompts={[
+                  {
+                    id: 'l28-vid-bad',
+                    label: '太模糊',
+                    text: '帮我写一段 5 秒的短视频脚本。',
+                  },
+                  {
+                    id: 'l28-vid-mid',
+                    label: '说了主角',
+                    text: '帮我写一段 5 秒的短视频脚本，主角是一只小猫。',
+                  },
+                  {
+                    id: 'l28-vid-good',
+                    label: '主角+场景+镜头+风格+情绪',
+                    text: `请帮我写一段适合喂给可灵 AI 的视频提示词，时长 5-8 秒。要求：
+- 主角：一只橙色小猫
+- 场景：春天的窗台，外面下小雨
+- 镜头：先慢慢推近到猫的眼睛，再切到窗外
+- 风格：电影感、暖色调、像宫崎骏的画
+- 情绪：宁静、有点想念
+
+请直接输出一段可以粘贴到可灵的中文提示词（80 字以内），不要解释。`,
+                  },
+                ]}
+                allowCustom={true}
+                customLabel="✏️ 你也写一条视频提示词"
+                customPlaceholder={`换主角、换场景、换风格——看 AI 给你写出什么样的画面`}
+              />
+            ) : (
+              <PromptCompareLab
+                subject="ai-song-lyrics"
+                accent={accentColor}
+                intro="点按钮，让 AI 用每条提示词写一段歌词草稿。"
+                hint="说清楚【主题 + 段数行数 + 听众 + 风格 + 情绪】，AI 写出来的歌词才能直接进 Suno ✨"
+                prompts={[
+                  {
+                    id: 'l28-song-bad',
+                    label: '太模糊',
+                    text: '帮我写首歌。',
+                  },
+                  {
+                    id: 'l28-song-mid',
+                    label: '说了主题',
+                    text: '帮我写一首关于夏天的歌。',
+                  },
+                  {
+                    id: 'l28-song-good',
+                    label: '主题+结构+受众+风格',
+                    text: `请帮我写一首要丢给 Suno 生成的中文歌歌词。要求：
+- 主题：暑假和好朋友一起骑车去看夕阳
+- 结构：主歌 1（4行）+ 副歌（4行，要重复出彩的一句）+ 主歌 2（4行）+ 副歌（重复）
+- 听众：我的同学（10-12岁）
+- 风格：流行 + 一点点民谣，活泼向上
+- 韵脚要押韵
+请直接输出歌词，每段前用【主歌1】【副歌】等标签，方便我贴进 Suno。`,
+                  },
+                ]}
+                allowCustom={true}
+                customLabel="✏️ 你也写一条歌词提示词"
+                customPlaceholder={`换主题、换风格、换段数——看 AI 写出来的歌词差别多大`}
+              />
+            )}
           </div>
         </div>
       )}
