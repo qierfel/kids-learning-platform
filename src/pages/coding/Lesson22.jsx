@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Lesson.css'
+import ImageGenLab from './ImageGenLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -100,6 +101,15 @@ export default function Lesson22({ onBack }) {
   const [quizDone, setQuizDone] = useState(false)
   const [myPlatform, setMyPlatform] = useState(null)
   const [selectedPlatform, setSelectedPlatform] = useState(null)
+  const [savedWorks, setSavedWorks] = useState([])
+
+  useEffect(() => {
+    if (tab !== 'work') return
+    try {
+      const list = JSON.parse(localStorage.getItem('imageGenLab:lesson22') || '[]')
+      setSavedWorks(Array.isArray(list) ? list : [])
+    } catch { setSavedWorks([]) }
+  }, [tab])
 
   const accentColor = '#10b981'
 
@@ -273,9 +283,29 @@ export default function Lesson22({ onBack }) {
 
           {builtPrompt && (
             <div style={{ marginTop: 12, background: '#dcfce7', border: '1.5px solid #86efac', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#15803d', fontWeight: 600 }}>
-              ✅ 提示词准备好了！去"去哪画"选一个平台，把它粘贴进去！
+              ✅ 提示词准备好了！下面直接让 AI 画一张试试 ↓<br />
+              （也可以去"去哪画"标签选一个外部平台对比效果）
             </div>
           )}
+
+          <div style={{ marginTop: 18, paddingTop: 14, borderTop: '2px dashed #86efac' }}>
+            <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🎨 直接让 AI 画一张</h2>
+            <p className="lesson-text">这就是本课的真正动手时刻——把你拼好的提示词试出来，画到满意为止，然后保存到我的作品！</p>
+            <ImageGenLab
+              defaultPrompt={builtPrompt}
+              accent={accentColor}
+              subject="Lesson22-builder"
+              size="1024x1024"
+              quality="standard"
+              savedKey="lesson22"
+              intro="点击按钮让 AI 画图。第一次大概要等 10–30 秒，画出来后可以重画或保存。"
+              presetPrompts={[
+                '一只白色波斯猫，坐在雨天的咖啡馆窗台上，水彩插画风格，温暖橙色室内光，超高清细节',
+                '一头银色独角兽，在月光下的森林湖边，魔法粒子飘散，梦幻油画风格，电影级光影',
+                '一艘飞船穿过五彩星云，未来科幻风格，霓虹灯光，超精细，8K 画质',
+              ]}
+            />
+          </div>
         </div>
       )}
 
@@ -407,6 +437,23 @@ export default function Lesson22({ onBack }) {
             <div style={{ marginTop: 14, background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 12, padding: '14px' }}>
               <div style={{ fontSize: 13, color: accentColor, fontWeight: 700, marginBottom: 6 }}>✏️ 你在本课写好的提示词：</div>
               <div style={{ fontSize: 14, color: '#1e293b', fontStyle: 'italic', lineHeight: 1.7 }}>{builtPrompt}</div>
+            </div>
+          )}
+
+          {savedWorks.length > 0 && (
+            <div style={{ marginTop: 16, background: '#fff', border: `2px solid ${accentColor}40`, borderRadius: 14, padding: '14px' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: accentColor, marginBottom: 10 }}>🖼️ 你保存的作品（{savedWorks.length}）</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
+                {savedWorks.map((w, i) => (
+                  <a key={i} href={w.url} target="_blank" rel="noreferrer" style={{ display: 'block', borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <img src={w.url} alt={w.prompt} style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block' }} />
+                    <div style={{ padding: '6px 8px', fontSize: 11, color: '#475569', lineHeight: 1.4, maxHeight: 50, overflow: 'hidden' }}>
+                      {(w.prompt || '').slice(0, 40)}{(w.prompt || '').length > 40 ? '…' : ''}
+                    </div>
+                  </a>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 8 }}>点缩略图查看大图。作品保存在你这台设备上。</div>
             </div>
           )}
 
