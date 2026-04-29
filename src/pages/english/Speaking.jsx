@@ -65,6 +65,10 @@ export default function Speaking({ user, onBack }) {
   const analyserRef = useRef(null)
   const rafRef = useRef(null)
   const rtAiTranscriptRef = useRef('')
+  // Echo-loop guard: mute mic track while Emma is speaking, then re-enable
+  // after a small buffer so trailing audio playback doesn't get re-captured.
+  const isAiSpeakingRef = useRef(false)
+  const unmuteTimerRef = useRef(null)
 
   useEffect(() => { messagesRef.current = messages }, [messages])
   useEffect(() => { isStreamingRef.current = isStreaming }, [isStreaming])
@@ -125,6 +129,8 @@ export default function Speaking({ user, onBack }) {
   // ── Realtime cleanup ─────────────────────────────────────────────────────
   function cleanupRealtime() {
     stopWaveform()
+    if (unmuteTimerRef.current) { clearTimeout(unmuteTimerRef.current); unmuteTimerRef.current = null }
+    isAiSpeakingRef.current = false
     dcRef.current?.close(); dcRef.current = null
     pcRef.current?.close(); pcRef.current = null
     micStreamRef.current?.getTracks().forEach(t => t.stop()); micStreamRef.current = null
@@ -134,6 +140,30 @@ export default function Speaking({ user, onBack }) {
       audioElRef.current = null
     }
     analyserRef.current = null
+  }
+
+  // Disable the local mic track so Emma's playback (or speaker bleed) can't be
+  // captured and shipped back to the server's VAD. WebRTC keeps transmitting
+  // silence, so the connection stays alive — only the audio is gated.
+  function muteMicForAiSpeech() {
+    if (unmuteTimerRef.current) { clearTimeout(unmuteTimerRef.current); unmuteTimerRef.current = null }
+    isAiSpeakingRef.current = true
+    micStreamRef.current?.getAudioTracks().forEach(t => { t.enabled = false })
+  }
+
+  // Re-enable the mic after Emma finishes. The 500 ms delay covers buffered
+  // audio still playing through the <audio> element after response.done fires.
+  // Also clear any server-side input buffer as a defensive sweep.
+  function unmuteMicAfterAiSpeech(delayMs = 500) {
+    if (unmuteTimerRef.current) clearTimeout(unmuteTimerRef.current)
+    unmuteTimerRef.current = setTimeout(() => {
+      isAiSpeakingRef.current = false
+      micStreamRef.current?.getAudioTracks().forEach(t => { t.enabled = true })
+      if (dcRef.current?.readyState === 'open') {
+        try { dcRef.current.send(JSON.stringify({ type: 'input_audio_buffer.clear' })) } catch {}
+      }
+      unmuteTimerRef.current = null
+    }, delayMs)
   }
 
   // ── Realtime session ─────────────────────────────────────────────────────
@@ -164,10 +194,15 @@ export default function Speaking({ user, onBack }) {
       }
       const ephemeralKey = sessData.client_secret.value
 
-      // 2. Microphone access
+      // 2. Microphone access — full echo/noise/gain pipeline so Emma's
+      // playback isn't captured by the same mic that's feeding the API.
       step = '请求麦克风权限'
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       })
       micStreamRef.current = stream
       startWaveform(stream)
@@ -254,10 +289,14 @@ export default function Speaking({ user, onBack }) {
       }
 
       case 'conversation.item.input_audio_transcription.delta':
+        // Drop any partial transcript that arrives while Emma is speaking —
+        // it's almost certainly her own voice echoed through the speakers.
+        if (isAiSpeakingRef.current) break
         setRtUserTranscript(prev => prev + (ev.delta || ''))
         break
 
       case 'response.created':
+        muteMicForAiSpeech()
         setRtStatus('thinking')
         setRtAiTranscript('')
         rtAiTranscriptRef.current = ''
@@ -279,10 +318,14 @@ export default function Speaking({ user, onBack }) {
       }
 
       case 'response.done':
+      case 'response.cancelled':
+      case 'response.failed':
+        unmuteMicAfterAiSpeech()
         setRtStatus('listening')
         break
 
       case 'error':
+        unmuteMicAfterAiSpeech(0)
         setRtError(`API 错误：${ev.error?.message || 'Unknown error'}`)
         setRtStatus('error')
         break
