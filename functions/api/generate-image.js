@@ -158,5 +158,15 @@ export async function onRequestPost(context) {
   const images = pickImages(data)
   if (!images.length) return json({ error: 'OpenAI returned no images' }, 502)
 
-  return json({ images, mode: editMode ? 'edit' : 'generate' })
+  // Top-level compat fields for callers that didn't read the canonical
+  // { images, mode } shape — keeps the homework-grading client working
+  // without forcing a coordinated change there.
+  const first = images[0]
+  const m = first.url.match(/^data:image\/[\w+-]+;base64,(.+)$/)
+  return json({
+    images,
+    mode: editMode ? 'edit' : 'generate',
+    url: first.url,
+    ...(m ? { imageBase64: m[1], mediaType: 'image/png' } : {}),
+  })
 }
