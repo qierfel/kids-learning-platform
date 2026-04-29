@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logActivity } from '../utils/activityLogger'
 import './HomeworkGrade.css'
@@ -17,7 +17,6 @@ async function apiMistakes(body) {
 const MAX_DIM = 1600
 const MAX_BYTES = 900_000
 
-// Compress image: scale down + re-encode JPEG until under MAX_BYTES
 async function compressImage(file) {
   const url = URL.createObjectURL(file)
   try {
@@ -56,84 +55,83 @@ function dataUrlToBase64(dataUrl) {
 const SUBJECT_FALLBACK = '语文'
 const VALID_SUBJECTS = ['语文', '数学', '英语', '物理', '化学', '历史', '地理']
 
+function buildAnnotationPrompt(errors) {
+  if (!errors || errors.length === 0) {
+    return '这是一张小学生的作业照片。请保留原图所有内容不变，在作业右上角用红色批改笔写一个大大的红色对勾"✓"，并在旁边写"全对！太棒了"四个红色字。'
+  }
+  const lines = errors.map((e, i) => {
+    const loc = e.location?.trim() || `第${i + 1}题位置`
+    const correct = e.correctAnswer?.trim() || ''
+    const detail = correct ? `（正确答案：${correct}）` : ''
+    return `${i + 1}. ${loc}：用红色批改笔在该题目附近画一个红圈，并在旁边写一个红色"✗"标记${detail}`
+  })
+  return `这是一张小学生的作业照片。请保留原图所有内容（题目文字、答案、版面）完全不变，仅在原图上叠加用红色批改笔做的标注：
+
+${lines.join('\n')}
+
+要求：
+- 只用纯红色（#E53E3E 类似的鲜红色）做标注，模仿真人老师用红笔批改
+- 红色标注线条要清晰但不要遮挡题目本身的文字
+- 不要修改、重写、移动或删除原图中任何已有内容
+- 不要添加额外的装饰、水印、阴影或边框
+- 输出与输入图片相同的尺寸和构图`
+}
+
+async function callImageEdit(imageBase64, prompt) {
+  const candidates = [
+    { url: '/api/generate-image', body: { inputImage: imageBase64, prompt, mediaType: 'image/jpeg' } },
+    { url: '/api/generate-image', body: { image: imageBase64, prompt, mediaType: 'image/jpeg' } },
+  ]
+  for (const c of candidates) {
+    try {
+      const res = await fetch(c.url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(c.body),
+      })
+      if (!res.ok) continue
+      const data = await res.json()
+      const url = extractImageUrl(data)
+      if (url) return { url, raw: data }
+    } catch { /* try next */ }
+  }
+  return null
+}
+
+function extractImageUrl(data) {
+  if (!data) return null
+  if (typeof data.url === 'string') return data.url
+  if (typeof data.imageUrl === 'string') return data.imageUrl
+  if (typeof data.dataUrl === 'string') return data.dataUrl
+  if (typeof data.imageBase64 === 'string') {
+    const mt = data.mediaType || 'image/png'
+    return `data:${mt};base64,${data.imageBase64}`
+  }
+  if (typeof data.b64_json === 'string') {
+    return `data:image/png;base64,${data.b64_json}`
+  }
+  if (Array.isArray(data.data) && data.data[0]) {
+    const first = data.data[0]
+    if (typeof first.url === 'string') return first.url
+    if (typeof first.b64_json === 'string') return `data:image/png;base64,${first.b64_json}`
+  }
+  return null
+}
+
 export default function HomeworkGrade({ user }) {
   const navigate = useNavigate()
-  const [phase, setPhase] = useState('upload') // upload | grading | result | error
+  const [phase, setPhase] = useState('upload') // upload | grading_vision | grading_image | result | error
   const [imageDataUrl, setImageDataUrl] = useState('')
   const [imageDims, setImageDims] = useState({ width: 0, height: 0 })
   const [grade, setGrade] = useState(3)
-  const [result, setResult] = useState(null) // { errors, summary, subject }
+  const [result, setResult] = useState(null) // { errors, summary, subject, annotatedUrl, annotatedFailed }
   const [errorMsg, setErrorMsg] = useState('')
-  const [savedIds, setSavedIds] = useState({}) // index -> mistakeId
-  const [activeIndex, setActiveIndex] = useState(null)
+  const [savedIds, setSavedIds] = useState({})
   const [savingAll, setSavingAll] = useState(false)
   const [savingOne, setSavingOne] = useState({})
 
   const cameraInputRef = useRef(null)
   const galleryInputRef = useRef(null)
-  const canvasRef = useRef(null)
-  const imgElRef = useRef(null)
-  const annotatedDataUrlRef = useRef('')
-
-  const drawAnnotations = useCallback(() => {
-    const canvas = canvasRef.current
-    const img = imgElRef.current
-    if (!canvas || !img || !result) return
-    const ratio = img.naturalWidth ? img.naturalHeight / img.naturalWidth : 1
-    const cw = Math.min(960, img.naturalWidth || 800)
-    const ch = Math.round(cw * ratio)
-    canvas.width = cw
-    canvas.height = ch
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(img, 0, 0, cw, ch)
-
-    const errors = Array.isArray(result.errors) ? result.errors : []
-    errors.forEach((err, i) => {
-      const bb = err.boundingBox
-      if (!bb) return
-      const x = clamp01(bb.x) * cw
-      const y = clamp01(bb.y) * ch
-      const w = Math.max(8, clamp01(bb.width) * cw)
-      const h = Math.max(8, clamp01(bb.height) * ch)
-      const isActive = activeIndex === i
-      ctx.lineWidth = isActive ? 5 : 3
-      ctx.strokeStyle = isActive ? '#ff8a00' : '#e53e3e'
-      ctx.shadowColor = 'rgba(0,0,0,0.18)'
-      ctx.shadowBlur = isActive ? 6 : 3
-      ctx.strokeRect(x, y, w, h)
-      ctx.shadowBlur = 0
-
-      // Number badge top-left of box
-      const label = String(i + 1)
-      const badgeR = 16
-      const bx = Math.max(badgeR, x)
-      const by = Math.max(badgeR, y)
-      ctx.beginPath()
-      ctx.fillStyle = isActive ? '#ff8a00' : '#e53e3e'
-      ctx.arc(bx, by, badgeR, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.fillStyle = '#fff'
-      ctx.font = 'bold 18px system-ui, -apple-system, sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(label, bx, by)
-    })
-    annotatedDataUrlRef.current = canvas.toDataURL('image/png')
-  }, [result, activeIndex])
-
-  useEffect(() => {
-    if (phase !== 'result' || !result || !imageDataUrl) return
-    const img = new Image()
-    img.onload = () => {
-      imgElRef.current = img
-      drawAnnotations()
-    }
-    img.src = imageDataUrl
-  }, [phase, result, imageDataUrl, drawAnnotations])
-
-  useEffect(() => {
-    if (phase === 'result' && imgElRef.current) drawAnnotations()
-  }, [activeIndex, phase, drawAnnotations])
 
   async function handleFile(e) {
     const file = e.target.files?.[0]
@@ -150,7 +148,6 @@ export default function HomeworkGrade({ user }) {
       setErrorMsg('')
       setResult(null)
       setSavedIds({})
-      setActiveIndex(null)
       setPhase('upload')
     } catch {
       setErrorMsg('图片处理失败，请换一张试试')
@@ -159,8 +156,11 @@ export default function HomeworkGrade({ user }) {
 
   async function startGrading() {
     if (!imageDataUrl) return
-    setPhase('grading')
     setErrorMsg('')
+
+    // Step 1 — Vision analysis (Claude)
+    setPhase('grading_vision')
+    let parsed
     try {
       const res = await fetch('/api/claude', {
         method: 'POST',
@@ -175,22 +175,41 @@ export default function HomeworkGrade({ user }) {
         }),
       })
       const json = await res.json()
-      if (json.parsed) {
-        const parsed = json.parsed
-        const errors = Array.isArray(parsed.errors) ? parsed.errors : []
-        const subject = VALID_SUBJECTS.includes(parsed.subject) ? parsed.subject : SUBJECT_FALLBACK
-        setResult({ errors, summary: parsed.summary || '', subject })
-        setPhase('result')
-        if (errors.length > 0) {
-          logActivity(user?.uid, { type: 'homework_graded', count: errors.length, subject, moduleKey: 'homework_grade' })
-        }
-      } else {
+      if (!json.parsed) {
         setErrorMsg(json.error || 'AI 没识别出内容，换张更清晰的照片再试一次吧')
         setPhase('error')
+        return
       }
+      parsed = json.parsed
     } catch (err) {
       setErrorMsg(err?.message || '网络出了点小问题，重试一下')
       setPhase('error')
+      return
+    }
+
+    const errors = Array.isArray(parsed.errors) ? parsed.errors : []
+    const subject = VALID_SUBJECTS.includes(parsed.subject) ? parsed.subject : SUBJECT_FALLBACK
+    const baseResult = { errors, summary: parsed.summary || '', subject, annotatedUrl: '', annotatedFailed: false }
+
+    // Step 2 — Image edit (OpenAI gpt-image-1 via /api/generate-image)
+    setResult(baseResult)
+    setPhase('grading_image')
+    let annotatedUrl = ''
+    let annotatedFailed = false
+    try {
+      const editPrompt = buildAnnotationPrompt(errors)
+      const edit = await callImageEdit(dataUrlToBase64(imageDataUrl), editPrompt)
+      if (edit?.url) annotatedUrl = edit.url
+      else annotatedFailed = true
+    } catch {
+      annotatedFailed = true
+    }
+
+    setResult({ ...baseResult, annotatedUrl, annotatedFailed })
+    setPhase('result')
+
+    if (errors.length > 0) {
+      logActivity(user?.uid, { type: 'homework_graded', count: errors.length, subject, moduleKey: 'homework_grade' })
     }
   }
 
@@ -235,7 +254,7 @@ export default function HomeworkGrade({ user }) {
   }
 
   function downloadAnnotated() {
-    const url = annotatedDataUrlRef.current
+    const url = result?.annotatedUrl || imageDataUrl
     if (!url) return
     const a = document.createElement('a')
     a.href = url
@@ -248,13 +267,13 @@ export default function HomeworkGrade({ user }) {
     setImageDims({ width: 0, height: 0 })
     setResult(null)
     setSavedIds({})
-    setActiveIndex(null)
     setErrorMsg('')
     setPhase('upload')
   }
 
   const errors = result?.errors || []
   const allSaved = errors.length > 0 && errors.every((_, i) => savedIds[i])
+  const displayImage = result?.annotatedUrl || imageDataUrl
 
   return (
     <div className="hwgrade">
@@ -262,9 +281,9 @@ export default function HomeworkGrade({ user }) {
         <h2 className="page-title">📸 作业批改</h2>
         <button className="hwgrade-link" onClick={() => navigate('/mistakes')}>错题本 →</button>
       </div>
-      <p className="hwgrade-sub">拍照上传作业，AI 老师自动找出错题、画红圈、给讲解，可一键存进错题本。</p>
+      <p className="hwgrade-sub">拍照上传作业，AI 老师自动找出错题、用红笔标注，可一键存进错题本。</p>
 
-      {phase !== 'result' && (
+      {phase !== 'result' && phase !== 'grading_image' && (
         <div className="hwgrade-grade-row">
           <span className="hwgrade-grade-label">孩子年级</span>
           <div className="hwgrade-grade-btns">
@@ -298,11 +317,19 @@ export default function HomeworkGrade({ user }) {
         </div>
       )}
 
-      {phase === 'grading' && (
+      {phase === 'grading_vision' && (
         <div className="hwgrade-loading">
-          <div className="hwgrade-loading-spinner">⏳</div>
-          <div className="hwgrade-loading-text">AI 老师正在批改作业…</div>
-          <div className="hwgrade-loading-hint">通常需要 10-20 秒，请稍等</div>
+          <div className="hwgrade-loading-spinner">🔎</div>
+          <div className="hwgrade-loading-text">AI 老师正在看作业…</div>
+          <div className="hwgrade-loading-hint">第 1 步：识别题目和错题（约 10 秒）</div>
+        </div>
+      )}
+
+      {phase === 'grading_image' && (
+        <div className="hwgrade-loading">
+          <div className="hwgrade-loading-spinner">🖍️</div>
+          <div className="hwgrade-loading-text">AI 老师正在用红笔批改…</div>
+          <div className="hwgrade-loading-hint">第 2 步：在原图上标注错题（约 15-25 秒）</div>
         </div>
       )}
 
@@ -331,10 +358,15 @@ export default function HomeworkGrade({ user }) {
             </div>
           </div>
 
-          <div className="hwgrade-canvas-wrap">
-            <canvas ref={canvasRef} className="hwgrade-canvas" />
-            <div className="hwgrade-canvas-actions">
-              <button className="hwgrade-btn hwgrade-btn-secondary" onClick={downloadAnnotated}>⬇️ 下载标注图</button>
+          <div className="hwgrade-image-wrap">
+            <img src={displayImage} alt="批改后作业" className="hwgrade-result-img" />
+            {result.annotatedFailed && (
+              <div className="hwgrade-fallback-note">
+                ℹ️ AI 红笔标注暂不可用，下方仅显示原图。错题列表照常使用。
+              </div>
+            )}
+            <div className="hwgrade-image-actions">
+              <button className="hwgrade-btn hwgrade-btn-secondary" onClick={downloadAnnotated}>⬇️ 下载{result.annotatedUrl ? '标注' : '原'}图</button>
               <button className="hwgrade-btn hwgrade-btn-secondary" onClick={reset}>📷 换一张</button>
             </div>
           </div>
@@ -358,18 +390,13 @@ export default function HomeworkGrade({ user }) {
 
               <ol className="hwgrade-error-list">
                 {errors.map((err, i) => (
-                  <li
-                    key={i}
-                    className={activeIndex === i ? 'hwgrade-err active' : 'hwgrade-err'}
-                    onMouseEnter={() => setActiveIndex(i)}
-                    onMouseLeave={() => setActiveIndex(null)}
-                    onClick={() => setActiveIndex(i)}
-                  >
+                  <li key={i} className="hwgrade-err">
                     <div className="hwgrade-err-head">
                       <span className="hwgrade-err-num">{i + 1}</span>
                       <span className="hwgrade-err-subject">{err.subject || result.subject}</span>
                       {err.topic && <span className="hwgrade-err-topic">{err.topic}</span>}
                       {err.errorType && <span className="hwgrade-err-type">{err.errorType}</span>}
+                      {err.location && <span className="hwgrade-err-location">📍{err.location}</span>}
                     </div>
                     <div className="hwgrade-err-q">{err.question || '（题目未识别）'}</div>
                     <div className="hwgrade-err-answers">
@@ -382,7 +409,7 @@ export default function HomeworkGrade({ user }) {
                     <div className="hwgrade-err-actions">
                       {savedIds[i]
                         ? <span className="hwgrade-saved">✓ 已加入错题本{savedIds[i] === 'local' ? '（本地暂存）' : ''}</span>
-                        : <button className="hwgrade-btn-mini" onClick={e => { e.stopPropagation(); saveOne(i) }} disabled={savingOne[i]}>
+                        : <button className="hwgrade-btn-mini" onClick={() => saveOne(i)} disabled={savingOne[i]}>
                             {savingOne[i] ? '保存中...' : '+ 加入错题本'}
                           </button>
                       }
@@ -395,7 +422,6 @@ export default function HomeworkGrade({ user }) {
         </>
       )}
 
-      {/* hidden file inputs */}
       <input
         ref={cameraInputRef}
         type="file"
@@ -413,14 +439,6 @@ export default function HomeworkGrade({ user }) {
       />
     </div>
   )
-}
-
-function clamp01(v) {
-  const n = Number(v)
-  if (Number.isNaN(n)) return 0
-  if (n < 0) return 0
-  if (n > 1) return 1
-  return n
 }
 
 const PENDING_KEY = 'homework_grade_pending_mistakes'

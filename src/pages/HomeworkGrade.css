@@ -243,7 +243,7 @@
   line-height: 1.55;
 }
 
-.hwgrade-canvas-wrap {
+.hwgrade-image-wrap {
   background: #f6f7fb;
   border-radius: 14px;
   padding: 14px;
@@ -251,7 +251,7 @@
   text-align: center;
 }
 
-.hwgrade-canvas {
+.hwgrade-result-img {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
@@ -260,11 +260,30 @@
   margin: 0 auto 12px;
 }
 
-.hwgrade-canvas-actions {
+.hwgrade-fallback-note {
+  font-size: 13px;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fbd38d;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 auto 12px;
+  max-width: 540px;
+}
+
+.hwgrade-image-actions {
   display: flex;
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.hwgrade-err-location {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #fff7ed;
+  color: #9a3412;
 }
 
 .hwgrade-actions-bar {
