@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -276,6 +277,39 @@ export default function Lesson22({ onBack }) {
               ✅ 提示词准备好了！去"去哪画"选一个平台，把它粘贴进去！
             </div>
           )}
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="lesson-section-title">🤖 在去画图平台前，让 AI 先"评一下"你的提示词</h2>
+            <p className="lesson-text" style={{ marginBottom: 8 }}>
+              下面三条提示词从弱到强。让 AI 老师每条评一下：缺什么、会画出什么样、给几分。看完再去画图平台，效果完全不一样！
+            </p>
+            <PromptCompareLab
+              subject="ai-image-prompt"
+              accent={accentColor}
+              intro="点按钮，让 AI 用每条提示词描述它脑中的画面 + 打分。"
+              hint="主体 + 场景 + 风格 + 光线 + 细节，五样齐活，AI 画出来才稳 ✏️"
+              prompts={[
+                {
+                  id: 'l22-bad',
+                  label: '❌ 弱提示词',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只猫"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么？这条提示词缺了哪些关键信息？最后给它打 1-10 分。',
+                },
+                {
+                  id: 'l22-mid',
+                  label: '⚠️ 中等提示词',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只白色波斯猫，坐在窗台上"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么？还差哪些信息？最后打 1-10 分。',
+                },
+                {
+                  id: 'l22-good',
+                  label: '✅ 强提示词',
+                  text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只白色波斯猫，坐在雨天的咖啡馆窗台上，水彩插画风格，温暖橙色室内光，超高清细节"。请用 60 字以内描述：AI 大概会画出什么样的画面？给 1-10 分，并说明为什么。',
+                },
+              ]}
+              allowCustom={true}
+              customLabel={builtPrompt ? '✏️ 把你刚拼好的提示词发给 AI 评价' : '✏️ 你也写一条提示词试试'}
+              customPlaceholder={builtPrompt ? `把上面拼好的"${builtPrompt.slice(0, 30)}…"粘贴进来` : '比如：一只戴墨镜的小狗，在沙滩上看夕阳，油画风格…'}
+            />
+          </div>
         </div>
       )}
 
