@@ -17,6 +17,7 @@ const JUNIOR_NAV = [
 ]
 
 const TOOL_NAV = [
+  { to: '/homework-grade', label: '📸 作业批改' },
   { to: '/mistakes', label: '错题本' },
   { to: '/notebook', label: '问题讨论' },
   { to: '/achievements', label: '🏆 成就' },
