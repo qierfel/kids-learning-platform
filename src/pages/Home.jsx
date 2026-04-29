@@ -38,6 +38,13 @@ const FEATURED_TRACKS = [
 
 const QUICK_TOOLS = [
   {
+    path: '/homework-grade',
+    label: '作业批改',
+    description: '拍张作业照片，AI 老师帮你找错题、画红圈、给讲解。',
+    icon: '/icons/generated/mistakes-icon.png',
+    emoji: '📸',
+  },
+  {
     path: '/mistakes',
     label: '错题本',
     description: '把错题留下来，回头复习更方便。',
@@ -340,7 +347,7 @@ export default function Home({ user }) {
             <button key={tool.label} className="home-tool-card" onClick={() => navigate(tool.path)}>
               <img src={tool.icon} alt={tool.label} className="home-tool-icon" />
               <div className="home-tool-copy">
-                <div className="home-tool-title">{tool.label}</div>
+                <div className="home-tool-title">{tool.emoji ? `${tool.emoji} ` : ''}{tool.label}</div>
                 <p className="home-tool-desc">{tool.description}</p>
               </div>
             </button>

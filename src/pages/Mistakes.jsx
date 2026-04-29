@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { logActivity } from '../utils/activityLogger'
 import './Mistakes.css'
 
@@ -127,6 +128,7 @@ export default function Mistakes({ user }) {
   const [subject, setSubject] = useState('全部')
   const [selected, setSelected] = useState(null)
   const [showAdd, setShowAdd] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     apiMistakes({ action: 'list' }).then(data => {
@@ -156,6 +158,15 @@ export default function Mistakes({ user }) {
         <h2 className="page-title">错题本</h2>
         <button className="new-btn" onClick={() => setShowAdd(true)}>+ 添加错题</button>
       </div>
+
+      <button className="mistakes-grade-shortcut" onClick={() => navigate('/homework-grade')}>
+        <span className="mistakes-grade-shortcut-icon">📸</span>
+        <div className="mistakes-grade-shortcut-text">
+          <strong>上传作业自动加入错题本</strong>
+          <span>拍照让 AI 老师批改，错题一键存入</span>
+        </div>
+        <span className="mistakes-grade-shortcut-arrow">→</span>
+      </button>
 
       <div className="stats-row">
         <div className="stat-card stat-new"><div className="stat-num">{counts.new}</div><div className="stat-label">待复习</div></div>

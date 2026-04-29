@@ -11,6 +11,7 @@ import History from './pages/History'
 import Geography from './pages/Geography'
 import Notebook from './pages/Notebook'
 import Mistakes from './pages/Mistakes'
+import HomeworkGrade from './pages/HomeworkGrade'
 import Admin from './pages/Admin'
 import Coding from './pages/Coding'
 import Achievements from './pages/Achievements'
@@ -156,6 +157,7 @@ export default function App() {
           <Route path="/coding" element={user ? <Coding user={user} /> : <Navigate to="/login" />} />
           <Route path="/notebook" element={user ? <Notebook user={user} /> : <Navigate to="/login" />} />
           <Route path="/mistakes" element={user ? <Mistakes user={user} /> : <Navigate to="/login" />} />
+          <Route path="/homework-grade" element={user ? <HomeworkGrade user={user} /> : <Navigate to="/login" />} />
           <Route path="/achievements" element={user ? <Achievements user={user} /> : <Navigate to="/login" />} />
           <Route path="/plan" element={user ? <PlanEditor user={user} /> : <Navigate to="/login" />} />
           <Route path="/admin" element={

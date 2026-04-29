@@ -20,6 +20,49 @@
   box-shadow: 0 18px 48px rgba(67, 52, 35, 0.08);
 }
 
+.mistakes-grade-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff4ec, #fff8ee);
+  border: 1px solid rgba(213, 86, 74, 0.22);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+}
+.mistakes-grade-shortcut:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(213, 86, 74, 0.14);
+}
+.mistakes-grade-shortcut-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.mistakes-grade-shortcut-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mistakes-grade-shortcut-text strong {
+  font-size: 15px;
+  color: #6b2f1f;
+  font-weight: 600;
+}
+.mistakes-grade-shortcut-text span {
+  font-size: 12.5px;
+  color: #8a6c5a;
+}
+.mistakes-grade-shortcut-arrow {
+  font-size: 20px;
+  color: #d5564a;
+  flex-shrink: 0;
+}
+
 .page-title {
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 900;

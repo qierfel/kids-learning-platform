@@ -250,6 +250,46 @@ ${lines.join('\n')}
       return json({ text })
     } catch (e) { return json({ error: e.message }, 500) }
 
+  } else if (type === 'grade_homework') {
+    const { imageBase64, mediaType: rawMediaType = 'image/jpeg', grade = '' } = payload
+    if (!imageBase64) return json({ error: 'imageBase64 required' }, 400)
+    const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1].replace(/\s/g, '') : imageBase64.replace(/\s/g, '')
+    const supported = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const mediaType = supported.includes(rawMediaType) ? rawMediaType : 'image/jpeg'
+    const gradeHint = grade ? `孩子是${grade}年级。` : ''
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 2048,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: cleanBase64 } },
+              { type: 'text', text: `你是一位耐心专业的小学/初中作业批改老师。${gradeHint}请仔细查看这张作业照片，找出所有做错的题目。\n\n严格按以下JSON格式返回（只输出JSON，不要任何 markdown 代码块标记或额外说明）：\n{\n  "imageWidth": 图片像素宽度（数字，估算即可）,\n  "imageHeight": 图片像素高度（数字，估算即可）,\n  "subject": "作业主科目（语文/数学/英语/物理/化学/历史/地理之一）",\n  "summary": "整体点评1-2句，温和鼓励，不超过60字",\n  "errors": [\n    {\n      "boundingBox": { "x": 错题左上角横坐标占图宽比例(0-1的小数), "y": 错题左上角纵坐标占图高比例(0-1的小数), "width": 错题宽度占图宽比例(0-1), "height": 错题高度占图高比例(0-1) },\n      "subject": "本题科目",\n      "topic": "知识点（如：两位数加法/古诗词默写/欧姆定律等）",\n      "question": "完整的错题原文",\n      "myAnswer": "孩子写的错误答案",\n      "correctAnswer": "正确答案",\n      "errorType": "错误类型（计算错误/概念错误/粗心大意/方法错误/未掌握知识点之一）",\n      "explanation": "讲解（用孩子能听懂的话说清楚错在哪、正确思路是什么、给一个记忆小技巧，不超过100字）"\n    }\n  ]\n}\n\n注意：\n- bounding box 坐标必须用 0 到 1 之间的小数（归一化坐标），不要用像素值。\n- 只列出确实做错的题目，对的题目不要列。如果整张作业都对，errors 返回空数组并在 summary 中表扬。\n- 如果图片不清楚或不是作业，errors 返回空数组，summary 写明原因。\n- 题目最多列出 8 道，挑最重要的。` }
+            ]
+          }],
+        }),
+      })
+      if (!response.ok) {
+        const err = await response.text()
+        console.error(`[claude] grade_homework upstream error ${response.status}:`, err)
+        return json({ error: 'Upstream API error', detail: err }, 502)
+      }
+      const data = await response.json()
+      const text = data.content?.[0]?.text?.trim() || ''
+      try {
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+        if (jsonMatch) return json({ parsed: JSON.parse(jsonMatch[0]) })
+      } catch { /* fall through */ }
+      return json({ text, error: 'Failed to parse model output' }, 502)
+    } catch (e) {
+      console.error(`[claude] grade_homework exception:`, e.message)
+      return json({ error: e.message }, 500)
+    }
+
   } else if (type === 'speaking_tutor') {
     const { messages: chatMessages = [], level = 'KET' } = payload
     const levelDesc = level === 'KET' ? 'beginner (A2)' : level === 'PET' ? 'elementary (B1)' : 'intermediate (B2)'
