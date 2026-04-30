@@ -63,7 +63,7 @@ export const CHAPTER_BOOKS = [
     name: '西游记（英文版）',
     nameEn: 'Journey to the West',
     desc: 'Penguin Readers Lv.5 · 108章 · MP3',
-    color: '#e85d4a',
+    color: '#b8341f',
     icon: '🐒',
     chapters: journeyChapters,
   },

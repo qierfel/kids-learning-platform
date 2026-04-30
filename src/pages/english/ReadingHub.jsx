@@ -8,7 +8,7 @@ import '../Subject.css'
 const CATEGORIES = [
   { id: 'graded',  icon: '📚', label: '分级读物', desc: 'RAZ · 海尼曼 · 牛津树 · 音频+PDF', color: '#6366f1', ready: true },
   { id: 'picture', icon: '🖼️', label: '英文绘本', desc: '小猪小象 · 弗洛格 · 音频+PDF',    color: '#f59e0b', ready: true },
-  { id: 'chapter', icon: '📖', label: '章节书',   desc: '西游记英文版 · 2000词 · 108章',   color: '#e85d4a', ready: true },
+  { id: 'chapter', icon: '📖', label: '章节书',   desc: '西游记英文版 · 2000词 · 108章',   color: '#b8341f', ready: true },
   { id: 'novel',   icon: '📕', label: '小说',     desc: '英文原版小说 · 有声书',            color: '#8b5cf6', ready: false },
   { id: 'exam',    icon: '📝', label: '考试阅读', desc: 'KET/PET/FCE真题 · AI讲解',        color: '#10b981', ready: true },
 ]
