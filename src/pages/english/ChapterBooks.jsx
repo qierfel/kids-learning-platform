@@ -26,8 +26,8 @@ const cbStyles = `
   border-color: #e2e8f0;
 }
 .cb-chapter-item.active {
-  border-color: var(--cb-color, #e85d4a);
-  background: color-mix(in srgb, var(--cb-color, #e85d4a) 8%, #fff);
+  border-color: var(--cb-color, #b8341f);
+  background: color-mix(in srgb, var(--cb-color, #b8341f) 8%, #fff);
 }
 .cb-chapter-num {
   font-size: 11px;
@@ -38,7 +38,7 @@ const cbStyles = `
   text-align: center;
 }
 .cb-chapter-item.active .cb-chapter-num {
-  color: var(--cb-color, #e85d4a);
+  color: var(--cb-color, #b8341f);
 }
 .cb-chapter-title {
   flex: 1;
@@ -199,7 +199,7 @@ export default function ChapterBooks({ onBack }) {
   }
 
   const series = selectedSeries ? CHAPTER_BOOKS.find(s => s.id === selectedSeries) : null
-  const color = series?.color || '#e85d4a'
+  const color = series?.color || '#b8341f'
 
   // ── 西游记章节列表 ──────────────────────────────────────────────
   if (series?.id === 'journey_west') {
