@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './Lesson.css'
 import ImageGenLab from './ImageGenLab'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -282,6 +283,39 @@ export default function Lesson24({ onBack }) {
               <div style={{ fontSize: 14, color: '#1e293b', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{builtBrief}</div>
             </div>
           )}
+
+          <div style={{ marginTop: 22 }}>
+            <h2 className="lesson-section-title" style={{ fontSize: 16 }}>🤖 让 AI 帮你写海报标题（对比三种提示词）</h2>
+            <p className="lesson-text" style={{ marginBottom: 8 }}>
+              海报最重要的就是一句"标题口号"。下面三条提示词，从随便说→说清楚→很具体，让 AI 给你出标题，差距一眼就看出来！
+            </p>
+            <PromptCompareLab
+              subject="ai-poster-copy"
+              accent={accentColor}
+              intro="点按钮，让 AI 用每条提示词给你一组海报文案。"
+              hint="说清楚【主题 + 受众 + 风格 + 想传达什么】，AI 给你的文案才能直接拿去用 ✨"
+              prompts={[
+                {
+                  id: 'l24-bad',
+                  label: '太模糊',
+                  text: '帮我想一句海报标题。',
+                },
+                {
+                  id: 'l24-mid',
+                  label: '说了主题',
+                  text: '帮我想一句运动会海报的标题。',
+                },
+                {
+                  id: 'l24-good',
+                  label: '主题+受众+风格+情绪',
+                  text: `请帮我为一张${theme?.label.slice(2) || '校园'}海报写文案：主标题（不超过 8 字、有力量感）+ 副标题（一句话点明主题）+ 一句口号 slogan。受众是 10-12 岁的同学，风格${theme?.keywords || '阳光、积极、有少年感'}。直接给我三份不同风格的方案，标号 1/2/3。`,
+                },
+              ]}
+              allowCustom={true}
+              customLabel="✏️ 改一改第三条提示词，看看 AI 又会写出什么"
+              customPlaceholder="比如把'校园海报'换成'我们班的辩论赛海报'，受众换成'全校同学'……"
+            />
+          </div>
         </div>
       )}
 

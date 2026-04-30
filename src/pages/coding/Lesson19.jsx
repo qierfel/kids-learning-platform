@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './Lesson.css'
 import ImageGenLab from './ImageGenLab'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -118,6 +119,7 @@ export default function Lesson19({ onBack }) {
   const [quizScore, setQuizScore] = useState(0)
   const [quizDone, setQuizDone] = useState(false)
   const [favoriteTool, setFavoriteTool] = useState(null)
+  const [promptSubTab, setPromptSubTab] = useState('compare')
 
   const accentColor = '#ec4899'
   const toolDetail = IMAGE_TOOLS.find(t => t.id === selectedTool)
@@ -316,21 +318,71 @@ export default function Lesson19({ onBack }) {
           )}
 
           <div style={{ marginTop: 18, paddingTop: 14, borderTop: '2px dashed #f9a8d4' }}>
-            <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🤖 直接让 AI 画一张</h2>
-            <p className="lesson-text">来对比一下：先用"懒提示词"画一张，再用"详细提示词"画一张，看看差多少！</p>
-            <ImageGenLab
-              defaultPrompt={builtPrompt}
-              accent={accentColor}
-              subject="Lesson19-prompt-builder"
-              size="1024x1024"
-              quality="standard"
-              intro="把上面拼好的提示词试一试，或者点下面的预设对比看看："
-              presetPrompts={[
-                '画一只猫',
-                '一只戴着宇航员头盔的橙色猫咪，在星空下望向地球，水彩画风格，温暖光线，超清晰',
-                '一座漂浮在云端的奇幻图书馆，阳光透过彩色玻璃窗洒入，温暖梦幻，8K 超清细节',
-              ]}
-            />
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              <button onClick={() => setPromptSubTab('compare')}
+                style={{ flex: 1, padding: '10px 12px', borderRadius: 10, border: `2px solid ${promptSubTab === 'compare' ? accentColor : '#e2e8f0'}`, background: promptSubTab === 'compare' ? '#fdf2f8' : '#fff', color: promptSubTab === 'compare' ? accentColor : '#475569', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                🤖 让 AI 评估提示词
+              </button>
+              <button onClick={() => setPromptSubTab('image')}
+                style={{ flex: 1, padding: '10px 12px', borderRadius: 10, border: `2px solid ${promptSubTab === 'image' ? accentColor : '#e2e8f0'}`, background: promptSubTab === 'image' ? '#fdf2f8' : '#fff', color: promptSubTab === 'image' ? accentColor : '#475569', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                🎨 直接画一张
+              </button>
+            </div>
+
+            {promptSubTab === 'compare' && (
+              <div>
+                <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🤖 真的让 AI 来"读"你的提示词</h2>
+                <p className="lesson-text" style={{ marginBottom: 8 }}>
+                  下面三条提示词，从最简单到最完整。让 AI 用每条来想象画面、给出建议——你就能直观感受到：提示词差一点，AI 想出来的画面差很多！
+                </p>
+                <PromptCompareLab
+                  subject="ai-image-prompt"
+                  accent={accentColor}
+                  intro="点按钮，让 AI 用每条提示词描述它脑中的画面、并打分。"
+                  hint="主体 + 场景 + 风格 + 细节，缺一条 AI 都得自己脑补 ✏️"
+                  prompts={[
+                    {
+                      id: 'l19-bad',
+                      label: '太简单',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只猫"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？这条提示词缺了哪些关键信息？给它打 1-10 分。',
+                    },
+                    {
+                      id: 'l19-mid',
+                      label: '还不够',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只橙色小猫在窗台上"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？还缺什么？给它打 1-10 分。',
+                    },
+                    {
+                      id: 'l19-good',
+                      label: '主体+场景+风格+细节',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只橙色小猫坐在木窗台上看雨，水彩画风格，温暖橙色光线，超清晰细节"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么样的画面？给它打 1-10 分，并说说为什么。',
+                    },
+                  ]}
+                  allowCustom={true}
+                  customLabel="✏️ 试试你刚拼好的提示词"
+                  customPlaceholder="把上面拼出来的提示词粘贴进来，让 AI 评价一下，再决定要不要拿去画图工具用"
+                />
+              </div>
+            )}
+
+            {promptSubTab === 'image' && (
+              <div>
+                <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🤖 直接让 AI 画一张</h2>
+                <p className="lesson-text">来对比一下：先用"懒提示词"画一张，再用"详细提示词"画一张，看看差多少！</p>
+                <ImageGenLab
+                  defaultPrompt={builtPrompt}
+                  accent={accentColor}
+                  subject="Lesson19-prompt-builder"
+                  size="1024x1024"
+                  quality="standard"
+                  intro="把上面拼好的提示词试一试，或者点下面的预设对比看看："
+                  presetPrompts={[
+                    '画一只猫',
+                    '一只戴着宇航员头盔的橙色猫咪，在星空下望向地球，水彩画风格，温暖光线，超清晰',
+                    '一座漂浮在云端的奇幻图书馆，阳光透过彩色玻璃窗洒入，温暖梦幻，8K 超清细节',
+                  ]}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

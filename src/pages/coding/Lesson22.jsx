@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './Lesson.css'
 import ImageGenLab from './ImageGenLab'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -102,6 +103,7 @@ export default function Lesson22({ onBack }) {
   const [myPlatform, setMyPlatform] = useState(null)
   const [selectedPlatform, setSelectedPlatform] = useState(null)
   const [savedWorks, setSavedWorks] = useState([])
+  const [builderSubTab, setBuilderSubTab] = useState('compare')
 
   useEffect(() => {
     if (tab !== 'work') return
@@ -289,22 +291,72 @@ export default function Lesson22({ onBack }) {
           )}
 
           <div style={{ marginTop: 18, paddingTop: 14, borderTop: '2px dashed #86efac' }}>
-            <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🎨 直接让 AI 画一张</h2>
-            <p className="lesson-text">这就是本课的真正动手时刻——把你拼好的提示词试出来，画到满意为止，然后保存到我的作品！</p>
-            <ImageGenLab
-              defaultPrompt={builtPrompt}
-              accent={accentColor}
-              subject="Lesson22-builder"
-              size="1024x1024"
-              quality="standard"
-              savedKey="lesson22"
-              intro="点击按钮让 AI 画图。第一次大概要等 10–30 秒，画出来后可以重画或保存。"
-              presetPrompts={[
-                '一只白色波斯猫，坐在雨天的咖啡馆窗台上，水彩插画风格，温暖橙色室内光，超高清细节',
-                '一头银色独角兽，在月光下的森林湖边，魔法粒子飘散，梦幻油画风格，电影级光影',
-                '一艘飞船穿过五彩星云，未来科幻风格，霓虹灯光，超精细，8K 画质',
-              ]}
-            />
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              <button onClick={() => setBuilderSubTab('compare')}
+                style={{ flex: 1, padding: '10px 12px', borderRadius: 10, border: `2px solid ${builderSubTab === 'compare' ? accentColor : '#e2e8f0'}`, background: builderSubTab === 'compare' ? '#dcfce7' : '#fff', color: builderSubTab === 'compare' ? accentColor : '#475569', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                🤖 让 AI 评估提示词
+              </button>
+              <button onClick={() => setBuilderSubTab('image')}
+                style={{ flex: 1, padding: '10px 12px', borderRadius: 10, border: `2px solid ${builderSubTab === 'image' ? accentColor : '#e2e8f0'}`, background: builderSubTab === 'image' ? '#dcfce7' : '#fff', color: builderSubTab === 'image' ? accentColor : '#475569', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
+                🎨 直接画一张
+              </button>
+            </div>
+
+            {builderSubTab === 'compare' && (
+              <div>
+                <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🤖 在去画图平台前，让 AI 先"评一下"你的提示词</h2>
+                <p className="lesson-text" style={{ marginBottom: 8 }}>
+                  下面三条提示词从弱到强。让 AI 老师每条评一下：缺什么、会画出什么样、给几分。看完再去画图平台，效果完全不一样！
+                </p>
+                <PromptCompareLab
+                  subject="ai-image-prompt"
+                  accent={accentColor}
+                  intro="点按钮，让 AI 用每条提示词描述它脑中的画面 + 打分。"
+                  hint="主体 + 场景 + 风格 + 光线 + 细节，五样齐活，AI 画出来才稳 ✏️"
+                  prompts={[
+                    {
+                      id: 'l22-bad',
+                      label: '❌ 弱提示词',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只猫"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么？这条提示词缺了哪些关键信息？最后给它打 1-10 分。',
+                    },
+                    {
+                      id: 'l22-mid',
+                      label: '⚠️ 中等提示词',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只白色波斯猫，坐在窗台上"。请用 60 字以内描述：如果按这条提示词去画，AI 大概会画出什么？还差哪些信息？最后打 1-10 分。',
+                    },
+                    {
+                      id: 'l22-good',
+                      label: '✅ 强提示词',
+                      text: '请你扮演 AI 画图老师。我给你一条画图提示词："一只白色波斯猫，坐在雨天的咖啡馆窗台上，水彩插画风格，温暖橙色室内光，超高清细节"。请用 60 字以内描述：AI 大概会画出什么样的画面？给 1-10 分，并说明为什么。',
+                    },
+                  ]}
+                  allowCustom={true}
+                  customLabel={builtPrompt ? '✏️ 把你刚拼好的提示词发给 AI 评价' : '✏️ 你也写一条提示词试试'}
+                  customPlaceholder={builtPrompt ? `把上面拼好的"${builtPrompt.slice(0, 30)}…"粘贴进来` : '比如：一只戴墨镜的小狗，在沙滩上看夕阳，油画风格…'}
+                />
+              </div>
+            )}
+
+            {builderSubTab === 'image' && (
+              <div>
+                <h2 className="lesson-section-title" style={{ marginTop: 0 }}>🎨 直接让 AI 画一张</h2>
+                <p className="lesson-text">这就是本课的真正动手时刻——把你拼好的提示词试出来，画到满意为止，然后保存到我的作品！</p>
+                <ImageGenLab
+                  defaultPrompt={builtPrompt}
+                  accent={accentColor}
+                  subject="Lesson22-builder"
+                  size="1024x1024"
+                  quality="standard"
+                  savedKey="lesson22"
+                  intro="点击按钮让 AI 画图。第一次大概要等 10–30 秒，画出来后可以重画或保存。"
+                  presetPrompts={[
+                    '一只白色波斯猫，坐在雨天的咖啡馆窗台上，水彩插画风格，温暖橙色室内光，超高清细节',
+                    '一头银色独角兽，在月光下的森林湖边，魔法粒子飘散，梦幻油画风格，电影级光影',
+                    '一艘飞船穿过五彩星云，未来科幻风格，霓虹灯光，超精细，8K 画质',
+                  ]}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

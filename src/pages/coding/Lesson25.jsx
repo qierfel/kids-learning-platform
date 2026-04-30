@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -330,6 +331,41 @@ export default function Lesson25({ onBack }) {
               >
                 策划好了，去制作 →
               </button>
+            </div>
+          )}
+
+          {selectedTopic && (
+            <div style={{ marginTop: 24 }}>
+              <h3 style={{ color: accentColor, marginBottom: 4 }}>🤖 先让 AI 写大纲（看不同提示词的差距）</h3>
+              <p style={{ color: '#6b7280', fontSize: 14, marginTop: 0 }}>
+                还没去 Gamma 之前，先在这里让 AI 写一份 PPT 大纲。三条提示词从模糊到具体，看哪种回答你能直接用！
+              </p>
+              <PromptCompareLab
+                subject="ai-ppt-outline"
+                accent={accentColor}
+                intro="点按钮，让 AI 用每条提示词写一份 PPT 大纲。"
+                hint="说清楚【主题 + 页数 + 受众 + 风格】，AI 给的大纲才不用大改 ✏️"
+                prompts={[
+                  {
+                    id: 'l25-bad',
+                    label: '太简单',
+                    text: `帮我做一份关于${topicExample || '我喜欢的话题'}的 PPT。`,
+                  },
+                  {
+                    id: 'l25-mid',
+                    label: '说了页数',
+                    text: `帮我做一份关于${topicExample || '我喜欢的话题'}的 8 页 PPT，列出每页标题。`,
+                  },
+                  {
+                    id: 'l25-good',
+                    label: '主题+受众+页数+风格',
+                    text: `请帮我设计一份 PPT 大纲：主题是"${topicExample || '我喜欢的话题'}"，共 8 页，受众是我的同班同学（10-12岁），风格活泼、有故事感。请按以下格式输出：第1页（标题页）/ 第2页（目录） / 第3-7页（内容页，每页一个要点 + 一句细节描述）/ 第8页（结尾），并在每页后面给一句"配图建议"。`,
+                  },
+                ]}
+                allowCustom={true}
+                customLabel="✏️ 你也试一条提示词"
+                customPlaceholder={`比如把页数改成 6 页，或者把受众换成"老师"，看看 AI 写出来什么不一样的大纲`}
+              />
             </div>
           )}
         </div>

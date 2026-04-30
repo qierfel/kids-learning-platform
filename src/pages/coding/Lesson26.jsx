@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Lesson.css'
+import PromptCompareLab from './PromptCompareLab'
 
 const DEVICE_BADGE = (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -313,6 +314,48 @@ export default function Lesson26({ onBack }) {
               >
                 想好了，去制作 →
               </button>
+            </div>
+          )}
+
+          {selectedType && (
+            <div style={{ marginTop: 24 }}>
+              <h3 style={{ color: '#111', marginBottom: 4 }}>🤖 先让 AI 写一版网页内容（试试三种提示词）</h3>
+              <p style={{ color: '#6b7280', fontSize: 14, marginTop: 0 }}>
+                同样一个网页想法，告诉 AI 时含糊一点 vs 说清楚一点，差别非常大。让 AI 真的写一段网页内容（标题 + 段落 + 按钮文字）给你看！
+              </p>
+              <PromptCompareLab
+                subject="ai-web-copy"
+                accent={accentColor}
+                intro="点按钮，让 AI 用每条提示词写一份网页内容稿。"
+                hint="说清楚【是什么页面 + 给谁看 + 要包含什么 + 整体风格】，AI 写出来的稿才能直接进 V0 ✨"
+                prompts={[
+                  {
+                    id: 'l26-bad',
+                    label: '太简单',
+                    text: `帮我做一个网页：${typeExample || '我的想法'}。`,
+                  },
+                  {
+                    id: 'l26-mid',
+                    label: '加了点细节',
+                    text: `帮我设计一个网页内容：${typeExample || '我的想法'}。给我标题、一段介绍文字、和一些按钮文字。`,
+                  },
+                  {
+                    id: 'l26-good',
+                    label: '内容+受众+模块+风格',
+                    text: `请帮我写一份网页文案，准备粘贴到 V0：网页类型是"${typeExample || '我的网页'}"，受众是我的同学（10-12岁）。请输出：
+1. 网页主标题（吸引人，10字以内）
+2. 副标题（一句话点明用途）
+3. 三个内容板块的标题 + 每个板块 30-50字 的介绍
+4. 一个主按钮的文字 + 一个次要按钮的文字
+5. 整体视觉风格建议（颜色 / 字体感觉 / 整体氛围）
+
+请直接给我成品，不要解释。`,
+                  },
+                ]}
+                allowCustom={true}
+                customLabel="✏️ 你也想个提示词"
+                customPlaceholder={`比如把受众改成"我的爸妈"或"幼儿园弟弟妹妹"，看看 AI 写的内容会变成什么样`}
+              />
             </div>
           )}
         </div>
