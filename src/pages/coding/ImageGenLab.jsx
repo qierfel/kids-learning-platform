@@ -28,6 +28,8 @@ export default function ImageGenLab({
   const [error, setError] = useState('')
   const [image, setImage] = useState(null)   // { url, revised_prompt, prompt }
   const [savedNote, setSavedNote] = useState('')
+  const [remaining, setRemaining] = useState(null)  // null until first response
+  const [rateLimited, setRateLimited] = useState(false)
   const inflightRef = useRef(false)
   const lastPromptRef = useRef('')
 
@@ -55,6 +57,15 @@ export default function ImageGenLab({
         body: JSON.stringify({ prompt: text, size, quality, n: 1 }),
       })
       const data = await res.json()
+      if (typeof data.remaining === 'number') setRemaining(data.remaining)
+      if (res.status === 429 || data.error === 'rate_limited') {
+        setRateLimited(true)
+        setRemaining(0)
+        setImage(null)
+        setError(data.message || '今天已经画了 5 张图啦，明天再来吧～')
+        lastPromptRef.current = ''
+        return
+      }
       if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`)
       const first = data.images?.[0]
       if (!first?.url) throw new Error('AI 没返回图片，再试一次')
@@ -102,7 +113,23 @@ export default function ImageGenLab({
 
   return (
     <div style={{ background: '#fff', border: `2px solid ${accent}30`, borderRadius: 16, padding: '14px 14px 16px', marginTop: 12 }}>
-      <div style={{ fontSize: 13, color: '#475569', marginBottom: 10, lineHeight: 1.6 }}>{intro}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.6, flex: 1 }}>{intro}</div>
+        {remaining !== null && (
+          <span style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: rateLimited ? '#b91c1c' : (remaining <= 1 ? '#b45309' : accent),
+            background: rateLimited ? '#fef2f2' : (remaining <= 1 ? '#fffbeb' : `${accent}10`),
+            border: `1px solid ${rateLimited ? '#fca5a5' : (remaining <= 1 ? '#fcd34d' : accent + '40')}`,
+            padding: '3px 10px',
+            borderRadius: 999,
+            whiteSpace: 'nowrap',
+          }}>
+            今天还剩 {remaining} 次
+          </span>
+        )}
+      </div>
 
       {presetPrompts.length > 0 && (
         <div style={{ marginBottom: 10 }}>
@@ -157,19 +184,19 @@ export default function ImageGenLab({
         <span style={{ fontSize: 11, color: '#94a3b8' }}>{prompt.length}/500</span>
         <button
           onClick={generate}
-          disabled={loading || !prompt.trim()}
+          disabled={loading || !prompt.trim() || rateLimited}
           style={{
             padding: '8px 18px',
-            background: loading ? '#cbd5e1' : (!prompt.trim() ? '#e2e8f0' : accent),
-            color: !prompt.trim() && !loading ? '#94a3b8' : '#fff',
+            background: loading || rateLimited ? '#cbd5e1' : (!prompt.trim() ? '#e2e8f0' : accent),
+            color: (!prompt.trim() && !loading) || rateLimited ? '#94a3b8' : '#fff',
             border: 'none',
             borderRadius: 999,
             fontSize: 13,
             fontWeight: 700,
-            cursor: loading ? 'wait' : (!prompt.trim() ? 'not-allowed' : 'pointer'),
+            cursor: loading ? 'wait' : (rateLimited || !prompt.trim() ? 'not-allowed' : 'pointer'),
           }}
         >
-          {loading ? '⏳ AI 正在画…(10–30 秒)' : '🎨 让 AI 画一张'}
+          {rateLimited ? '🛑 今天画够了' : loading ? '⏳ AI 正在画…(10–30 秒)' : '🎨 让 AI 画一张'}
         </button>
       </div>
 

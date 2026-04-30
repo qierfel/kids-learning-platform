@@ -89,8 +89,11 @@ async function callImageEdit(imageBase64, prompt) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(c.body),
       })
-      if (!res.ok) continue
-      const data = await res.json()
+      const data = await res.json().catch(() => null)
+      if (res.status === 429 || data?.error === 'rate_limited') {
+        return { rateLimited: true, message: data?.message || '今天的批改次数用完啦，明天再来吧～' }
+      }
+      if (!res.ok || !data) continue
       const url = extractImageUrl(data)
       if (url) return { url, raw: data }
     } catch { /* try next */ }
@@ -189,23 +192,25 @@ export default function HomeworkGrade({ user }) {
 
     const errors = Array.isArray(parsed.errors) ? parsed.errors : []
     const subject = VALID_SUBJECTS.includes(parsed.subject) ? parsed.subject : SUBJECT_FALLBACK
-    const baseResult = { errors, summary: parsed.summary || '', subject, annotatedUrl: '', annotatedFailed: false }
+    const baseResult = { errors, summary: parsed.summary || '', subject, annotatedUrl: '', annotatedFailed: false, rateLimitedMessage: '' }
 
     // Step 2 — Image edit (OpenAI gpt-image-1 via /api/generate-image)
     setResult(baseResult)
     setPhase('grading_image')
     let annotatedUrl = ''
     let annotatedFailed = false
+    let rateLimitedMessage = ''
     try {
       const editPrompt = buildAnnotationPrompt(errors)
       const edit = await callImageEdit(dataUrlToBase64(imageDataUrl), editPrompt)
       if (edit?.url) annotatedUrl = edit.url
+      else if (edit?.rateLimited) { annotatedFailed = true; rateLimitedMessage = edit.message }
       else annotatedFailed = true
     } catch {
       annotatedFailed = true
     }
 
-    setResult({ ...baseResult, annotatedUrl, annotatedFailed })
+    setResult({ ...baseResult, annotatedUrl, annotatedFailed, rateLimitedMessage })
     setPhase('result')
 
     if (errors.length > 0) {
@@ -362,7 +367,9 @@ export default function HomeworkGrade({ user }) {
             <img src={displayImage} alt="批改后作业" className="hwgrade-result-img" />
             {result.annotatedFailed && (
               <div className="hwgrade-fallback-note">
-                ℹ️ AI 红笔标注暂不可用，下方仅显示原图。错题列表照常使用。
+                {result.rateLimitedMessage
+                  ? `🛑 ${result.rateLimitedMessage}（下方仍是原图，错题列表已保留可用）`
+                  : 'ℹ️ AI 红笔标注暂不可用，下方仅显示原图。错题列表照常使用。'}
               </div>
             )}
             <div className="hwgrade-image-actions">

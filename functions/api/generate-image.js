@@ -10,11 +10,17 @@
 //   - quality: "standard" | "hd" | "low" | "medium" | "high" | "auto"  (default "medium")
 //   - n: integer 1-4 (default 1)
 //
-// Response:
-//   { images: [{ url, revised_prompt? }], mode: "generate" | "edit" }
-//   url is a data:image/png;base64,... URL (gpt-image-1 returns b64_json).
+// Response (200):
+//   { images: [{ url, revised_prompt? }], mode, remaining, resetAt, ...compat }
+//
+// Response (429):
+//   { error: "rate_limited", message, remaining: 0, resetAt }
+
+import { getSessionFromRequest } from './_usage.js'
 
 const MODEL = 'gpt-image-1'
+const DAILY_LIMIT = 5
+const KV_TTL_SECONDS = 48 * 60 * 60
 
 function json(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -60,6 +66,48 @@ async function inputToBlob(input) {
   return new Blob([bytes], { type: mime })
 }
 
+function utcDateKey(ts = Date.now()) {
+  return new Date(ts).toISOString().slice(0, 10)
+}
+
+function nextUtcMidnightISO(ts = Date.now()) {
+  const d = new Date(ts)
+  d.setUTCHours(24, 0, 0, 0)
+  return d.toISOString()
+}
+
+async function reserveQuota(KV, identifier) {
+  if (!KV || !identifier) return { allowed: true, remaining: DAILY_LIMIT, key: null }
+  const key = `image_gen:${identifier}:${utcDateKey()}`
+  let used = 0
+  try {
+    const raw = await KV.get(key)
+    used = parseInt(raw, 10) || 0
+  } catch {
+    return { allowed: true, remaining: DAILY_LIMIT, key: null }
+  }
+  if (used >= DAILY_LIMIT) {
+    return { allowed: false, remaining: 0, key }
+  }
+  try {
+    await KV.put(key, String(used + 1), { expirationTtl: KV_TTL_SECONDS })
+  } catch {
+    return { allowed: true, remaining: DAILY_LIMIT - used, key: null }
+  }
+  return { allowed: true, remaining: DAILY_LIMIT - used - 1, key }
+}
+
+async function refundQuota(KV, key) {
+  if (!KV || !key) return
+  try {
+    const raw = await KV.get(key)
+    const used = parseInt(raw, 10) || 0
+    if (used > 0) {
+      await KV.put(key, String(used - 1), { expirationTtl: KV_TTL_SECONDS })
+    }
+  } catch {}
+}
+
 function pickImages(data) {
   const arr = Array.isArray(data?.data) ? data.data : []
   return arr.map(item => {
@@ -96,6 +144,22 @@ export async function onRequestPost(context) {
   const n = Math.max(1, Math.min(4, parseInt(body?.n, 10) || 1))
   const inputImage = body?.inputImage
   const mask = body?.mask
+
+  const session = await getSessionFromRequest(env.KV, request, body)
+  const identifier = session?.uid
+    || request.headers.get('CF-Connecting-IP')
+    || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim()
+    || 'anon'
+
+  const quota = await reserveQuota(env.KV, identifier)
+  if (!quota.allowed) {
+    return json({
+      error: 'rate_limited',
+      message: '今天已经画了 5 张图啦，明天再来吧～',
+      remaining: 0,
+      resetAt: nextUtcMidnightISO(),
+    }, 429)
+  }
 
   const editMode = !!inputImage
   let resp
@@ -140,6 +204,7 @@ export async function onRequestPost(context) {
       })
     }
   } catch (e) {
+    await refundQuota(env.KV, quota.key)
     return json({ error: `Network error: ${e.message || 'unknown'}` }, 502)
   }
 
@@ -147,16 +212,21 @@ export async function onRequestPost(context) {
   try {
     data = await resp.json()
   } catch {
+    await refundQuota(env.KV, quota.key)
     return json({ error: `OpenAI returned non-JSON (${resp.status})` }, 502)
   }
 
   if (!resp.ok) {
+    await refundQuota(env.KV, quota.key)
     const msg = data?.error?.message || `OpenAI error ${resp.status}`
     return json({ error: msg, code: data?.error?.code }, resp.status)
   }
 
   const images = pickImages(data)
-  if (!images.length) return json({ error: 'OpenAI returned no images' }, 502)
+  if (!images.length) {
+    await refundQuota(env.KV, quota.key)
+    return json({ error: 'OpenAI returned no images' }, 502)
+  }
 
   // Top-level compat fields for callers that didn't read the canonical
   // { images, mode } shape — keeps the homework-grading client working
@@ -166,6 +236,8 @@ export async function onRequestPost(context) {
   return json({
     images,
     mode: editMode ? 'edit' : 'generate',
+    remaining: quota.remaining,
+    resetAt: nextUtcMidnightISO(),
     url: first.url,
     ...(m ? { imageBase64: m[1], mediaType: 'image/png' } : {}),
   })
