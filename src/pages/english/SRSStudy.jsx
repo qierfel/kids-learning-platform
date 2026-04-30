@@ -112,8 +112,8 @@ export default function SRSStudy({ user, onBack }) {
         level={level}
         todayPlan={todayPlan}
         progress={progress}
-        onFinish={async (newProgress) => {
-          await saveProgress(newProgress)
+        onProgressUpdate={saveProgress}
+        onFinish={(newProgress) => {
           const pool = getWordPool(level)
           const wordCount = (todayPlan?.dueReviews?.length || 0) + (todayPlan?.todayNew?.length || 0)
           if (wordCount > 0) {
@@ -342,7 +342,7 @@ function buildOptions(word, pool) {
   return [...shuffled, word].sort(() => Math.random() - 0.5)
 }
 
-function Session({ level, todayPlan, progress, onFinish, onBack }) {
+function Session({ level, todayPlan, progress, onProgressUpdate, onFinish, onBack }) {
   const pool = getWordPool(level)
   const [queue] = useState(() => buildSessionQueue(todayPlan))
   const [idx, setIdx] = useState(0)
@@ -423,6 +423,7 @@ function Session({ level, todayPlan, progress, onFinish, onBack }) {
     const updated = sm2Update(card, quality)
     const np = { ...newProgress, [current.word.word]: updated }
     setNewProgress(np)
+    onProgressUpdate(np) // persist after each card so mid-session exits don't lose progress
     advance(np)
   }
 
