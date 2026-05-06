@@ -129,6 +129,24 @@ function PoemDetail({ poem, onBack }) {
               <p key={i} className="poem-line">{line}</p>
             ))}
           </div>
+          {poem.notes && (
+            <div className="poem-detail-section">
+              <div className="poem-detail-label">注释</div>
+              <p className="poem-detail-text">{poem.notes}</p>
+            </div>
+          )}
+          {poem.theme && (
+            <div className="poem-detail-section">
+              <div className="poem-detail-label">主题思想</div>
+              <p className="poem-detail-text">{poem.theme}</p>
+            </div>
+          )}
+          {poem.exam && (
+            <div className="poem-detail-section">
+              <div className="poem-detail-label">常见考点</div>
+              <p className="poem-detail-text">{poem.exam}</p>
+            </div>
+          )}
         </div>
       )}
 

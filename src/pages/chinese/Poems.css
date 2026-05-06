@@ -194,3 +194,24 @@
 .poem-search-clear { background: #f3f4f6; border: none; border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; color: #555; flex-shrink: 0; }
 .poem-search-clear:hover { background: #e5e7eb; }
 .poem-empty { text-align: center; color: #888; padding: 40px 0; font-size: 14px; }
+
+
+.poem-detail-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed #e8edf2;
+}
+
+.poem-detail-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #d97706;
+  margin-bottom: 8px;
+}
+
+.poem-detail-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+  white-space: pre-wrap;
+}
