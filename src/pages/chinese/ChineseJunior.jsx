@@ -45,6 +45,9 @@ const JUNIOR_POEMS = [
     notes: '东临：向东登临。碣石：山名。澹澹：水波摇动的样子。竦峙：高高挺立。星汉：银河。幸甚至哉：真是幸运极了。',
     theme: '写大海的壮阔景象，表现诗人博大的胸怀和豪迈气概。',
     exam: '常考：最能体现诗人博大胸怀的句子；全诗如何借写景抒发豪情。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -54,6 +57,9 @@ const JUNIOR_POEMS = [
     notes: '次：停宿。北固山：山名。潮平：潮水涨满。风正：风顺。残夜：夜将尽未尽的时候。归雁：北归的大雁。',
     theme: '旅途见闻，抒发思乡之情，蕴含新旧交替的哲理。',
     exam: '蕴含哲理的名句：海日生残夜，江春入旧年。（新旧交替，积极向上）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -63,6 +69,9 @@ const JUNIOR_POEMS = [
     notes: '左迁：贬官。龙标：地名。子规：杜鹃鸟。五溪：偏远地区。杨花落尽：点出暮春时节。',
     theme: '听闻友人被贬，借明月传递牵挂与安慰之情。',
     exam: '表达对友人关切的句子：我寄愁心与明月，随君直到夜郎西。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -72,6 +81,9 @@ const JUNIOR_POEMS = [
     notes: '天净沙：曲牌名。昏鸦：黄昏归巢的乌鸦。断肠人：极度伤心的人，这里指漂泊天涯的游子。天涯：遥远的地方。',
     theme: '描绘秋天荒凉景象，抒发漂泊天涯的孤寂愁苦。',
     exam: '被称为"秋思之祖"；全曲用9个名词叠加，无一动词，却意境深远。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   // ── 7年级下册 ──────────────────────────────
   {
@@ -91,6 +103,9 @@ const JUNIOR_POEMS = [
     notes: '幽州台：燕昭王招贤纳士之处。悠悠：辽远、久长。怆然：悲伤失意的样子。涕：眼泪。',
     theme: '登台远眺，感慨生不逢时、怀才不遇，抒发孤独苦闷之情。',
     exam: '表达诗人孤独悲怆的千古名句，开盛唐之音先声。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -100,6 +115,9 @@ const JUNIOR_POEMS = [
     notes: '岱宗：泰山别称。齐鲁：古代齐国、鲁国一带。钟：聚集。决眦：睁大眼睛远望。会当：终当，终要。',
     theme: '描写泰山雄伟壮丽，表达诗人不怕困难、勇于攀登的豪情壮志。',
     exam: '千古名句：会当凌绝顶，一览众山小。（比喻不怕困难，敢于攀登高峰）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -109,6 +127,9 @@ const JUNIOR_POEMS = [
     notes: '飞来峰：山名。千寻：形容极高。浮云：比喻遮蔽视线的事物或困难。缘：因为。',
     theme: '登塔俯瞰，表达诗人不惧艰难、敢于改革的远大抱负。',
     exam: '含哲理名句：不畏浮云遮望眼，自缘身在最高层。（站得高才能看得远）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -118,6 +139,9 @@ const JUNIOR_POEMS = [
     notes: '腊酒：腊月酿的酒。豚：猪。山重水复：山峦重叠，流水曲折。柳暗花明：柳色深绿，花色明丽。春社：春天祭土地神的节日。',
     theme: '描写农村美景与淳朴民风，表达对农村生活的热爱。',
     exam: '千古名句：山重水复疑无路，柳暗花明又一村。（比喻困境中往往蕴藏转机）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -127,6 +151,9 @@ const JUNIOR_POEMS = [
     notes: '己亥：道光十九年。浩荡：广阔无边。吟鞭：诗人的马鞭。落红：落花。化作春泥：化成泥土，继续护花。',
     theme: '辞官离京，以落花自比，表达虽离开官场仍心系国家、奉献余热的情怀。',
     exam: '千古名句：落红不是无情物，化作春泥更护花。（比喻甘愿奉献、无私奉献的精神）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   // ── 8年级上册 ──────────────────────────────
   {
@@ -388,6 +415,9 @@ const JUNIOR_PROSE = [
     notes: '说（yuè）：同“悦”，高兴。愠：生气、恼怒。三省：多次反省自己。逾矩：越过规矩。罔：迷惑。殆：疑惑。箪：盛饭的竹器。肱：手臂。逝者：流逝的时光。笃志：坚定志向。',
     theme: '孔子及其弟子关于学习、道德修养的言论，是儒家思想的精华。',
     exam: '必背名句：温故而知新；学而不思则罔，思而不学则殆；三人行，必有我师焉；逝者如斯夫，不舍昼夜。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -397,6 +427,9 @@ const JUNIOR_PROSE = [
     notes: '淡泊：内心恬淡，不追名逐利。宁静：排除杂念，专心学习。淫慢：放纵懈怠。励精：振奋精神。险躁：轻薄浮躁。治性：修养性情。',
     theme: '诸葛亮告诫儿子要以静修身、以俭养德，珍惜时间、勤学励志。',
     exam: '千古名句：非淡泊无以明志，非宁静无以致远。（对偶句，强调修身立志的重要性）',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -406,6 +439,9 @@ const JUNIOR_PROSE = [
     notes: '内集：把家里人聚在一起。儿女：子侄辈。俄而：不久。骤：急。欣然：高兴的样子。差可拟：大体可以相比。',
     theme: '谢家子女以比喻描述雪花，展示了古代才女谢道韫的聪慧才情。',
     exam: '"未若柳絮因风起"被认为更胜一筹，柳絮轻盈飘逸更能传达雪花神韵。谢道韫也因此被称为"咏絮才"。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   {
     grade: 7, semester: '上',
@@ -415,6 +451,9 @@ const JUNIOR_PROSE = [
     notes: '期：约定。日中：正午。舍去：丢下他离开。尊君：对别人父亲的尊称。家君：对自己父亲的谦称。委：舍弃。引：拉。顾：回头看。',
     theme: '元方据理批评友人失信失礼，体现儿童聪慧和做人要讲信义礼仪的道理。',
     exam: '元方反驳友人的核心：无信（失约）、无礼（骂人父亲）。"入门不顾"表达元方对失礼者的鄙视。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级上册教材核对',
   },
   // ── 7年级下册 ──────────────────────────────
   {
@@ -426,6 +465,9 @@ const JUNIOR_PROSE = [
     notes: '当涂：当道，当权。辞：推托。治经：研究儒家经典。涉猎：粗略地阅读。见往事：了解历史。才略：才干和谋略。吴下阿蒙：过去学识浅陋的吕蒙。刮目相待：另眼相看。',
     theme: '说明学习能够增长才干，也表现吕蒙善于接受劝告、不断进步。',
     exam: '常考：吕蒙前后变化说明了什么；“刮目相待”的含义；孙权是怎样劝学的。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -441,6 +483,9 @@ const JUNIOR_PROSE = [
     notes: '机杼：织布机和梭子。戎机：战争。朔气：北方的寒气。金柝：打更用的器具。策勋：记功。强：有余。扶将：扶持。',
     theme: '歌颂木兰代父从军、英勇善战又不慕功名的优秀品质。',
     exam: '常考：木兰的人物形象；“万里赴戎机，关山度若飞”的表达效果；结尾比喻的作用。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -452,6 +497,9 @@ const JUNIOR_PROSE = [
     notes: '善射：擅长射箭。自矜：自夸。释担：放下担子。睨：斜着眼看。颔：点头。酌油：倒油。沥之：注入其中。惟：只是。熟：熟练。',
     theme: '说明熟能生巧，也启发人不能因为一技之长而骄傲自满。',
     exam: '常考：卖油翁“但微颔之”的原因；“惟手熟尔”说明了什么道理。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -464,6 +512,9 @@ const JUNIOR_PROSE = [
     notes: '铭：古代刻在器物上警戒自己或称述功德的文字。馨：香气远播，这里指品德高尚。鸿儒：博学的人。白丁：平民。案牍：官府文书。',
     theme: '表达作者安贫乐道、洁身自好的情怀。',
     exam: '常考：“惟吾德馨”的作用；作者借“陋室”表达了怎样的志趣。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -476,6 +527,9 @@ const JUNIOR_PROSE = [
     notes: '蕃：多。染：沾染。濯：洗。妖：艳丽而不庄重。蔓：生枝蔓。亵玩：亲近而不庄重地玩弄。',
     theme: '借莲花赞美君子的高洁品质，也表达作者洁身自好的态度。',
     exam: '常考：莲花有哪些君子品质；“可远观而不可亵玩焉”的含义。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
@@ -492,6 +546,9 @@ const JUNIOR_PROSE = [
     notes: '河干：河边。圮：倒塌。木杮：木片。暴涨：洪水。物理：事物的道理。沿河：顺着河流。颠：荒唐。',
     theme: '说明遇事不能只凭主观猜想，要根据实际情况分析判断。',
     exam: '常考：老河兵为什么判断正确；本文说明了什么道理。',
+    sourceType: 'platform-draft',
+    sourceName: '平台整理稿',
+    sourceStatus: '待按统编语文七年级下册教材核对',
   },
   {
     grade: 7, semester: '下',
