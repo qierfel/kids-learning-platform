@@ -71,9 +71,14 @@ export default function Notebook({ user }) {
   const [isListening, setIsListening] = useState(false)
   const [ttsEnabled, setTtsEnabled]   = useState(false)
   const [threadId, setThreadId]       = useState(null)
+  const [threadCreatedAt, setThreadCreatedAt] = useState(null)
   const [showHistory, setShowHistory] = useState(false)
   const [historyList, setHistoryList] = useState([])
   const [historyLoading, setHistoryLoading] = useState(false)
+
+  // 导出
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const [toastText, setToastText] = useState('')
 
   // 图片状态
   const [pendingImage, setPendingImage] = useState(null) // { base64, dataUrl, mediaType }
@@ -215,8 +220,109 @@ export default function Notebook({ user }) {
   }
 
   function newChat() {
-    setMessages([]); setStreamingText(''); setThreadId(null)
+    setMessages([]); setStreamingText(''); setThreadId(null); setThreadCreatedAt(null)
     setInputText(''); setIsStreaming(false); setPendingImage(null)
+    setShowExportMenu(false)
+  }
+
+  // ── 导出聊天记录 ───────────────────────────────────────────────────────────
+  function pad2(n) { return String(n).padStart(2, '0') }
+  function fmtDateTime(ts) {
+    if (!ts) return ''
+    const d = new Date(ts)
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`
+  }
+  function fmtDateShort(ts) {
+    const d = ts ? new Date(ts) : new Date()
+    return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`
+  }
+  function slugifyTitle(s) {
+    return (s || '问题讨论')
+      .replace(/\s+/g, ' ')
+      .replace(/[\\/:*?"<>|]+/g, '')
+      .trim()
+      .slice(0, 24) || '问题讨论'
+  }
+  function deriveTitle() {
+    const firstUser = messages.find(m => m.role === 'user' && (m.content || '').trim())
+    return slugifyTitle(firstUser?.content || '问题讨论')
+  }
+  function buildExportData() {
+    const title = deriveTitle()
+    const created = threadCreatedAt || messages[0]?.time || Date.now()
+    const teacherName = teacher.name
+    const lines = []
+    lines.push(`# ${title}`)
+    lines.push('')
+    lines.push(`**学科**：${subject}  `)
+    lines.push(`**老师**：${teacherName}  `)
+    lines.push(`**创建时间**：${fmtDateTime(created)}  `)
+    lines.push(`**消息数**：${messages.length}`)
+    lines.push('')
+    lines.push('---')
+    lines.push('')
+    for (const m of messages) {
+      const isUser = m.role === 'user'
+      const who = isUser
+        ? `🧒 我${m.userName ? `（${m.userName}）` : ''}`
+        : `🤖 ${teacherName}`
+      lines.push(`## ${who}（${fmtDateTime(m.time || created)}）`)
+      lines.push('')
+      if (m.image?.dataUrl) lines.push('*[图片：题目截图]*', '')
+      if (m.content) { lines.push(m.content); lines.push('') }
+    }
+    return { markdown: lines.join('\n'), title, created }
+  }
+  function showToast(text) {
+    setToastText(text)
+    setTimeout(() => setToastText(''), 2200)
+  }
+  function handleExportMarkdown() {
+    setShowExportMenu(false)
+    if (!messages.length) return
+    const { markdown, title, created } = buildExportData()
+    const filename = `${subject || '不限科目'}_${title}_${fmtDateShort(created)}.md`
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 1500)
+    showToast(`已导出 ${messages.length} 条消息`)
+  }
+  function handleExportPDF() {
+    setShowExportMenu(false)
+    if (!messages.length) return
+    // 让打印视图先渲染（@media print 控制可见），再触发系统打印对话框
+    setTimeout(() => { try { window.print() } catch {} }, 60)
+  }
+  async function handleCopyMarkdown() {
+    setShowExportMenu(false)
+    if (!messages.length) return
+    const { markdown } = buildExportData()
+    let ok = false
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(markdown)
+        ok = true
+      }
+    } catch { /* fallback below */ }
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = markdown
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+      } catch { /* ignore */ }
+    }
+    showToast(ok ? `已复制 ${messages.length} 条消息` : '复制失败，请改用 Markdown 导出')
   }
 
   async function loadHistory() {
@@ -235,9 +341,11 @@ export default function Notebook({ user }) {
 
   function loadThread(thread) {
     setMessages(thread.messages || []); setThreadId(thread.id)
+    setThreadCreatedAt(thread.createdAt || null)
     setSubject(thread.subject || '不限科目'); setShowHistory(false)
     setTeacherRole(thread.teacherRole || 'academic')
     setStreamingText(''); setPendingImage(null)
+    setShowExportMenu(false)
     updateReadMark(user?.uid, thread.id)
   }
 
@@ -309,6 +417,45 @@ export default function Notebook({ user }) {
           >
             {ttsEnabled ? '🔊' : '🔇'}
           </button>
+          {messages.length > 0 && (
+            <div className="export-wrap">
+              <button
+                className={`topbar-icon-btn export-btn ${showExportMenu ? 'active' : ''}`}
+                onClick={() => setShowExportMenu(v => !v)}
+                title="导出聊天记录"
+              >
+                📥
+              </button>
+              {showExportMenu && (
+                <>
+                  <div className="export-backdrop" onClick={() => setShowExportMenu(false)} />
+                  <div className="export-menu" role="menu">
+                    <button className="export-menu-item" onClick={handleExportMarkdown}>
+                      <span className="export-menu-icon">📄</span>
+                      <span className="export-menu-text">
+                        <span className="export-menu-title">导出为 Markdown</span>
+                        <span className="export-menu-sub">推荐 · 适合复习/分享</span>
+                      </span>
+                    </button>
+                    <button className="export-menu-item" onClick={handleExportPDF}>
+                      <span className="export-menu-icon">🖨</span>
+                      <span className="export-menu-text">
+                        <span className="export-menu-title">导出为 PDF</span>
+                        <span className="export-menu-sub">打印或保存为 PDF</span>
+                      </span>
+                    </button>
+                    <button className="export-menu-item" onClick={handleCopyMarkdown}>
+                      <span className="export-menu-icon">📋</span>
+                      <span className="export-menu-text">
+                        <span className="export-menu-title">复制全部到剪贴板</span>
+                        <span className="export-menu-sub">一键 copy 纯文本</span>
+                      </span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           <button className="topbar-icon-btn" onClick={loadHistory} title="历史记录">📋</button>
           <button className="topbar-icon-btn" onClick={newChat} title="新对话">✏️</button>
         </div>
@@ -449,6 +596,42 @@ export default function Notebook({ user }) {
           发送
         </button>
       </div>
+
+      {/* 打印导出（仅在 @media print 下可见） */}
+      {messages.length > 0 && (() => {
+        const title = deriveTitle()
+        const created = threadCreatedAt || messages[0]?.time || Date.now()
+        return (
+          <div className="print-export" aria-hidden="true">
+            <h1 className="print-title">{title}</h1>
+            <div className="print-meta">
+              <div><strong>学科</strong>：{subject}</div>
+              <div><strong>老师</strong>：{teacher.name}</div>
+              <div><strong>创建时间</strong>：{fmtDateTime(created)}</div>
+              <div><strong>消息数</strong>：{messages.length}</div>
+            </div>
+            <hr className="print-hr" />
+            {messages.map((m, i) => {
+              const isUser = m.role === 'user'
+              const who = isUser
+                ? `🧒 我${m.userName ? `（${m.userName}）` : ''}`
+                : `🤖 ${teacher.name}`
+              return (
+                <section key={i} className={`print-msg ${isUser ? 'print-msg-user' : 'print-msg-ai'}`}>
+                  <h2 className="print-who">{who}<span className="print-when">（{fmtDateTime(m.time || created)}）</span></h2>
+                  {m.image?.dataUrl && (
+                    <img src={m.image.dataUrl} alt="题目图片" className="print-img" />
+                  )}
+                  {m.content && <div className="print-content">{m.content}</div>}
+                </section>
+              )
+            })}
+          </div>
+        )
+      })()}
+
+      {/* 复制成功 / 导出反馈 */}
+      {toastText && <div className="export-toast">{toastText}</div>}
     </div>
   )
 }
