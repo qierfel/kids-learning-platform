@@ -216,6 +216,22 @@
   white-space: pre-wrap;
 }
 
+.poem-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poem-detail-item {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+  padding: 10px 12px;
+  background: #fffaf0;
+  border: 1px solid #f5ead7;
+  border-radius: 10px;
+}
+
 .poem-source-section {
   border-top-style: solid;
 }

@@ -59,6 +59,32 @@
 }
 .poem-detail-text { font-size: 14px; color: #555; line-height: 1.7; margin: 0; }
 
+.poem-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poem-detail-item {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #475569;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.exam-detail-list {
+  margin-top: 10px;
+}
+
+.exam-detail-item {
+  background: #fffaf0;
+  border-color: #f5e7c2;
+  color: #5b4636;
+}
+
 .poem-source-section {
   margin-top: 14px;
 }

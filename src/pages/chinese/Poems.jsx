@@ -6,6 +6,18 @@ import './Poems.css'
 const GRADES = [1, 2, 3, 4, 5, 6]
 const BASE_URL = '/kids-learning-platform/audio/poems/'
 
+function splitDetailText(text) {
+  if (!text) return []
+  const normalized = text
+    .replace(/常考：/g, '')
+    .replace(/[；;]/g, '。')
+    .replace(/([0-9]+)\.\s*/g, '')
+  return normalized
+    .split('。')
+    .map(part => part.trim())
+    .filter(Boolean)
+}
+
 function getSourceMeta(item) {
   if (item.sourceType || item.sourceName || item.sourceStatus) {
     return {
@@ -92,6 +104,8 @@ function PoemDetail({ poem, onBack }) {
   const audioFile = audioManifest[poem.title]
   const audioUrl = audioFile ? `${BASE_URL}${audioFile}` : null
   const sourceMeta = getSourceMeta(poem)
+  const noteLines = splitDetailText(poem.notes)
+  const examLines = splitDetailText(poem.exam)
 
   function togglePlay() {
     if (!audioRef.current) return
@@ -153,7 +167,11 @@ function PoemDetail({ poem, onBack }) {
           {poem.notes && (
             <div className="poem-detail-section">
               <div className="poem-detail-label">注释</div>
-              <p className="poem-detail-text">{poem.notes}</p>
+              <div className="poem-detail-list">
+                {noteLines.map((line, index) => (
+                  <div key={index} className="poem-detail-item">{line}</div>
+                ))}
+              </div>
             </div>
           )}
           {poem.theme && (
@@ -165,7 +183,11 @@ function PoemDetail({ poem, onBack }) {
           {poem.exam && (
             <div className="poem-detail-section">
               <div className="poem-detail-label">常见考点</div>
-              <p className="poem-detail-text">{poem.exam}</p>
+              <div className="poem-detail-list">
+                {examLines.map((line, index) => (
+                  <div key={index} className="poem-detail-item">{line}</div>
+                ))}
+              </div>
             </div>
           )}
           {sourceMeta && (

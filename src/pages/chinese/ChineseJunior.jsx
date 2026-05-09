@@ -2,6 +2,18 @@ import { useState } from 'react'
 import '../JuniorSubject.css'
 import './ChineseJunior.css'
 
+function splitDetailText(text) {
+  if (!text) return []
+  const normalized = text
+    .replace(/常考：/g, '')
+    .replace(/[；;]/g, '。')
+    .replace(/([0-9]+)\.\s*/g, '')
+  return normalized
+    .split('。')
+    .map(part => part.trim())
+    .filter(Boolean)
+}
+
 function getSourceMeta(item) {
   if (item.sourceType || item.sourceName || item.sourceStatus) {
     return {
@@ -643,6 +655,8 @@ export default function ChineseJunior({ section }) {
     // ── 诗词详情 ─────────────────────────────────
     if (selectedPoem) {
       const sourceMeta = getSourceMeta(selectedPoem)
+      const noteLines = splitDetailText(selectedPoem.notes)
+      const examLines = splitDetailText(selectedPoem.exam)
       return (
         <div className="junior-subject">
           <button className="junior-back" onClick={() => setSelectedPoem(null)}>← 返回列表</button>
@@ -657,7 +671,11 @@ export default function ChineseJunior({ section }) {
             {selectedPoem.notes && (
               <div className="poem-detail-section">
                 <div className="poem-detail-label">注释</div>
-                <p className="poem-detail-text">{selectedPoem.notes}</p>
+                <div className="poem-detail-list">
+                  {noteLines.map((line, index) => (
+                    <div key={index} className="poem-detail-item">{line}</div>
+                  ))}
+                </div>
               </div>
             )}
             <div className="poem-detail-section">
@@ -666,7 +684,11 @@ export default function ChineseJunior({ section }) {
             </div>
             <div className="exam-tip" style={{ marginTop: 12 }}>
               <span className="exam-label">中考考点</span>
-              {selectedPoem.exam}
+              <div className="poem-detail-list exam-detail-list">
+                {examLines.map((line, index) => (
+                  <div key={index} className="poem-detail-item exam-detail-item">{line}</div>
+                ))}
+              </div>
             </div>
             {sourceMeta && (
               <div className="poem-detail-section poem-source-section">
@@ -688,6 +710,8 @@ export default function ChineseJunior({ section }) {
     // ── 文言文详情 ───────────────────────────────
     if (selectedProse) {
       const sourceMeta = getSourceMeta(selectedProse)
+      const noteLines = splitDetailText(selectedProse.notes)
+      const examLines = splitDetailText(selectedProse.exam)
       return (
         <div className="junior-subject">
           <button className="junior-back" onClick={() => setSelectedProse(null)}>← 返回列表</button>
@@ -702,7 +726,11 @@ export default function ChineseJunior({ section }) {
             {selectedProse.notes && (
               <div className="poem-detail-section">
                 <div className="poem-detail-label">重点词注释</div>
-                <p className="poem-detail-text">{selectedProse.notes}</p>
+                <div className="poem-detail-list">
+                  {noteLines.map((line, index) => (
+                    <div key={index} className="poem-detail-item">{line}</div>
+                  ))}
+                </div>
               </div>
             )}
             <div className="poem-detail-section">
@@ -711,7 +739,11 @@ export default function ChineseJunior({ section }) {
             </div>
             <div className="exam-tip" style={{ marginTop: 12 }}>
               <span className="exam-label">中考考点</span>
-              {selectedProse.exam}
+              <div className="poem-detail-list exam-detail-list">
+                {examLines.map((line, index) => (
+                  <div key={index} className="poem-detail-item exam-detail-item">{line}</div>
+                ))}
+              </div>
             </div>
             {sourceMeta && (
               <div className="poem-detail-section poem-source-section">
