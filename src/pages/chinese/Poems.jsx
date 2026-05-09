@@ -6,6 +6,26 @@ import './Poems.css'
 const GRADES = [1, 2, 3, 4, 5, 6]
 const BASE_URL = '/kids-learning-platform/audio/poems/'
 
+function getSourceMeta(item) {
+  if (item.sourceType || item.sourceName || item.sourceStatus) {
+    return {
+      type: item.sourceType || 'platform-draft',
+      name: item.sourceName || '平台整理稿',
+      status: item.sourceStatus || '待按教材核对'
+    }
+  }
+
+  if (item.notes || item.theme || item.exam) {
+    return {
+      type: 'platform-draft',
+      name: '平台整理稿',
+      status: '待按教材核对'
+    }
+  }
+
+  return null
+}
+
 export default function Poems() {
   const [grade, setGrade] = useState('all')
   const [selected, setSelected] = useState(null)
@@ -71,6 +91,7 @@ function PoemDetail({ poem, onBack }) {
 
   const audioFile = audioManifest[poem.title]
   const audioUrl = audioFile ? `${BASE_URL}${audioFile}` : null
+  const sourceMeta = getSourceMeta(poem)
 
   function togglePlay() {
     if (!audioRef.current) return
@@ -145,6 +166,18 @@ function PoemDetail({ poem, onBack }) {
             <div className="poem-detail-section">
               <div className="poem-detail-label">常见考点</div>
               <p className="poem-detail-text">{poem.exam}</p>
+            </div>
+          )}
+          {sourceMeta && (
+            <div className="poem-detail-section poem-source-section">
+              <div className="poem-detail-label">注释来源状态</div>
+              <div className="poem-source-card">
+                <span className={`poem-source-badge ${sourceMeta.type}`}>{sourceMeta.type}</span>
+                <div className="poem-source-lines">
+                  <div className="poem-source-line"><strong>来源：</strong>{sourceMeta.name}</div>
+                  <div className="poem-source-line"><strong>状态：</strong>{sourceMeta.status}</div>
+                </div>
+              </div>
             </div>
           )}
         </div>

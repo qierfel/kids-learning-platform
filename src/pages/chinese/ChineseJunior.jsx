@@ -2,6 +2,26 @@ import { useState } from 'react'
 import '../JuniorSubject.css'
 import './ChineseJunior.css'
 
+function getSourceMeta(item) {
+  if (item.sourceType || item.sourceName || item.sourceStatus) {
+    return {
+      type: item.sourceType || 'platform-draft',
+      name: item.sourceName || '平台整理稿',
+      status: item.sourceStatus || '待按教材核对'
+    }
+  }
+
+  if (item.notes || item.theme || item.exam) {
+    return {
+      type: 'platform-draft',
+      name: '平台整理稿',
+      status: '待按教材核对'
+    }
+  }
+
+  return null
+}
+
 // ── 初中必背古诗词（人教版 7-9年级，完整版）
 const JUNIOR_POEMS = [
   // ── 7年级上册 ──────────────────────────────
@@ -622,6 +642,7 @@ export default function ChineseJunior({ section }) {
   if (section === 'junior_poems') {
     // ── 诗词详情 ─────────────────────────────────
     if (selectedPoem) {
+      const sourceMeta = getSourceMeta(selectedPoem)
       return (
         <div className="junior-subject">
           <button className="junior-back" onClick={() => setSelectedPoem(null)}>← 返回列表</button>
@@ -647,6 +668,18 @@ export default function ChineseJunior({ section }) {
               <span className="exam-label">中考考点</span>
               {selectedPoem.exam}
             </div>
+            {sourceMeta && (
+              <div className="poem-detail-section poem-source-section">
+                <div className="poem-detail-label">注释来源状态</div>
+                <div className="poem-source-card">
+                  <span className={`poem-source-badge ${sourceMeta.type}`}>{sourceMeta.type}</span>
+                  <div className="poem-source-lines">
+                    <div className="poem-source-line"><strong>来源：</strong>{sourceMeta.name}</div>
+                    <div className="poem-source-line"><strong>状态：</strong>{sourceMeta.status}</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )
@@ -654,6 +687,7 @@ export default function ChineseJunior({ section }) {
 
     // ── 文言文详情 ───────────────────────────────
     if (selectedProse) {
+      const sourceMeta = getSourceMeta(selectedProse)
       return (
         <div className="junior-subject">
           <button className="junior-back" onClick={() => setSelectedProse(null)}>← 返回列表</button>
@@ -679,6 +713,18 @@ export default function ChineseJunior({ section }) {
               <span className="exam-label">中考考点</span>
               {selectedProse.exam}
             </div>
+            {sourceMeta && (
+              <div className="poem-detail-section poem-source-section">
+                <div className="poem-detail-label">注释来源状态</div>
+                <div className="poem-source-card">
+                  <span className={`poem-source-badge ${sourceMeta.type}`}>{sourceMeta.type}</span>
+                  <div className="poem-source-lines">
+                    <div className="poem-source-line"><strong>来源：</strong>{sourceMeta.name}</div>
+                    <div className="poem-source-line"><strong>状态：</strong>{sourceMeta.status}</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )
