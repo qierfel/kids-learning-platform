@@ -83,6 +83,11 @@ export default function Poems() {
         ) : (
           filtered.map((poem, i) => (
             <div key={i} className="poem-card" onClick={() => setSelected(poem)}>
+              {getSourceMeta(poem) && (
+                <span className={`poem-card-source-badge ${getSourceMeta(poem).type}`}>
+                  {getSourceMeta(poem).type === 'textbook' ? '教材版' : getSourceMeta(poem).type === 'platform-draft' ? '整理稿' : '已标源'}
+                </span>
+              )}
               <div className="poem-card-title">{poem.title}</div>
               <div className="poem-card-meta">{poem.dynasty} · {poem.author}</div>
               <div className="poem-card-preview">{poem.lines[0]}</div>

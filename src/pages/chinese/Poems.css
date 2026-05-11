@@ -48,11 +48,42 @@
 
 .poem-card:active { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
 
+.poem-card-source-badge {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.poem-card-source-badge.platform-draft {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.poem-card-source-badge.textbook {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.poem-card-source-badge.official-support {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.poem-card-source-badge.reference {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
 .poem-card-title {
   font-size: 16px;
   font-weight: 700;
   color: #1a1a2e;
-  margin-bottom: 4px;
+  margin: 18px 0 4px;
 }
 
 .poem-card-meta {

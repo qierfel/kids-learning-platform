@@ -27,6 +27,28 @@
 .poem-list-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
 .poem-list-meta { font-size: 13px; color: #888; margin-top: 2px; }
 .poem-list-right { display: flex; align-items: center; gap: 8px; }
+.poem-source-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.poem-source-pill.platform-draft {
+  background: #fff1f2;
+  color: #be123c;
+}
+.poem-source-pill.textbook {
+  background: #ecfdf5;
+  color: #047857;
+}
+.poem-source-pill.official-support {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.poem-source-pill.reference {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
 .poem-grade-badge {
   font-size: 12px; background: #f0f0ff; color: #7c3aed;
   padding: 2px 8px; border-radius: 10px; font-weight: 500;

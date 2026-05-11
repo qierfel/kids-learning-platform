@@ -872,6 +872,11 @@ export default function ChineseJunior({ section }) {
                   <div className="poem-list-meta">{p.dynasty} · {p.author}</div>
                 </div>
                 <div className="poem-list-right">
+                  {getSourceMeta(p) && (
+                    <span className={`poem-source-pill ${getSourceMeta(p).type}`}>
+                      {getSourceMeta(p).type === 'textbook' ? '教材版' : getSourceMeta(p).type === 'platform-draft' ? '整理稿' : '已标源'}
+                    </span>
+                  )}
                   <span className="poem-grade-badge">{p.grade}年级{p.semester}册</span>
                   <span className="poem-list-arrow">›</span>
                 </div>
@@ -890,6 +895,11 @@ export default function ChineseJunior({ section }) {
                   <div className="poem-list-meta">{p.dynasty} · {p.author}</div>
                 </div>
                 <div className="poem-list-right">
+                  {getSourceMeta(p) && (
+                    <span className={`poem-source-pill ${getSourceMeta(p).type}`}>
+                      {getSourceMeta(p).type === 'textbook' ? '教材版' : getSourceMeta(p).type === 'platform-draft' ? '整理稿' : '已标源'}
+                    </span>
+                  )}
                   <span className="poem-grade-badge">{p.grade}年级{p.semester}册</span>
                   <span className="poem-list-arrow">›</span>
                 </div>
