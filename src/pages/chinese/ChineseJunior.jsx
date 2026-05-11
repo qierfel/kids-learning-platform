@@ -833,6 +833,12 @@ export default function ChineseJunior({ section }) {
           初中必背古诗文 <span className="edition">人教版 7-9年级</span>
         </h2>
 
+        <div className="poem-source-legend">
+          <span className="poem-legend-title">来源说明</span>
+          <span className="poem-legend-item textbook">教材版：已按教材核对</span>
+          <span className="poem-legend-item draft">整理稿：当前为平台整理稿，后续继续按教材终校</span>
+        </div>
+
         {/* 诗词 / 文言文 切换 */}
         <div className="poem-type-tabs">
           <button

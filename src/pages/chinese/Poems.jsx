@@ -57,6 +57,12 @@ export default function Poems() {
     <div className="poems">
       <h2 className="page-title">古诗词</h2>
 
+      <div className="poem-source-legend">
+        <span className="poem-legend-title">来源说明</span>
+        <span className="poem-legend-item textbook">教材版：已按教材核对</span>
+        <span className="poem-legend-item draft">整理稿：当前为平台整理稿，后续继续按教材终校</span>
+      </div>
+
       <div className="poem-search-row">
         <input
           className="poem-search-input"

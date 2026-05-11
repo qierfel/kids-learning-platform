@@ -55,6 +55,41 @@
 }
 .poem-list-arrow { font-size: 20px; color: #ccc; }
 
+.poem-source-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #faf7ff;
+  border: 1px solid #e9ddff;
+}
+
+.poem-legend-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6d28d9;
+}
+
+.poem-legend-item {
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.poem-legend-item.textbook {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.poem-legend-item.draft {
+  background: #fff1f2;
+  color: #be123c;
+}
+
 /* 诗词详情 */
 .poem-detail-card {
   background: #fff; border-radius: 16px; border: 1.5px solid #e8edf2; padding: 20px;
