@@ -818,10 +818,11 @@ const poems = [
     sourceStatus: "待按统编语文对应册次教材核对"
   },
   {
-    title: "凉州词·葡萄",
+    title: "凉州词",
     author: "王翰",
     dynasty: "唐",
     grade: 4,
+    semester: "上",
     lines: [
       "葡萄美酒夜光杯，",
       "欲饮琵琶马上催。",
@@ -833,7 +834,7 @@ const poems = [
     exam: "常考：1. 前两句渲染了什么气氛；2. 全诗体现了怎样的边塞情怀。",
     sourceType: "platform-draft",
     sourceName: "平台整理稿",
-    sourceStatus: "待按统编语文对应册次教材核对"
+    sourceStatus: "待按统编语文四年级上册教材核对"
   },
   {
     title: "别董大",
