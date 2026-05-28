@@ -223,6 +223,44 @@
   margin-bottom: 14px;
 }
 
+.ket-resource-panel,
+.ket-part-block {
+  border-radius: 18px;
+  border: 1px solid rgba(158, 184, 227, 0.14);
+  background: rgba(8, 18, 34, 0.52);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.ket-resource-title {
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.ket-resource-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+.ket-resource-list a {
+  color: #bedeff;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid rgba(158, 184, 227, 0.16);
+  background: rgba(13, 32, 61, 0.66);
+  border-radius: 999px;
+  padding: 9px 12px;
+}
+
+.ket-note-list {
+  margin: 12px 0 0 18px;
+  color: #d8e4f8;
+  line-height: 1.75;
+}
+
 .ket-audio-label,
 .ket-question-meta,
 .ket-section-label {
@@ -249,6 +287,10 @@
 .ket-options {
   display: grid;
   gap: 10px;
+}
+
+.ket-options--compact {
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
 }
 
 .ket-option {
@@ -278,6 +320,21 @@
   font: inherit;
   resize: vertical;
   box-sizing: border-box;
+}
+
+.ket-writing-textarea--compact {
+  min-height: 120px;
+}
+
+.ket-short-input {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 1px solid rgba(158, 184, 227, 0.16);
+  background: rgba(7, 16, 31, 0.8);
+  color: #f7fbff;
+  padding: 12px 14px;
+  font: inherit;
 }
 
 .ket-followups {
