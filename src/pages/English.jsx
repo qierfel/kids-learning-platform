@@ -9,6 +9,7 @@ import Dictionary from './english/Dictionary'
 import HumanHistory from './english/HumanHistory'
 import Phonics from './english/Phonics'
 import ReadingHub from './english/ReadingHub'
+import KetExamHub from './english/KetExamHub'
 import TextbookVocab from './english/TextbookVocab'
 import './English.css'
 
@@ -16,6 +17,7 @@ const CARDS = [
   { id: 'listening',      img: '/icons/generated/english/listening.png',       label: '听力练习',      desc: '听故事',   ready: true  },
   { id: 'history',        img: '/icons/generated/english/history.png',         label: '人类大历史',    desc: '双语学习', ready: true  },
   { id: 'phonics',        img: '/icons/generated/english/phonics.png',         label: '自然拼读',      desc: '发音规则', ready: true  },
+  { id: 'ket_exam',       img: '/icons/generated/english/reading-hub.png',     label: 'KET模拟考试',  desc: '整套模考', ready: true  },
   { id: 'speaking',       img: '/icons/generated/english/speaking.png',        label: '口语对话',      desc: '开口练习', ready: true  },
   { id: 'reading_hub',    img: '/icons/generated/english/reading-hub.png',     label: '阅读中心',      desc: '分级阅读', ready: true  },
   { id: 'writing',        img: '/icons/generated/english/writing.png',         label: '写作练习',      desc: '写句写文', ready: true  },
@@ -44,6 +46,7 @@ export default function English({ user }) {
   if (activeTool === 'reading_hub')    return <ReadingHub user={user} onBack={() => setActiveTool(null)} />
   if (activeTool === 'history')        return <HumanHistory onBack={() => setActiveTool(null)} />
   if (activeTool === 'phonics')        return <Phonics onBack={() => setActiveTool(null)} />
+  if (activeTool === 'ket_exam')       return <KetExamHub user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />
   if (activeTool === 'listening')      return <Listening onBack={() => setActiveTool(null)} />
   if (activeTool === 'speaking')       return <Speaking user={user} onBack={() => setActiveTool(null)} />
   if (activeTool === 'writing')        return <Writing user={user} onBack={() => setActiveTool(null)} onAddMistake={handleAddMistake} />

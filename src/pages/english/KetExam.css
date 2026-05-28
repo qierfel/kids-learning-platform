@@ -1,0 +1,349 @@
+.ket-page {
+  padding: 18px 16px 84px;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(64, 112, 255, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(77, 212, 185, 0.12), transparent 26%),
+    linear-gradient(180deg, #071120 0%, #0d1830 100%);
+  color: #f4f8ff;
+}
+
+.ket-back-btn {
+  border: 1px solid rgba(162, 184, 226, 0.22);
+  background: rgba(17, 28, 51, 0.72);
+  color: #dbe7ff;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.ket-hero,
+.ket-result-card,
+.ket-paper-card,
+.ket-overview-card,
+.ket-card,
+.ket-shell {
+  border: 1px solid rgba(158, 184, 227, 0.16);
+  background: linear-gradient(145deg, rgba(10, 23, 43, 0.94), rgba(15, 31, 61, 0.88));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.ket-hero {
+  padding: 24px 22px;
+  border-radius: 28px;
+  margin-bottom: 16px;
+}
+
+.ket-hero-badge,
+.ket-result-badge {
+  width: fit-content;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(88, 135, 255, 0.18);
+  color: #aecdff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.ket-hero-title,
+.ket-result-title {
+  margin: 0 0 8px;
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.ket-hero-sub,
+.ket-result-note,
+.ket-section-subtitle {
+  color: #b6c7e6;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.ket-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ket-overview-card {
+  padding: 16px;
+  border-radius: 22px;
+}
+
+.ket-overview-card--accent {
+  background: linear-gradient(135deg, rgba(50, 101, 212, 0.92), rgba(57, 154, 193, 0.9));
+}
+
+.ket-overview-label {
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.74;
+  letter-spacing: 0.05em;
+}
+
+.ket-overview-value {
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 900;
+}
+
+.ket-section-head {
+  margin-bottom: 14px;
+}
+
+.ket-section-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 6px;
+}
+
+.ket-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ket-card {
+  border-radius: 22px;
+  padding: 18px;
+  text-align: left;
+  color: #f4f8ff;
+  cursor: pointer;
+}
+
+.ket-card--coming {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ket-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ket-card-title {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.ket-card-status {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  color: #d7e6ff;
+}
+
+.ket-card-desc {
+  color: #b6c7e6;
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+.ket-shell {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.ket-timer-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(158, 184, 227, 0.12);
+  background: linear-gradient(90deg, rgba(44, 93, 215, 0.24), rgba(21, 40, 80, 0.2));
+}
+
+.ket-timer-bar--warning {
+  background: linear-gradient(90deg, rgba(214, 138, 33, 0.28), rgba(21, 40, 80, 0.22));
+}
+
+.ket-timer-bar--danger {
+  background: linear-gradient(90deg, rgba(208, 65, 65, 0.35), rgba(21, 40, 80, 0.24));
+}
+
+.ket-timer-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #b6c7e6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ket-timer-title {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.ket-timer-subtitle,
+.ket-timer-meta {
+  font-size: 12px;
+  color: #c6d5ef;
+}
+
+.ket-timer-right {
+  text-align: right;
+}
+
+.ket-timer-clock,
+.ket-result-score {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.ket-paper-card,
+.ket-result-card {
+  border-radius: 24px;
+  padding: 18px;
+  margin-top: 16px;
+}
+
+.ket-audio-box,
+.ket-question-card,
+.ket-writing-card {
+  border-radius: 18px;
+  border: 1px solid rgba(158, 184, 227, 0.14);
+  background: rgba(8, 18, 34, 0.52);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.ket-audio-label,
+.ket-question-meta,
+.ket-section-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #93b4ff;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.ket-question-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.ket-passage,
+.ket-audio-note {
+  color: #d8e4f8;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.ket-options {
+  display: grid;
+  gap: 10px;
+}
+
+.ket-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid rgba(158, 184, 227, 0.12);
+  background: rgba(11, 26, 48, 0.72);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.ket-option--active {
+  border-color: rgba(110, 173, 255, 0.78);
+  background: rgba(34, 68, 124, 0.56);
+}
+
+.ket-writing-textarea {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 16px;
+  border: 1px solid rgba(158, 184, 227, 0.16);
+  background: rgba(7, 16, 31, 0.8);
+  color: #f7fbff;
+  padding: 14px;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.ket-followups {
+  margin: 0 0 12px 18px;
+  padding: 0;
+  color: #d8e4f8;
+}
+
+.ket-speaking-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  color: #aecdff;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.ket-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 18px;
+  border-top: 1px solid rgba(158, 184, 227, 0.12);
+}
+
+.ket-primary-btn,
+.ket-secondary-btn {
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ket-primary-btn {
+  border: none;
+  background: linear-gradient(135deg, #4f7cff, #4ab3ff);
+  color: #fff;
+}
+
+.ket-primary-btn--small {
+  padding: 10px 14px;
+}
+
+.ket-secondary-btn {
+  border: 1px solid rgba(158, 184, 227, 0.18);
+  background: rgba(10, 23, 43, 0.8);
+  color: #dbe7ff;
+}
+
+@media (max-width: 900px) {
+  .ket-overview,
+  .ket-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ket-timer-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ket-timer-right {
+    text-align: left;
+  }
+
+  .ket-submit-row {
+    flex-direction: column;
+  }
+}
